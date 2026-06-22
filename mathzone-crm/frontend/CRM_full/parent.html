@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM — Ota-onalar portali</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <style>
+        :root { --modme-orange: #ff7a00; }
+        body { background: #f6f8fb; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .parent-header { background: linear-gradient(135deg, #1e1e2d 0%, #2d2d45 100%); color: #fff; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-size: 20px; font-weight: 800; }
+        .brand span { color: var(--modme-orange); }
+        .parent-tag { background: rgba(255,122,0,0.2); color: #ff9e40; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 700; }
+        .main { max-width: 860px; margin: 0 auto; padding: 24px 16px 40px; }
+        .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .stat-box { background: #fff; border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .stat-num { font-size: 28px; font-weight: 700; }
+        .stat-lbl { font-size: 12px; color: #99a1ad; margin-top: 4px; }
+        .card { background: #fff; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); border: none; margin-bottom: 18px; overflow: hidden; }
+        .card-head { padding: 14px 18px; border-bottom: 1px solid #f1f3f7; font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .card-body { padding: 16px 18px; }
+        .att-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .att-day { font-size: 12px; color: #99a1ad; min-width: 60px; }
+        .att-chip { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+        .att-was { background: #d3f3da; color: #1f7a30; }
+        .att-not { background: #fbdada; color: #b32626; }
+        .att-empty { background: #f1f3f7; color: #aaa; }
+        .pay-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f3f7; font-size: 13px; }
+        .pay-row:last-child { border-bottom: none; }
+        .login-box { max-width: 400px; margin: 60px auto; background: #fff; border-radius: 20px; padding: 36px; box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+        .login-box h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+        .login-box p { color: #99a1ad; font-size: 14px; margin-bottom: 24px; }
+        .form-control { border-radius: 10px; height: 44px; }
+        .btn-login { width:100%;height:46px;background:var(--modme-orange);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer; }
+    </style>
+</head>
+<body>
+
+<div class="parent-header">
+    <div>
+        <div class="brand">math<span>zone</span></div>
+        <div class="parent-tag mt-1"><i class="ti ti-heart me-1"></i>Ota-onalar portali</div>
+    </div>
+    <button class="btn btn-sm btn-ghost-secondary text-white" onclick="parentLogout()"><i class="ti ti-logout me-1"></i>Chiqish</button>
+</div>
+
+<!-- LOGIN PANEL (ko'rsatiladigan agar login qilinmagan bo'lsa) -->
+<div id="login-section" style="padding:0 16px;">
+    <div class="login-box">
+        <h2>Kirish</h2>
+        <p>Farzandingizning o'quv natijalarini kuzating</p>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Telefon raqamingiz</label>
+            <input type="text" id="parent-phone" class="form-control" placeholder="+998 90 123 45 67">
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Farzandingizning ID raqami</label>
+            <input type="text" id="parent-student-id" class="form-control" placeholder="Masalan: 1234">
+            <small class="text-muted">ID ni CRM adminidan so'rang</small>
+        </div>
+        <button class="btn-login" onclick="parentLogin()">Kirish</button>
+        <div id="parent-error" style="color:#d63939;font-size:13px;text-align:center;margin-top:10px;display:none;"></div>
+        <div class="mt-3 p-3 rounded-2" style="background:#f8fafc;font-size:12px;color:#626976;">
+            <strong>Demo kirish:</strong> istalgan telefon + talaba ID si (student.html dan ko'ring yoki birinchi talabani qo'shing)
+        </div>
+    </div>
+</div>
+
+<!-- PORTAL PANEL -->
+<div id="portal-section" style="display:none;">
+    <div class="main">
+        <!-- Talaba haqida ma'lumot -->
+        <div class="card">
+            <div class="card-head" style="background:linear-gradient(135deg,#fff8f3,#fff);"><i class="ti ti-backpack" style="color:var(--modme-orange);font-size:20px;"></i><span id="portal-student-name">Talaba</span><span class="ms-auto badge bg-orange-lt" id="portal-student-status"></span></div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6"><div class="text-muted small">Guruh</div><div class="fw-bold" id="portal-group">—</div></div>
+                    <div class="col-6"><div class="text-muted small">Qo'shilgan sana</div><div class="fw-bold" id="portal-start">—</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistika -->
+        <div class="stat-row">
+            <div class="stat-box">
+                <div class="stat-num" id="portal-balance" style="color:#2bab41;">0</div>
+                <div class="stat-lbl">Balans (UZS)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" id="portal-att-pct" style="color:#206bc4;">0%</div>
+                <div class="stat-lbl">Davomat</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" id="portal-att-total" style="color:#ff7a00;">0</div>
+                <div class="stat-lbl">Jami darslar</div>
+            </div>
+        </div>
+
+        <!-- Davomat -->
+        <div class="card">
+            <div class="card-head"><i class="ti ti-calendar-check" style="color:#2bab41;"></i>So'nggi davomat</div>
+            <div class="card-body" id="portal-attendance">
+                <div class="text-muted small text-center py-3">Davomat ma'lumoti yo'q</div>
+            </div>
+        </div>
+
+        <!-- To'lovlar tarixi -->
+        <div class="card">
+            <div class="card-head"><i class="ti ti-cash" style="color:#206bc4;"></i>To'lovlar tarixi</div>
+            <div class="card-body" id="portal-payments">
+                <div class="text-muted small text-center py-3">To'lovlar tarixi yo'q</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+<script>
+const MONTH_UZ = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentyabr','Oktyabr','Noyabr','Dekabr'];
+
+function parentLogin() {
+    const phone = document.getElementById('parent-phone').value.trim();
+    const sid   = document.getElementById('parent-student-id').value.trim();
+    const errEl = document.getElementById('parent-error');
+
+    if (!phone || !sid) { errEl.style.display='block'; errEl.innerText='Barcha maydonlarni to\'ldiring'; return; }
+
+    const students = JSON.parse(localStorage.getItem('students') || '[]');
+    const student = students.find(s => String(s.id) === String(sid));
+
+    if (!student) { errEl.style.display='block'; errEl.innerText='Talaba topilmadi. ID ni tekshiring.'; return; }
+
+    localStorage.setItem('parent_session', JSON.stringify({ studentId: sid, phone, loginTime: Date.now() }));
+    errEl.style.display = 'none';
+    showPortal(student);
+}
+
+function showPortal(student) {
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('portal-section').style.display = 'block';
+
+    document.getElementById('portal-student-name').innerText = student.name;
+    document.getElementById('portal-student-status').innerText = student.status || '';
+    document.getElementById('portal-group').innerText = student.group || '—';
+    document.getElementById('portal-start').innerText = student.startDate || '—';
+
+    const bal = Number(student.balance) || 0;
+    const balEl = document.getElementById('portal-balance');
+    balEl.innerText = bal.toLocaleString();
+    balEl.style.color = bal >= 0 ? '#2bab41' : '#d63939';
+
+    // Davomat
+    const att = JSON.parse(localStorage.getItem('attendance') || '{}');
+    const groupAtt = att[student.group] || {};
+    const studentAtt = groupAtt[student.id] || {};
+
+    const today = new Date();
+    let total = 0, was = 0;
+    const recent = [];
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date(today); d.setDate(today.getDate() - i);
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        if (studentAtt[key]) {
+            total++;
+            if (studentAtt[key] === 'was') was++;
+            recent.push({ key, status: studentAtt[key], d });
+        }
+    }
+
+    document.getElementById('portal-att-total').innerText = total;
+    document.getElementById('portal-att-pct').innerText = total ? Math.round(was/total*100)+'%' : '—';
+
+    const attEl = document.getElementById('portal-attendance');
+    attEl.innerHTML = recent.length ? recent.slice(-10).reverse().map(r => {
+        const cls = r.status==='was' ? 'att-was' : 'att-not';
+        const lbl = r.status==='was' ? '✓ Keldi' : '✕ Kelmadi';
+        return `<div class="att-row"><div class="att-day">${r.d.getDate()} ${MONTH_UZ[r.d.getMonth()]}</div><span class="att-chip ${cls}">${lbl}</span></div>`;
+    }).join('') : '<div class="text-muted small text-center py-3">So\'nggi 30 kunda davomat belgilanmagan</div>';
+
+    // To'lovlar
+    const history = JSON.parse(localStorage.getItem('payment_history') || '[]');
+    const myPay = history.filter(p => String(p.studentId) === String(student.id));
+    const payEl = document.getElementById('portal-payments');
+    payEl.innerHTML = myPay.length ? myPay.slice(0,10).map(p => {
+        const d = new Date(p.date);
+        return `<div class="pay-row"><div><div class="fw-bold">${p.amount.toLocaleString()} UZS</div><div style="font-size:11px;color:#99a1ad;">${p.method} · ${d.getDate()} ${MONTH_UZ[d.getMonth()]} ${d.getFullYear()}</div>${p.note?`<div style="font-size:11px;color:#626976;">${p.note}</div>`:''}</div><span class="badge bg-success">To'landi</span></div>`;
+    }).join('') : '<div class="text-muted small text-center py-3">To\'lovlar tarixi yo\'q</div>';
+}
+
+function parentLogout() {
+    localStorage.removeItem('parent_session');
+    document.getElementById('login-section').style.display = 'block';
+    document.getElementById('portal-section').style.display = 'none';
+}
+
+// Sessiyani tekshirish
+window.onload = function() {
+    const ps = localStorage.getItem('parent_session');
+    if (ps) {
+        try {
+            const s = JSON.parse(ps);
+            if (Date.now() - s.loginTime < 4*3600*1000) {
+                const students = JSON.parse(localStorage.getItem('students') || '[]');
+                const student = students.find(x => String(x.id) === String(s.studentId));
+                if (student) { showPortal(student); return; }
+            }
+        } catch(e) {}
+    }
+};
+</script>
+</body>
+</html>

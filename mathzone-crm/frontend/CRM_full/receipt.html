@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM - Elektron chek</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { --modme-orange: #ff7a00; }
+        body { background: #eef1f6; font-family: system-ui, -apple-system, sans-serif; padding: 30px 15px; }
+        .receipt-wrap { max-width: 440px; margin: 0 auto; }
+        .receipt-card { background: #fff; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.08); overflow: hidden; }
+        .receipt-header { background: var(--modme-orange); color: #fff; padding: 26px; text-align: center; position: relative; }
+        .receipt-header h2 { margin:0; font-weight:800; font-size:22px; }
+        .receipt-header small { opacity:.9; font-size:13px; }
+        .status-badge { position:absolute; top:14px; right:14px; background:rgba(255,255,255,.2); border-radius:20px; padding:4px 12px; font-size:11px; font-weight:700; }
+        .receipt-body { padding: 24px; }
+        .amount-block { text-align:center; padding:18px 0 10px; }
+        .amount-block .sum { font-size:36px; font-weight:800; color:var(--modme-orange); }
+        .amount-block small { color:#99a1ad; font-size:13px; display:block; }
+        .dashed { border-top:2px dashed #e8eaee; margin:14px 0; }
+        .receipt-row { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px dashed #eef1f6; font-size:14px; }
+        .receipt-row:last-child { border-bottom:none; }
+        .receipt-row .lbl { color:#8a909c; }
+        .receipt-row .val { font-weight:700; color:#1a1f24; text-align:right; }
+        .qr-wrap { display:flex; justify-content:center; padding:16px 0 6px; }
+        .receipt-id { text-align:center; color:#b0b5bd; font-size:11px; letter-spacing:1px; padding-bottom:12px; }
+        .back-link { color:#626976; text-decoration:none; font-size:13px; display:inline-flex; align-items:center; margin-bottom:16px; }
+        .back-link:hover { color:var(--modme-orange); }
+        .action-row { display:flex; gap:10px; margin-top:16px; }
+        .btn-pdf { background:#d63939; color:#fff; border:none; border-radius:10px; padding:10px 0; font-size:14px; font-weight:600; cursor:pointer; flex:1; display:flex; align-items:center; justify-content:center; gap:6px; }
+        .btn-pdf:hover { background:#b32626; }
+        .shartnoma-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9999; align-items:center; justify-content:center; padding:16px; }
+        .shartnoma-modal.open { display:flex; }
+        .shartnoma-box { background:#fff; border-radius:16px; max-width:580px; width:100%; max-height:90vh; overflow-y:auto; padding:32px; box-shadow:0 20px 50px rgba(0,0,0,.2); }
+        .contract-line { border-bottom:1px solid #e8eaee; padding:8px 0; font-size:13px; }
+        @media print {
+            .no-print { display:none !important; }
+            body { background:#fff; padding:0; }
+            .receipt-card { box-shadow:none; border-radius:0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="receipt-wrap">
+    <a href="finance.html" class="back-link no-print"><i class="ti ti-arrow-left me-1"></i>Moliyaga qaytish</a>
+
+    <div class="receipt-card" id="receipt-card">
+        <div class="receipt-header">
+            <div class="status-badge"><i class="ti ti-check me-1"></i>Tasdiqlangan</div>
+            <h2>math<span style="color:#1e1e2d;">zone</span></h2>
+            <small>Elektron to'lov cheki</small>
+        </div>
+        <div class="receipt-body">
+            <div class="amount-block">
+                <small>To'lov summasi</small>
+                <div class="sum" id="receipt-amount">0 UZS</div>
+            </div>
+            <div class="dashed"></div>
+            <div class="receipt-row"><span class="lbl">Talaba</span><span class="val" id="receipt-name">-</span></div>
+            <div class="receipt-row"><span class="lbl">Telefon</span><span class="val" id="receipt-phone">-</span></div>
+            <div class="receipt-row"><span class="lbl">Guruh</span><span class="val" id="receipt-group">-</span></div>
+            <div class="receipt-row"><span class="lbl">Kurs narxi</span><span class="val" id="receipt-price">-</span></div>
+            <div class="receipt-row"><span class="lbl">To'lov usuli</span><span class="val" id="receipt-method">-</span></div>
+            <div class="receipt-row"><span class="lbl">Sana</span><span class="val" id="receipt-date">-</span></div>
+            <div class="receipt-row"><span class="lbl">Vaqt</span><span class="val" id="receipt-time">-</span></div>
+            <div class="dashed"></div>
+            <div class="qr-wrap" id="qr-code"></div>
+            <div class="receipt-id" id="receipt-id">CHEK ID: -</div>
+        </div>
+    </div>
+
+    <div class="action-row no-print">
+        <button class="btn btn-outline-secondary" style="flex:1;border-radius:10px;" onclick="window.print()">
+            <i class="ti ti-printer me-2"></i>Chop etish
+        </button>
+        <button class="btn-pdf" onclick="downloadPDF()">
+            <i class="ti ti-file-type-pdf"></i>PDF yuklab olish
+        </button>
+        <button class="btn btn-outline-primary" style="flex:1;border-radius:10px;" onclick="openShartnoma()">
+            <i class="ti ti-file-description me-2"></i>Shartnoma
+        </button>
+    </div>
+</div>
+
+<!-- SHARTNOMA MODALI -->
+<div id="shartnoma-modal" class="shartnoma-modal">
+    <div class="shartnoma-box" id="shartnoma-content">
+        <div style="text-align:center;margin-bottom:20px;">
+            <div style="font-size:18px;font-weight:800;">XIZMAT KO'RSATISH SHARTNOMASI</div>
+            <div style="font-size:12px;color:#99a1ad;" id="contract-num">№ —</div>
+        </div>
+        <div class="contract-line"><strong>O'quv markaz:</strong> Mathzone O'quv Markazi</div>
+        <div class="contract-line"><strong>Talaba:</strong> <span id="c-name">—</span></div>
+        <div class="contract-line"><strong>Telefon:</strong> <span id="c-phone">—</span></div>
+        <div class="contract-line"><strong>Guruh:</strong> <span id="c-group">—</span></div>
+        <div class="contract-line"><strong>Oylik to'lov:</strong> <span id="c-price">—</span></div>
+        <div class="contract-line"><strong>Shartnoma sanasi:</strong> <span id="c-date">—</span></div>
+        <div style="margin-top:20px;font-size:13px;line-height:1.7;color:#626976;">
+            <strong>1. Umumiy qoidalar</strong><br>
+            Ushbu shartnoma Mathzone o'quv markazi (Xizmat ko'rsatuvchi) va Talaba (Xizmat oluvchi) o'rtasida tuzilgan.
+            <br><br>
+            <strong>2. Xizmat ko'rsatuvchining majburiyatlari</strong><br>
+            — Sifatli ta'lim xizmatini ko'rsatish;<br>
+            — Belgilangan jadval asosida darslarni o'tkazish;<br>
+            — Talaba davomati va o'zlashtirishi haqida ota-onani xabardor qilish.
+            <br><br>
+            <strong>3. Xizmat oluvchining majburiyatlari</strong><br>
+            — Oylik to'lovni o'z vaqtida to'lash;<br>
+            — Dars jadvaliga amal qilish;<br>
+            — O'quv markazining ichki tartib-qoidalariga rioya qilish.
+            <br><br>
+            <strong>4. To'lov shartlari</strong><br>
+            Oylik to'lov har oyning 1-5 kunlari ichida amalga oshiriladi. Kechiktirilgan to'lovlar uchun ogohlantirish yuboriladi.
+        </div>
+        <div style="display:flex;gap:30px;margin-top:28px;font-size:12px;">
+            <div style="flex:1;text-align:center;">
+                <div style="border-top:1px solid #dde0e6;padding-top:8px;margin-top:30px;color:#99a1ad;">Xizmat ko'rsatuvchi</div>
+                <div style="font-weight:700;">Mathzone O'quv Markazi</div>
+            </div>
+            <div style="flex:1;text-align:center;">
+                <div style="border-top:1px solid #dde0e6;padding-top:8px;margin-top:30px;color:#99a1ad;">Xizmat oluvchi</div>
+                <div class="fw-bold" id="c-sign-name">—</div>
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-4 no-print">
+            <button class="btn btn-outline-secondary w-100" onclick="document.getElementById('shartnoma-modal').classList.remove('open')">Yopish</button>
+            <button class="btn w-100 text-white" style="background:var(--modme-orange);" onclick="printShartnoma()"><i class="ti ti-printer me-1"></i>Chop etish</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentPayment = null;
+
+function formatDateTime(iso) {
+    const d = new Date(iso);
+    return {
+        date: `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`,
+        time: `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+    };
+}
+
+window.onload = function() {
+    const params = new URLSearchParams(window.location.search);
+    const payId = params.get('payment');
+
+    // payment_history (yangi) yoki payments (eski) dan qidirish
+    let payment = null;
+    const history = JSON.parse(localStorage.getItem('payment_history') || '[]');
+    if (payId) payment = history.find(p => String(p.id) === String(payId));
+
+    // Agar topilmasa — so'nggi to'lovni ko'rsat
+    if (!payment && history.length) payment = history[0];
+
+    if (!payment) {
+        document.getElementById('receipt-card').innerHTML = '<div class="p-5 text-center text-muted"><i class="ti ti-receipt-off" style="font-size:48px;display:block;margin-bottom:16px;"></i>Chek topilmadi. Avval to\'lov qabul qiling.</div>';
+        return;
+    }
+    currentPayment = payment;
+
+    const students = JSON.parse(localStorage.getItem('students') || '[]');
+    const groups   = JSON.parse(localStorage.getItem('groups')   || '[]');
+    const student  = students.find(s => String(s.id) === String(payment.studentId)) || {};
+    const group    = groups.find(g => g.name === (payment.group || student.group)) || {};
+
+    const priceDisplay = group.price ? Number(group.price).toLocaleString() + ' UZS / oy' : 'Belgilanmagan';
+    const { date, time } = formatDateTime(payment.date || Date.now());
+
+    document.getElementById('receipt-amount').innerText = Number(payment.amount).toLocaleString() + ' UZS';
+    document.getElementById('receipt-name').innerText   = payment.studentName || student.name || '—';
+    document.getElementById('receipt-phone').innerText  = student.phone || '—';
+    document.getElementById('receipt-group').innerText  = payment.group || student.group || '—';
+    document.getElementById('receipt-price').innerText  = priceDisplay;
+    document.getElementById('receipt-method').innerText = payment.method || '—';
+    document.getElementById('receipt-date').innerText   = date;
+    document.getElementById('receipt-time').innerText   = time;
+    document.getElementById('receipt-id').innerText     = 'CHEK ID: ' + payment.id;
+
+    // QR kod
+    const qrData = `Mathzone|ID:${payment.id}|${payment.studentName}|${Number(payment.amount).toLocaleString()} UZS|${date}`;
+    try {
+        new QRCode(document.getElementById('qr-code'), { text: qrData, width:130, height:130, colorDark:'#1e1e2d', colorLight:'#fff', correctLevel: QRCode.CorrectLevel.M });
+    } catch(e) {}
+};
+
+function downloadPDF() {
+    // html2canvas yoki browser print to PDF
+    window.print();
+    // Haqiqiy loyihada: puppeteer / jsPDF bilan PDF generatsiyasi
+}
+
+function openShartnoma() {
+    if (!currentPayment) return;
+    const p = currentPayment;
+    const students = JSON.parse(localStorage.getItem('students') || '[]');
+    const groups   = JSON.parse(localStorage.getItem('groups')   || '[]');
+    const student  = students.find(s => String(s.id) === String(p.studentId)) || {};
+    const group    = groups.find(g => g.name === (p.group || student.group)) || {};
+    const today    = new Date();
+
+    document.getElementById('contract-num').innerText   = `№ MZ-${p.id}`;
+    document.getElementById('c-name').innerText         = p.studentName || student.name || '—';
+    document.getElementById('c-phone').innerText        = student.phone || '—';
+    document.getElementById('c-group').innerText        = p.group || student.group || '—';
+    document.getElementById('c-price').innerText        = group.price ? Number(group.price).toLocaleString() + ' UZS / oy' : '—';
+    document.getElementById('c-date').innerText         = `${today.getDate()}.${today.getMonth()+1}.${today.getFullYear()}`;
+    document.getElementById('c-sign-name').innerText    = p.studentName || student.name || '—';
+
+    document.getElementById('shartnoma-modal').classList.add('open');
+}
+
+function printShartnoma() {
+    const content = document.getElementById('shartnoma-content').innerHTML;
+    const win = window.open('', '_blank', 'width=700,height=900');
+    win.document.write(`<html><head><title>Shartnoma</title><style>body{font-family:sans-serif;padding:40px;font-size:13px;}.no-print{display:none;}.contract-line{border-bottom:1px solid #eee;padding:8px 0;}</style></head><body>${content}</body></html>`);
+    win.document.close();
+    win.print();
+}
+</script>
+<script src="shared.js"></script>
+</body>
+</html>

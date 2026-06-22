@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM — Online testlar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        .exam-card{background:#fff;border-radius:14px;box-shadow:0 4px 14px rgba(0,0,0,.05);padding:20px;margin-bottom:14px;border:1px solid rgba(0,0,0,.04);}
+        .q-option{border:1.5px solid #e5e8ef;border-radius:8px;padding:10px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s;font-size:14px;}
+        .q-option:hover{border-color:#ff7a00;background:#fff8f3;}
+        .q-option.selected{border-color:#ff7a00;background:#fff0e6;color:#c85a00;}
+        .q-option.correct{border-color:#2bab41;background:#e8f7ee;color:#1a6b35;}
+        .q-option.wrong{border-color:#d63939;background:#fbeaea;color:#b32626;}
+        .timer{background:#1e1e2d;color:#ff7a00;border-radius:8px;padding:6px 14px;font-weight:700;font-size:15px;font-family:monospace;}
+        .progress-bar-custom{height:6px;border-radius:3px;background:#f1f3f7;overflow:hidden;margin-bottom:20px;}
+        .progress-fill{height:100%;border-radius:3px;background:#ff7a00;transition:width .3s;}
+        .result-card{text-align:center;padding:40px 20px;}
+        .result-score{font-size:64px;font-weight:800;line-height:1;}
+        .tab-btn{padding:7px 16px;border-radius:8px;border:none;background:transparent;font-size:13px;cursor:pointer;color:#626976;font-weight:500;}
+        .tab-btn.active{background:#ff7a00;color:#fff;}
+        .tab-pane{display:none;}
+        .tab-pane.active{display:block;}
+    </style>
+</head>
+<body>
+<div class="sidebar-fixed">
+    <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+    <ul class="sidebar-menu">
+        <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+        <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+        <li class="sidebar-item"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+        <li class="sidebar-item"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+        <li class="sidebar-item active"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+        <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+        <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+        <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+        <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+        <li class="sidebar-item" style="margin-top:auto;padding-bottom:12px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+    </ul>
+</div>
+<div class="mobile-bottom-nav">
+    <div class="nav-items">
+        <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+        <a href="student.html" class="active"><i class="ti ti-backpack"></i>Talabalar</a>
+        <a href="groups.html"><i class="ti ti-books"></i>Guruhlar</a>
+        <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+        <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="top-navbar">
+        <div class="fw-bold"><i class="ti ti-pencil-check me-2 text-muted"></i>Online testlar</div>
+        <div class="d-flex gap-2 align-items-center">
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <button class="btn text-white" style="background:#ff7a00;" onclick="openCreateExam()"><i class="ti ti-plus me-1"></i>Test yaratish</button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+            <div id="navbar-name" class="d-none d-xl-block fw-bold" style="font-size:13px;"></div>
+        </div>
+    </div>
+
+    <!-- Tablar -->
+    <div class="d-flex gap-2 mb-4">
+        <button class="tab-btn active" onclick="switchTab('exams')"><i class="ti ti-list me-1"></i>Testlar</button>
+        <button class="tab-btn" onclick="switchTab('results')"><i class="ti ti-chart-bar me-1"></i>Natijalar</button>
+        <button class="tab-btn" onclick="switchTab('take')"><i class="ti ti-pencil me-1"></i>Test ishlash</button>
+    </div>
+
+    <!-- Testlar ro'yxati -->
+    <div id="tab-exams" class="tab-pane active">
+        <div id="exams-list"></div>
+    </div>
+
+    <!-- Natijalar -->
+    <div id="tab-results" class="tab-pane">
+        <div class="exam-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold m-0"><i class="ti ti-trophy me-2 text-warning"></i>Barcha natijalar</h4>
+                <button class="btn btn-sm btn-outline-secondary" onclick="exportResults()"><i class="ti ti-file-spreadsheet me-1"></i>Excel</button>
+            </div>
+            <div id="results-table"></div>
+        </div>
+    </div>
+
+    <!-- Test ishlash -->
+    <div id="tab-take" class="tab-pane">
+        <div id="take-section">
+            <div class="exam-card text-center py-5">
+                <i class="ti ti-pencil-check" style="font-size:48px;color:#d0d3db;display:block;margin-bottom:12px;"></i>
+                <div class="fw-bold mb-2">Test boshlash</div>
+                <div class="text-muted small mb-4">Talabani va testni tanlang</div>
+                <div class="row g-3 justify-content-center">
+                    <div class="col-md-4"><select id="take-student" class="form-select"><option value="">Talabani tanlang</option></select></div>
+                    <div class="col-md-4"><select id="take-exam" class="form-select"><option value="">Testni tanlang</option></select></div>
+                    <div class="col-auto"><button class="btn text-white" style="background:#ff7a00;" onclick="startExam()">Boshlash</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test yaratish modali -->
+<div class="modal modal-blur fade" id="modal-create-exam" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius:14px;">
+            <div class="modal-header"><h5 class="modal-title fw-bold"><i class="ti ti-pencil-plus me-2" style="color:#ff7a00;"></i>Yangi test yaratish</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6"><label class="form-label fw-bold">Test nomi</label><input type="text" id="e-title" class="form-control" placeholder="Algebra yakuniy test"></div>
+                    <div class="col-md-3"><label class="form-label fw-bold">Guruh</label><select id="e-group" class="form-select"></select></div>
+                    <div class="col-md-3"><label class="form-label fw-bold">Vaqt (daqiqa)</label><input type="number" id="e-time" class="form-control" value="20" min="5" max="120"></div>
+                </div>
+                <h5 class="fw-bold mb-3">Savollar <span class="badge bg-orange-lt ms-1" id="q-count-badge">0</span></h5>
+                <div id="questions-builder"></div>
+                <button class="btn btn-outline-primary w-100 mt-2" onclick="addQuestion()"><i class="ti ti-plus me-1"></i>Savol qo'shish</button>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-link text-secondary" data-bs-dismiss="modal">Bekor</button>
+                <button class="btn text-white" style="background:#ff7a00;" onclick="saveExam()"><i class="ti ti-device-floppy me-1"></i>Saqlash</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="search-overlay" class="search-overlay">
+    <div class="search-box">
+        <div class="search-input-wrap"><i class="ti ti-search"></i><input type="text" id="search-global-input" placeholder="Qidirish..."><kbd style="font-size:11px;background:#f1f3f7;padding:2px 6px;border-radius:4px;">ESC</kbd></div>
+        <div class="search-results" id="search-global-results"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+<script src="shared.js"></script>
+<script>
+let questionCount = 0;
+let currentExam = null;
+let timerInterval = null;
+let timeLeft = 0;
+let answers = {};
+
+function getExams(){ return JSON.parse(localStorage.getItem('exams')||'[]'); }
+function saveExams(e){ localStorage.setItem('exams',JSON.stringify(e)); }
+function getResults(){ return JSON.parse(localStorage.getItem('exam_results')||'[]'); }
+function saveResults(r){ localStorage.setItem('exam_results',JSON.stringify(r)); }
+
+function switchTab(name){
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('tab-'+name).classList.add('active');
+    event.currentTarget.classList.add('active');
+    if(name==='results') renderResults();
+    if(name==='take') populateTakeDropdowns();
+}
+
+function openCreateExam(){
+    questionCount=0;
+    document.getElementById('e-title').value='';
+    document.getElementById('e-time').value=20;
+    document.getElementById('questions-builder').innerHTML='';
+    document.getElementById('q-count-badge').innerText='0';
+    const groups=JSON.parse(localStorage.getItem('groups')||'[]');
+    document.getElementById('e-group').innerHTML='<option value="">Barcha guruhlar</option>'+groups.map(g=>`<option>${g.name}</option>`).join('');
+    addQuestion();
+    new bootstrap.Modal(document.getElementById('modal-create-exam')).show();
+}
+
+function addQuestion(){
+    questionCount++;
+    document.getElementById('q-count-badge').innerText=questionCount;
+    const div=document.createElement('div');
+    div.style.cssText='background:#f8fafc;border:1px solid #e5e8ef;border-radius:10px;padding:14px;margin-bottom:12px;';
+    div.id=`q-block-${questionCount}`;
+    div.innerHTML=`
+        <div class="d-flex justify-content-between mb-2">
+            <span class="fw-bold" style="font-size:13px;">${questionCount}-savol</span>
+            <button class="btn btn-sm btn-icon btn-ghost-danger" onclick="this.closest('[id^=q-block]').remove();questionCount--;document.getElementById('q-count-badge').innerText=document.querySelectorAll('[id^=q-block]').length;"><i class="ti ti-trash"></i></button>
+        </div>
+        <input type="text" class="form-control mb-2 q-text" placeholder="Savol matni..." style="font-size:13px;">
+        <div class="row g-2 mb-2">
+            <div class="col-6"><input type="text" class="form-control q-opt" placeholder="A variant" style="font-size:12px;"></div>
+            <div class="col-6"><input type="text" class="form-control q-opt" placeholder="B variant" style="font-size:12px;"></div>
+            <div class="col-6"><input type="text" class="form-control q-opt" placeholder="C variant" style="font-size:12px;"></div>
+            <div class="col-6"><input type="text" class="form-control q-opt" placeholder="D variant" style="font-size:12px;"></div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <label style="font-size:12px;color:#626976;">To'g'ri javob:</label>
+            <select class="form-select q-correct" style="width:auto;font-size:12px;">
+                <option>A</option><option>B</option><option>C</option><option>D</option>
+            </select>
+        </div>`;
+    document.getElementById('questions-builder').appendChild(div);
+}
+
+function saveExam(){
+    const title=document.getElementById('e-title').value.trim();
+    if(!title){
+        if(typeof showToast==='function') showToast('Test nomini kiriting!','danger');
+        else alert('Test nomini kiriting!');
+        return;
+    }
+    const blocks=document.querySelectorAll('[id^=q-block]');
+    const questions=[];
+    const problems=[];
+    blocks.forEach((b, idx)=>{
+        const text=b.querySelector('.q-text').value.trim();
+        const opts=[...b.querySelectorAll('.q-opt')].map(o=>o.value.trim());
+        const correct=b.querySelector('.q-correct').value;
+        if(!text) return; // bo'sh savol — o'tkazib yuborish (qasddan qoldirilgan bo'lishi mumkin)
+
+        const filledCount = opts.filter(o => o).length;
+        const correctIdx = 'ABCD'.indexOf(correct);
+        const correctOptionFilled = opts[correctIdx] && opts[correctIdx].trim() !== '';
+
+        if (filledCount < 2) {
+            problems.push(`${idx+1}-savol: kamida 2 ta variant to'ldirilishi kerak`);
+            return;
+        }
+        if (!correctOptionFilled) {
+            problems.push(`${idx+1}-savol: to'g'ri javob qilib tanlangan "${correct}" varianti bo'sh — talaba uni hech qachon tanlay olmaydi!`);
+            return;
+        }
+        questions.push({text,options:opts,correct,id:Date.now()+Math.random()});
+    });
+
+    if (problems.length) {
+        if(typeof showToast==='function') showToast(problems[0], 'danger', 5000);
+        else alert(problems.join('\n'));
+        return;
+    }
+
+    if(!questions.length){
+        if(typeof showToast==='function') showToast('Kamida 1 ta to\'liq savol kiriting!','danger');
+        else alert('Kamida 1 ta savol kiriting!');
+        return;
+    }
+    const exam={
+        id:Date.now(), title, group:document.getElementById('e-group').value,
+        timeLimit:parseInt(document.getElementById('e-time').value)||20,
+        questions, createdAt:new Date().toISOString()
+    };
+    const exams=getExams();
+    exams.unshift(exam);
+    saveExams(exams);
+    if(typeof logActivity==='function') logActivity("Qo'shildi",`Test: ${title} (${questions.length} savol)`);
+    if(typeof showToast==='function') showToast(`"${title}" testi yaratildi (${questions.length} savol)`, 'success');
+    bootstrap.Modal.getInstance(document.getElementById('modal-create-exam')).hide();
+    renderExams();
+}
+
+function renderExams(){
+    const exams=getExams();
+    const results=getResults();
+    const el=document.getElementById('exams-list');
+    el.innerHTML=exams.length?exams.map(e=>{
+        const myResults=results.filter(r=>r.examId===e.id);
+        const avgScore=myResults.length?Math.round(myResults.reduce((a,r)=>a+r.score,0)/myResults.length):null;
+        return `<div class="exam-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="fw-bold" style="font-size:15px;">${e.title}</div>
+                    <div class="text-muted small mt-1"><i class="ti ti-books me-1"></i>${e.group||'Barcha guruhlar'} · <i class="ti ti-clock me-1 ms-1"></i>${e.timeLimit} daqiqa · <i class="ti ti-list me-1 ms-1"></i>${e.questions.length} savol</div>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                    ${avgScore!==null?`<span class="badge ${avgScore>=70?'bg-success-lt':avgScore>=50?'bg-warning-lt':'bg-danger-lt'}">${avgScore}% o'rtacha</span>`:''}
+                    <span class="badge bg-secondary-lt">${myResults.length} urinish</span>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteExam(${e.id})"><i class="ti ti-trash"></i></button>
+                </div>
+            </div>
+        </div>`;
+    }).join(''):'<div class="text-center text-muted py-5"><i class="ti ti-pencil-off" style="font-size:48px;display:block;margin-bottom:12px;color:#d0d3db;"></i>Testlar yo\'q. Yangi test yarating.</div>';
+}
+
+function deleteExam(id){
+    const exam = getExams().find(e=>e.id===id);
+    if(!exam) return;
+    const doDelete = () => {
+        saveExams(getExams().filter(e=>e.id!==id));
+        if(typeof logActivity==='function') logActivity("O'chirildi", `Test: ${exam.title}`);
+        if(typeof showToast==='function') showToast(`"${exam.title}" testi o'chirildi`, 'success');
+        renderExams();
+    };
+    if(typeof showConfirmModal==='function'){
+        showConfirmModal({ title:"Testni o'chirish", message:`<strong>${exam.title}</strong>ni o'chirishni xohlaysizmi? Talabalarning oldingi natijalari saqlanib qoladi.`, confirmLabel:"Ha, o'chirish", danger:true, onConfirm:doDelete });
+    } else if(confirm("Testni o'chirishni xohlaysizmi?")) {
+        doDelete();
+    }
+}
+
+function renderResults(){
+    const results=getResults();
+    const exams=getExams();
+    const el=document.getElementById('results-table');
+    el.innerHTML=results.length?`<table class="table table-striped" style="font-size:13px;">
+        <thead><tr><th>Talaba</th><th>Test</th><th>Ball</th><th>To'g'ri</th><th>Vaqt</th><th>Sana</th></tr></thead>
+        <tbody>${results.slice(0,50).map(r=>{
+            const e=exams.find(x=>x.id===r.examId)||{title:'O\'chirilgan',questions:[]};
+            const pct=Math.round(r.score);
+            const cls=pct>=70?'text-success':pct>=50?'text-warning':'text-danger';
+            const d=new Date(r.date);
+            const dt=`${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+            return `<tr><td>${r.studentName}</td><td>${e.title}</td><td class="${cls} fw-bold">${pct}%</td><td>${r.correct}/${r.total}</td><td>${r.timeTaken||'—'} daq</td><td>${dt}</td></tr>`;
+        }).join('')}</tbody>
+    </table>`:'<div class="text-center text-muted py-4">Natijalar yo\'q</div>';
+}
+
+function populateTakeDropdowns(){
+    const students=JSON.parse(localStorage.getItem('students')||'[]');
+    const exams=getExams();
+    document.getElementById('take-student').innerHTML='<option value="">Talabani tanlang</option>'+students.map(s=>`<option value="${s.id}|${s.name}">${s.name} — ${s.group}</option>`).join('');
+    document.getElementById('take-exam').innerHTML='<option value="">Testni tanlang</option>'+exams.map(e=>`<option value="${e.id}">${e.title} (${e.questions.length} savol)</option>`).join('');
+}
+
+function startExam(){
+    const stVal=document.getElementById('take-student').value;
+    const exId=parseInt(document.getElementById('take-exam').value);
+    if(!stVal){alert('Talabani tanlang!');return;}
+    if(!exId){alert('Testni tanlang!');return;}
+    const [sId,sName]=stVal.split('|');
+    const exam=getExams().find(e=>e.id===exId);
+    if(!exam){alert('Test topilmadi!');return;}
+    currentExam={...exam,studentId:sId,studentName:sName,startTime:Date.now()};
+    answers={};
+    timeLeft=exam.timeLimit*60;
+    renderExamUI();
+}
+
+function renderExamUI(){
+    const section=document.getElementById('take-section');
+    let html=`<div class="exam-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div><div class="fw-bold" style="font-size:16px;">${currentExam.title}</div><div class="text-muted small">${currentExam.studentName}</div></div>
+            <div class="timer" id="exam-timer">--:--</div>
+        </div>
+        <div class="progress-bar-custom"><div class="progress-fill" id="exam-progress" style="width:0%;"></div></div>
+        <div id="exam-questions">`;
+    currentExam.questions.forEach((q,i)=>{
+        const opts=['A','B','C','D'];
+        html+=`<div style="margin-bottom:24px;">
+            <div class="fw-bold mb-2" style="font-size:14px;">${i+1}. ${q.text||'Savol matni kiritilmagan'}</div>
+            ${opts.map((o,j)=>q.options[j]?`<div class="q-option" id="opt-${i}-${o}" onclick="selectAnswer(${i},'${o}')">${o}) ${q.options[j]}</div>`:'').join('')}
+        </div>`;
+    });
+    html+=`</div>
+        <button class="btn text-white w-100 mt-3" style="background:#ff7a00;" onclick="submitExam()"><i class="ti ti-check me-1"></i>Testni yakunlash</button>
+    </div>`;
+    section.innerHTML=html;
+
+    // Taymer
+    clearInterval(timerInterval);
+    timerInterval=setInterval(()=>{
+        timeLeft--;
+        const m=Math.floor(timeLeft/60), s=timeLeft%60;
+        const timerEl=document.getElementById('exam-timer');
+        if(timerEl) timerEl.innerText=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        if(timeLeft<=0){clearInterval(timerInterval);submitExam();}
+    },1000);
+}
+
+function selectAnswer(qIdx, opt){
+    answers[qIdx]=opt;
+    const q=currentExam.questions[qIdx];
+    ['A','B','C','D'].forEach(o=>{
+        const el=document.getElementById(`opt-${qIdx}-${o}`);
+        if(el) el.classList.remove('selected');
+    });
+    const el=document.getElementById(`opt-${qIdx}-${opt}`);
+    if(el) el.classList.add('selected');
+    const answered=Object.keys(answers).length;
+    const pEl=document.getElementById('exam-progress');
+    if(pEl) pEl.style.width=(answered/currentExam.questions.length*100)+'%';
+}
+
+function submitExam(){
+    clearInterval(timerInterval);
+    let correct=0;
+    currentExam.questions.forEach((q,i)=>{
+        if(answers[i]===q.correct) correct++;
+    });
+    const total=currentExam.questions.length;
+    const score=total>0?Math.round(correct/total*100):0;
+    const timeTaken=Math.round((Date.now()-currentExam.startTime)/60000);
+
+    const results=getResults();
+    results.unshift({
+        id:Date.now(),examId:currentExam.id,
+        studentId:currentExam.studentId,studentName:currentExam.studentName,
+        correct,total,score,timeTaken,date:new Date().toISOString()
+    });
+    saveResults(results.slice(0,500));
+    if(typeof logActivity==='function') logActivity("Test",""+currentExam.studentName+": "+score+"%");
+
+    // Avtomatik gamifikatsiya balli
+    if(typeof awardPointsForExam==='function') awardPointsForExam(currentExam.studentId, score, currentExam.title);
+
+    // Natija ko'rsatish
+    const grade=score>=90?{label:'A\'lo',color:'#2bab41',emoji:'🏆'}:score>=70?{label:'Yaxshi',color:'#206bc4',emoji:'✅'}:score>=50?{label:'Qoniqarli',color:'#ff7a00',emoji:'📝'}:{label:'Qoniqarsiz',color:'#d63939',emoji:'❌'};
+    document.getElementById('take-section').innerHTML=`
+        <div class="exam-card result-card">
+            <div style="font-size:48px;margin-bottom:8px;">${grade.emoji}</div>
+            <div class="result-score" style="color:${grade.color};">${score}%</div>
+            <div class="h4 mt-2 mb-1">${grade.label}</div>
+            <div class="text-muted">${correct} ta to'g'ri / ${total} ta savol · ${timeTaken} daqiqa</div>
+            <div class="row g-3 mt-4 text-start">
+                ${currentExam.questions.map((q,i)=>{
+                    const ua=answers[i]; const isRight=ua===q.correct;
+                    return `<div class="col-12">
+                        <div style="background:${isRight?'#f0fdf4':'#fef2f2'};border-radius:8px;padding:10px 14px;font-size:13px;">
+                            <div class="fw-bold mb-1">${i+1}. ${q.text}</div>
+                            <div style="color:${isRight?'#2bab41':'#d63939'};">${isRight?'✓':'✗'} Sizning javob: ${ua?q.options['ABCD'.indexOf(ua)]:'(javob bermagan)'}</div>
+                            ${!isRight?`<div style="color:#2bab41;">✓ To'g'ri: ${q.options['ABCD'.indexOf(q.correct)]}</div>`:''}
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>
+            <button class="btn text-white mt-4" style="background:#ff7a00;" onclick="populateTakeDropdowns();document.getElementById('take-section').innerHTML='<div class=\\'exam-card text-center py-5\\'><i class=\\'ti ti-pencil-check\\' style=\\'font-size:48px;color:#d0d3db;display:block;margin-bottom:12px;\\'></i><div class=\\'fw-bold mb-2\\'>Yana test ishlash</div><div class=\\'row g-3 justify-content-center\\'><div class=\\'col-md-4\\'><select id=\\'take-student\\' class=\\'form-select\\'></select></div><div class=\\'col-md-4\\'><select id=\\'take-exam\\' class=\\'form-select\\'></select></div><div class=\\'col-auto\\'><button class=\\'btn text-white\\' style=\\'background:#ff7a00;\\' onclick=\\'startExam()\\'>Boshlash</button></div></div></div>';populateTakeDropdowns();">
+                <i class="ti ti-refresh me-1"></i>Qayta boshlash
+            </button>
+        </div>`;
+}
+
+function exportResults(){
+    const results=getResults();
+    const exams=getExams();
+    const rows=[['Talaba','Test','Ball (%)','To\'g\'ri','Jami','Vaqt (daq)','Sana']];
+    results.forEach(r=>{
+        const e=exams.find(x=>x.id===r.examId)||{title:'O\'chirilgan'};
+        const d=new Date(r.date);
+        rows.push([r.studentName,e.title,r.score,r.correct,r.total,r.timeTaken||'—',`${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`]);
+    });
+    if(typeof downloadCSV==='function') downloadCSV(rows,'test_natijalari');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+    renderExams();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM - Talabalar</title>
+    <link class="tabler-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        :root { --modme-orange: #ff7a00; --sidebar-bg: #1e1e2d; }
+        body { background-color: #f6f8fb; font-family: system-ui, -apple-system, sans-serif; }
+        
+        
+        .sidebar-brand span { color: var(--modme-orange); }
+        
+        
+        
+        
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: #fff; padding: 12px 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .filter-btn.active { background-color: var(--modme-orange) !important; color: white !important; border-color: var(--modme-orange) !important; }
+
+        /* Tabler ba'zan kalendar belgisini yashirib qo'yadi - shu sabab uni majburan ko'rsatamiz */
+        input[type="date"] {
+            position: relative;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 1;
+            cursor: pointer;
+            filter: none;
+            display: block;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-fixed">
+        <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+            <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+            <li class="sidebar-item"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+            <li class="sidebar-item"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+            <li class="sidebar-item active"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+            <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+            <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+            <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+            <li class="sidebar-item"><a href="timetable.html" class="sidebar-link"><i class="ti ti-calendar-week"></i><span>Jadval</span></a></li>
+            <li class="sidebar-item"><a href="salary.html" class="sidebar-link"><i class="ti ti-moneybag"></i><span>Ish haqi</span></a></li>
+            <li class="sidebar-item"><a href="exam.html" class="sidebar-link"><i class="ti ti-pencil-check"></i><span>Testlar</span></a></li>
+            <li class="sidebar-item"><a href="certificate.html" class="sidebar-link"><i class="ti ti-award"></i><span>Sertifikat</span></a></li>
+            <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+            <li class="sidebar-item" style="margin-top:auto;padding-bottom:12px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+        </ul>
+    </div>
+
+    <div class="mobile-bottom-nav">
+        <div class="nav-items">
+            <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+            <a href="leads.html"><i class="ti ti-users-group"></i>Lidlar</a>
+            <a href="student.html"><i class="ti ti-backpack"></i>Talabalar</a>
+            <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+            <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center"><i class="ti ti-map-pin me-2 text-muted"></i><span class="fw-bold">Yunusobod filiali / Talabalar</span></div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="search-global-btn" class="btn btn-icon btn-ghost-secondary rounded-circle" title="Ctrl+K"><i class="ti ti-search"></i></button>
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+                <div class="d-none d-xl-block"><div id="navbar-name" class="fw-bold" style="font-size: 13px;">Behruz Berdiyev</div></div>
+            </div>
+        </div>
+
+        <div class="card p-3 mb-4 border-0 shadow-sm" style="border-radius: 12px;">
+            <div id="advanced-filter-panel" class="row g-3 mb-3 pb-3" style="display:none;border-bottom:1px solid #f1f3f7;">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">Guruh</label>
+                    <select id="adv-filter-group" class="form-select form-select-sm" onchange="renderStudents()">
+                        <option value="">Barcha guruhlar</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">Balans (dan)</label>
+                    <input type="number" id="adv-filter-balance-min" class="form-control form-control-sm" placeholder="Masalan: -100000" oninput="renderStudents()">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">Balans (gacha)</label>
+                    <input type="number" id="adv-filter-balance-max" class="form-control form-control-sm" placeholder="Masalan: 500000" oninput="renderStudents()">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">Qo'shilgan sana (dan)</label>
+                    <input type="date" id="adv-filter-date-from" class="form-control form-control-sm" onchange="renderStudents()">
+                </div>
+                <div class="col-12 text-end">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="resetAdvancedFilter()"><i class="ti ti-x me-1"></i>Filtrni tozalash</button>
+                </div>
+            </div>
+            <div class="row g-3 align-items-center justify-content-between">
+                <div class="col-md-8 d-flex flex-wrap gap-2 align-items-center">
+                    <div class="input-icon" style="min-width: 250px;">
+                        <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+                        <input type="text" id="search-input" class="form-control" placeholder="Ism yoki telefon orqali qidirish...">
+                    </div>
+                    <button class="btn btn-outline-secondary filter-btn" onclick="filterStatus('Sinov darsida', this)">Sinov darsida</button>
+                    <button class="btn btn-outline-secondary filter-btn active" onclick="filterStatus('Faol', this)">Faollar</button>
+                    <button class="btn btn-outline-secondary filter-btn" onclick="filterStatus('Muzlatilgan', this)">Muzlatilganlar</button>
+                    <button class="btn btn-outline-secondary filter-btn" onclick="filterStatus('Bitirgan', this)">Bitirganlar</button>
+                    <button class="btn btn-outline-secondary filter-btn" onclick="filterStatus('Qarzdor', this)">Qarzdorlar</button>
+                    <button class="btn btn-outline-secondary filter-btn" onclick="filterStatus('Arxiv', this)"><i class="ti ti-archive me-1"></i>Arxiv</button>
+                    <button class="btn btn-outline-primary position-relative" onclick="toggleAdvancedFilter()" id="adv-filter-btn">
+                        <i class="ti ti-filter me-1"></i>Kengaytirilgan
+                        <span id="adv-filter-badge" class="badge bg-orange rounded-circle" style="display:none;position:absolute;top:-4px;right:-4px;width:8px;height:8px;padding:0;"></span>
+                    </button>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn text-white" style="background-color: var(--modme-orange);" data-bs-toggle="modal" data-bs-target="#modal-student">
+                        <i class="ti ti-user-plus me-2"></i>Yangi talaba qo'shish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table table-striped">
+                    <thead>
+                        <tr>
+                            <th>F.I.Sh. / Telefon</th>
+                            <th>Guruhlari</th>
+                            <th>Qo'shilgan sana</th>
+                            <th>Balans</th>
+                            <th>Holati</th>
+                            <th class="w-1">Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-blur fade" id="modal-student" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 14px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold fs-3">Yangi talaba qo'shish</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">F.I.Sh</label>
+                        <input type="text" id="student-name" class="form-control" placeholder="Masalan: Asadbek Olimov">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Telefon raqami</label>
+                        <input type="text" id="student-phone" class="form-control" placeholder="+998 90 123 45 67" data-phone-mask>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Darsni boshlash sanasi</label>
+                        <input type="date" id="student-start-date" class="form-control">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Guruh</label>
+                                <select id="student-group" class="form-select">
+                                    <option>Math-01 (SAT)</option>
+                                    <option>Math-02 (Olimpiada)</option>
+                                    <option>Inter-03</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Balans (UZS)</label>
+                                <input type="number" id="student-balance" class="form-control" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="button" class="btn text-white" style="background-color: var(--modme-orange);" onclick="addStudent()">Saqlash</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-blur fade" id="modal-payment" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 14px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold fs-3">To'lov qabul qilish</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Talaba</label>
+                        <input type="text" id="payment-student-name" class="form-control" disabled>
+                        <input type="hidden" id="payment-student-id">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">To'lov summasi (UZS)</label>
+                        <input type="number" id="payment-amount" class="form-control" placeholder="Masalan: 450000">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">To'lov usuli</label>
+                        <select id="payment-method" class="form-select">
+                            <option>Naqd</option>
+                            <option>Click</option>
+                            <option>Payme</option>
+                            <option>Bank kartasi</option>
+                            <option>Bank o'tkazmasi</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="button" class="btn text-white" style="background-color: var(--modme-orange);" onclick="submitPayment()">To'lovni qabul qilish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GURUHGA NUSXALASH / KO'CHIRISH MODALI -->
+    <div class="modal modal-blur fade" id="modal-group-action" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 14px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold fs-3" id="ga-modal-title"><i class="ti ti-arrow-right me-2" style="color:var(--modme-orange);"></i>Guruhga ko'chirish</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="ga-student-info" class="alert alert-light py-2 mb-3" style="font-size:13px;"></div>
+                    <div id="ga-explainer" class="alert alert-info py-2 mb-3" style="font-size:12px;"></div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Yo'naltirish guruhi</label>
+                        <select id="ga-target-group" class="form-select"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" id="ga-date-label">Qaysi sanadan boshlab</label>
+                        <input type="date" id="ga-effective-date" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="button" id="ga-confirm-btn" class="btn text-white" style="background-color: var(--modme-orange);" onclick="confirmGroupAction()"><i class="ti ti-check me-1"></i>Tasdiqlash</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SINOV O'QUVCHISINI FAOLLASHTIRISH MODALI -->
+    <div class="modal modal-blur fade" id="modal-activate" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 14px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold fs-3"><i class="ti ti-circle-check me-2 text-success"></i>Talabani faollashtirish</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="act-student-info" class="alert alert-light py-2 mb-3" style="font-size:13px;"></div>
+                    <div id="act-explainer" class="alert alert-success py-2 mb-3" style="font-size:12px;"><i class="ti ti-info-circle me-1"></i>Talaba "Faol" holatga o'tkaziladi.</div>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">Faollashtirish sanasi <span class="text-danger">*</span></label>
+                        <input type="date" id="act-date" class="form-control">
+                        <small class="text-muted">Talaba qaysi sanadan boshlab to'liq kursga o'tadi</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="button" class="btn text-white" style="background:#2bab41;" onclick="confirmActivateStudent()"><i class="ti ti-check me-1"></i>Faollashtirish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TALABANI MUZLATISH MODALI (ro'yxat sahifasidan) -->
+    <div class="modal modal-blur fade" id="modal-freeze-list" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 14px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold fs-3"><i class="ti ti-snowflake me-2 text-warning"></i>Talabani muzlatish</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="fz-student-info" class="alert alert-light py-2 mb-3" style="font-size:13px;"></div>
+                    <div class="alert alert-warning py-2 mb-3" style="font-size:12px;"><i class="ti ti-info-circle me-1"></i>Talaba "Muzlatilgan" holatga o'tkaziladi — vaqtincha dars qatnashmaydi.</div>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">Qaysi sanadan boshlab muzlatiladi <span class="text-danger">*</span></label>
+                        <input type="date" id="fz-date" class="form-control">
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label fw-bold">Sabab (ixtiyoriy)</label>
+                        <input type="text" id="fz-reason" class="form-control" placeholder="Masalan: shifokorga ketdi, safarga chiqdi...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="button" class="btn text-white" style="background:#e67e22;" onclick="confirmFreezeStudentList()"><i class="ti ti-snowflake me-1"></i>Muzlatish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+    <script src="shared.js"></script>
+    
+    <script>
+        // Dastlabki namunaviy ma'lumotlar
+        let defaultStudents = [
+            { id: 2045, name: "Asadbek Olimov", phone: "+998 90 123 45 67", group: "Math-01 (SAT)", balance: 150000, status: "Faol", startDate: "2026-06-01" },
+            { id: 1988, name: "Sardor Marupov", phone: "+998 93 987 65 43", group: "Math-02 (Olimpiada)", balance: -80000, status: "Faol", startDate: "2026-06-10" }
+        ];
+
+        if (!localStorage.getItem('students')) {
+            localStorage.setItem('students', JSON.stringify(defaultStudents));
+        }
+
+        let currentFilter = 'Faol';
+
+        // Bugungi sanani kalendarga avtomat o'rnatish mantiqi
+        function setTodayDate() {
+            let today = new Date().toISOString().split('T')[0];
+            document.getElementById('student-start-date').value = today;
+        }
+
+        function getStudents() {
+            return localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : [];
+        }
+
+        function toggleAdvancedFilter() {
+            const panel = document.getElementById('advanced-filter-panel');
+            const isOpen = panel.style.display !== 'none';
+            panel.style.display = isOpen ? 'none' : 'flex';
+            document.getElementById('adv-filter-btn').classList.toggle('btn-outline-primary', isOpen);
+            document.getElementById('adv-filter-btn').classList.toggle('btn-primary', !isOpen);
+            if (!isOpen) {
+                document.getElementById('adv-filter-btn').style.color = '#fff';
+            } else {
+                document.getElementById('adv-filter-btn').style.color = '';
+            }
+        }
+
+        function resetAdvancedFilter() {
+            document.getElementById('adv-filter-group').value = '';
+            document.getElementById('adv-filter-balance-min').value = '';
+            document.getElementById('adv-filter-balance-max').value = '';
+            document.getElementById('adv-filter-date-from').value = '';
+            renderStudents();
+        }
+
+        function populateAdvFilterGroups() {
+            const groups = JSON.parse(localStorage.getItem('groups') || '[]');
+            const sel = document.getElementById('adv-filter-group');
+            if (!sel) return;
+            const current = sel.value;
+            sel.innerHTML = '<option value="">Barcha guruhlar</option>' + groups.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
+            sel.value = current;
+        }
+
+        function updateAdvFilterBadge() {
+            const badge = document.getElementById('adv-filter-badge');
+            if (!badge) return;
+            const active = document.getElementById('adv-filter-group').value ||
+                           document.getElementById('adv-filter-balance-min').value ||
+                           document.getElementById('adv-filter-balance-max').value ||
+                           document.getElementById('adv-filter-date-from').value;
+            badge.style.display = active ? 'block' : 'none';
+        }
+
+        function renderArchivedStudents() {
+            const tableBody = document.getElementById('students-table-body');
+            const searchQuery = document.getElementById('search-input').value.toLowerCase();
+            const archived = getArchivedStudents().filter(s =>
+                s.name.toLowerCase().includes(searchQuery) || (s.phone||'').includes(searchQuery)
+            );
+
+            if (!archived.length) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-5">
+                    <i class="ti ti-archive" style="font-size:48px;color:#d0d3db;display:block;margin-bottom:12px;"></i>
+                    <div class="fw-bold text-dark mb-1">Arxiv bo'sh</div>
+                    <div class="text-muted small">O'chirilgan talabalar shu yerda saqlanadi</div>
+                </td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = archived.map((s, i) => {
+                const d = new Date(s.archivedAt);
+                const dateStr = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+                const attDisplay = s.attendancePct !== null && s.attendancePct !== undefined ? s.attendancePct + '%' : '—';
+                return `<tr style="opacity:.85;">
+                    <td>
+                        <div class="d-flex align-items-center" style="gap:10px;">
+                            <span class="avatar rounded-circle fw-bold" style="background:#f1f3f7;color:#99a1ad;width:40px;height:40px;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${s.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase()}</span>
+                            <div>
+                                <div class="fw-bold text-dark" style="font-size:14px;">${s.name}</div>
+                                <div class="text-muted" style="font-size:11px;"><i class="ti ti-device-mobile me-1"></i>${s.phone}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-secondary-lt" style="font-size:11px;">${s.group}</span></td>
+                    <td><div class="text-muted" style="font-size:12px;"><i class="ti ti-calendar me-1"></i>${dateStr}</div><div class="text-muted" style="font-size:11px;">${s.reason || ''}</div></td>
+                    <td style="font-size:12px;">
+                        <div>Jami to'lov: <strong>${(s.totalPaid||0).toLocaleString()} UZS</strong></div>
+                        <div class="text-muted">Davomat: ${attDisplay}</div>
+                    </td>
+                    <td><span class="badge bg-secondary-lt" style="font-size:11px;"><i class="ti ti-archive me-1"></i>Arxivlangan</span></td>
+                    <td>
+                        <div class="btn-list flex-nowrap">
+                            <button class="btn btn-sm btn-icon btn-white text-success" title="Tiklash" onclick="restoreFromArchive(${i})"><i class="ti ti-refresh"></i></button>
+                            <button class="btn btn-sm btn-icon btn-white text-danger" title="Butunlay o'chirish" onclick="permanentlyDeleteArchived(${i})"><i class="ti ti-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderStudents() {
+            // Arxiv filtri alohida ko'rinishda render qilinadi
+            if (currentFilter === 'Arxiv') {
+                renderArchivedStudents();
+                return;
+            }
+
+            const students = getStudents();
+            const tableBody = document.getElementById('students-table-body');
+            const searchQuery = document.getElementById('search-input').value.toLowerCase();
+
+            // Kengaytirilgan filtr qiymatlari
+            const advGroupEl = document.getElementById('adv-filter-group');
+            const advBalMinEl = document.getElementById('adv-filter-balance-min');
+            const advBalMaxEl = document.getElementById('adv-filter-balance-max');
+            const advDateFromEl = document.getElementById('adv-filter-date-from');
+
+            const advGroup = advGroupEl ? advGroupEl.value : '';
+            const advBalMin = advBalMinEl && advBalMinEl.value !== '' ? Number(advBalMinEl.value) : null;
+            const advBalMax = advBalMaxEl && advBalMaxEl.value !== '' ? Number(advBalMaxEl.value) : null;
+            const advDateFrom = advDateFromEl ? advDateFromEl.value : '';
+
+            if (typeof updateAdvFilterBadge === 'function') updateAdvFilterBadge();
+
+            tableBody.innerHTML = '';
+            let visibleCount = 0;
+
+            students.forEach((student, index) => {
+                if (currentFilter === 'Qarzdor') {
+                    if (Number(student.balance) >= 0) return;
+                } else if (student.status !== currentFilter) {
+                    return;
+                }
+                if (!student.name.toLowerCase().includes(searchQuery) && !student.phone.includes(searchQuery)) return;
+
+                // Kengaytirilgan filtrlar
+                if (advGroup && student.group !== advGroup) return;
+                if (advBalMin !== null && Number(student.balance) < advBalMin) return;
+                if (advBalMax !== null && Number(student.balance) > advBalMax) return;
+                if (advDateFrom && student.startDate) {
+                    const sDate = new Date(student.startDate);
+                    const fDate = new Date(advDateFrom);
+                    if (!isNaN(sDate) && sDate < fDate) return;
+                }
+
+                visibleCount++;
+
+                let balanceClass = student.balance >= 0 ? 'text-success' : 'text-danger';
+                let avatarLetters = student.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+
+                // Avatar rangi — ism asosida deterministik rang
+                const avatarColors = [
+                    {bg:'#fff0e6',color:'#c85a00'}, // orange
+                    {bg:'#e8f0fd',color:'#1a5fa8'}, // blue
+                    {bg:'#e8f7ee',color:'#1a6b35'}, // green
+                    {bg:'#f3e8ff',color:'#6b21a8'}, // purple
+                    {bg:'#fef3c7',color:'#92400e'}, // amber
+                    {bg:'#ffe4e6',color:'#9f1239'}, // rose
+                    {bg:'#e0f2fe',color:'#075985'}, // sky
+                    {bg:'#f0fdf4',color:'#14532d'}, // emerald
+                ];
+                const charCode = student.name.charCodeAt(0) + (student.name.charCodeAt(1)||0);
+                const ac = avatarColors[charCode % avatarColors.length];
+
+                // Holat belgisi — icon bilan
+                const statusConfig = {
+                    'Faol':         { cls:'bg-success',    icon:'ti-circle-check',  label:'Faol' },
+                    'Muzlatilgan':  { cls:'bg-warning',    icon:'ti-snowflake',     label:'Muzlatilgan' },
+                    'Sinov darsida':{ cls:'bg-blue-lt text-blue', icon:'ti-eye',   label:'Sinov' },
+                    'Ketdi':        { cls:'bg-danger',     icon:'ti-circle-x',      label:'Ketdi' },
+                };
+                const sc = statusConfig[student.status] || { cls:'bg-secondary', icon:'ti-circle', label: student.status };
+
+                let statusBadgeClass = sc.cls;
+
+                // Eslatmalar bormi? (qarzdorlik, va'da qilingan to'lov sanasi va h.k.)
+                const studentNotes = JSON.parse(localStorage.getItem('notes_' + student.id) || '[]');
+                const pendingNotes = studentNotes.filter(n => !n.done);
+                const todayForNotes = new Date(); todayForNotes.setHours(0,0,0,0);
+                const hasOverdueNote = pendingNotes.some(n => n.reminderDate && new Date(n.reminderDate) < todayForNotes);
+                let noteIndicator = '';
+                if (pendingNotes.length > 0) {
+                    const niColor = hasOverdueNote ? '#d63939' : '#ff7a00';
+                    const niTitle = hasOverdueNote ? `${pendingNotes.length} ta eslatma (muddati o'tgan bor!)` : `${pendingNotes.length} ta eslatma`;
+                    noteIndicator = `<span title="${niTitle}" style="display:inline-flex;align-items:center;gap:2px;background:${niColor}15;color:${niColor};border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:6px;"><i class="ti ti-bell" style="font-size:10px;"></i>${pendingNotes.length}</span>`;
+                }
+                
+                // Sanani chiroyli formatda chiqarish (masalan: 2026-06-15)
+                let displayDate = student.startDate ? student.startDate : "Belgilanmagan";
+
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>
+                            <a href="student-detail.html?id=${student.id}" class="d-flex py-1 align-items-center text-decoration-none" style="gap:10px;">
+                                <span class="avatar rounded-circle fw-bold" style="background:${ac.bg};color:${ac.color};border:2px solid ${ac.color}20;width:40px;height:40px;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${avatarLetters}</span>
+                                <div class="flex-fill">
+                                    <div class="fw-bold text-dark" style="font-size:14px;">${student.name}${noteIndicator}</div>
+                                    <div class="text-muted" style="font-size:11px;"><i class="ti ti-id-badge me-1"></i>${student.id} · <i class="ti ti-device-mobile ms-1 me-1"></i>${student.phone}</div>
+                                </div>
+                            </a>
+                        </td>
+                        <td><span class="badge bg-purple-lt" style="font-size:11px;"><i class="ti ti-books me-1"></i>${student.group}</span></td>
+                        <td><div class="text-muted" style="font-size:12px;"><i class="ti ti-calendar me-1"></i>${displayDate}</div></td>
+                        <td class="${balanceClass} fw-bold" style="font-size:13px;">${student.balance.toLocaleString()} UZS</td>
+                        <td><span class="badge ${statusBadgeClass}" style="font-size:11px;"><i class="ti ${sc.icon} me-1"></i>${sc.label}</span></td>
+                        <td>
+                            <div class="btn-list flex-nowrap">
+                                <a href="student-detail.html?id=${student.id}" class="btn btn-sm btn-icon btn-white text-primary" title="Profil"><i class="ti ti-eye"></i></a>
+                                <button class="btn btn-sm btn-icon btn-white text-success" title="To'lov" onclick="openPaymentModal(${student.id}, '${student.name.replace(/'/g, "\\'")}')"><i class="ti ti-cash"></i></button>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-icon btn-white text-secondary" data-bs-toggle="dropdown" title="Boshqa amallar"><i class="ti ti-dots-vertical"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        ${student.status === 'Sinov darsida' ? `<button class="dropdown-item text-success" onclick="openActivateModal(${student.id})"><i class="ti ti-circle-check me-2"></i>Faollashtirish</button>` : ''}
+                                        ${student.status === 'Faol' ? `<button class="dropdown-item text-warning" onclick="openFreezeModalList(${student.id})"><i class="ti ti-snowflake me-2"></i>Muzlatish</button>` : ''}
+                                        ${student.status === 'Muzlatilgan' ? `<button class="dropdown-item text-success" onclick="openActivateModal(${student.id})"><i class="ti ti-player-play me-2"></i>Qayta faollashtirish</button>` : ''}
+                                        ${['Sinov darsida','Faol','Muzlatilgan'].includes(student.status) ? '<div class="dropdown-divider"></div>' : ''}
+                                        <a class="dropdown-item" href="certificate.html?student=${student.id}"><i class="ti ti-award me-2 text-warning"></i>Sertifikat</a>
+                                        <button class="dropdown-item" onclick="openGroupAction('copy', ${student.id})"><i class="ti ti-copy me-2 text-info"></i>Boshqa guruhga nusxalash</button>
+                                        <button class="dropdown-item" onclick="openGroupAction('move', ${student.id})"><i class="ti ti-arrow-right me-2 text-primary"></i>Boshqa guruhga ko'chirish</button>
+                                        <div class="dropdown-divider"></div>
+                                        <button class="dropdown-item text-danger" onclick="deleteStudent(${index})"><i class="ti ti-archive me-2"></i>O'chirish (arxivga)</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Bo'sh holat — chiroyli illustratsiya bilan
+            if (visibleCount === 0) {
+                const hasAnyFilter = searchQuery || advGroup || advBalMin !== null || advBalMax !== null || advDateFrom;
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-5">
+                    <i class="ti ${hasAnyFilter ? 'ti-search-off' : 'ti-users'}" style="font-size:48px;color:#d0d3db;display:block;margin-bottom:12px;"></i>
+                    <div class="fw-bold text-dark mb-1">${hasAnyFilter ? 'Hech narsa topilmadi' : 'Bu bo\'limda talabalar yo\'q'}</div>
+                    <div class="text-muted small mb-3">${hasAnyFilter ? 'Filtr shartlarini o\'zgartirib ko\'ring' : 'Birinchi talabani qo\'shing'}</div>
+                    ${hasAnyFilter
+                        ? `<button class="btn btn-sm btn-outline-secondary" onclick="resetAdvancedFilter();document.getElementById('search-input').value='';renderStudents();"><i class="ti ti-refresh me-1"></i>Filtrni tozalash</button>`
+                        : `<button class="btn btn-sm text-white" style="background:var(--modme-orange);" data-bs-toggle="modal" data-bs-target="#modal-student"><i class="ti ti-plus me-1"></i>Talaba qo'shish</button>`
+                    }
+                </td></tr>`;
+            }
+        }
+
+        function addStudent() {
+    // Elementlar bor yoki yo'qligini tekshirib, xavfsiz qiymat olish
+    const nameEl = document.getElementById('student-name');
+    const phoneEl = document.getElementById('student-phone');
+    const dateEl = document.getElementById('student-start-date');
+    const groupEl = document.getElementById('student-group');
+    const balanceEl = document.getElementById('student-balance');
+
+    const name = nameEl ? nameEl.value.trim() : '';
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+    const startDate = dateEl ? dateEl.value : '';
+    const group = groupEl ? groupEl.value : "Guruhsiz";
+    let balance = balanceEl && balanceEl.value ? parseInt(balanceEl.value) : 0;
+
+    // VALIDATSIYA 1: Majburiy maydonlar
+    if (!name) {
+        if (typeof showToast === 'function') showToast("Iltimos, o'quvchining ismini kiriting!", 'danger');
+        else alert("Iltimos, o'quvchining ismini kiriting!");
+        if (nameEl) nameEl.focus();
+        return;
+    }
+    if (!phone) {
+        if (typeof showToast === 'function') showToast("Iltimos, telefon raqamini kiriting!", 'danger');
+        else alert("Iltimos, telefon raqamini kiriting!");
+        if (phoneEl) phoneEl.focus();
+        return;
+    }
+
+    // VALIDATSIYA 2: Telefon formati
+    if (typeof isValidUzPhone === 'function' && !isValidUzPhone(phone)) {
+        if (typeof showToast === 'function') showToast("Telefon raqam noto'g'ri formatda! Masalan: +998 90 123 45 67", 'danger');
+        else alert("Telefon raqam noto'g'ri formatda!");
+        if (phoneEl) phoneEl.focus();
+        return;
+    }
+
+    // VALIDATSIYA 3: Manfiy balans himoyasi
+    if (balance < 0) balance = 0;
+
+    // VALIDATSIYA 4: Sana kelajakda bo'lmasligi
+    if (startDate) {
+        const selectedDate = new Date(startDate);
+        const today = new Date();
+        today.setHours(23,59,59,999);
+        if (selectedDate > today) {
+            if (typeof showToast === 'function') showToast("Qo'shilgan sana kelajakda bo'lishi mumkin emas!", 'danger');
+            else alert("Qo'shilgan sana kelajakda bo'lishi mumkin emas!");
+            if (dateEl) dateEl.focus();
+            return;
+        }
+    }
+
+    // VALIDATSIYA 5: Duplikat tekshiruvi (telefon raqam bo'yicha)
+    let students = localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : [];
+    const normalizedPhone = typeof normalizePhone === 'function' ? normalizePhone(phone) : phone;
+    const duplicate = students.find(s => (typeof normalizePhone === 'function' ? normalizePhone(s.phone) : s.phone) === normalizedPhone);
+
+    if (duplicate) {
+        if (typeof showConfirmModal === 'function') {
+            showConfirmModal({
+                title: "Bunday talaba allaqachon bor",
+                message: `<strong>${duplicate.name}</strong> ismli talaba shu telefon raqam (${duplicate.phone}) bilan ro'yxatda mavjud. Baribir qo'shishni xohlaysizmi?`,
+                confirmLabel: "Ha, baribir qo'shish",
+                danger: false,
+                onConfirm: () => proceedAddStudent(name, phone, startDate, group, balance)
+            });
+        } else if (confirm(`"${duplicate.name}" ismli talaba shu telefon raqam bilan allaqachon bor. Baribir qo'shasizmi?`)) {
+            proceedAddStudent(name, phone, startDate, group, balance);
+        }
+        return;
+    }
+
+    proceedAddStudent(name, phone, startDate, group, balance);
+}
+
+function proceedAddStudent(name, phone, startDate, group, balance) {
+    const newStudent = {
+        id: typeof generateUniqueStudentId === 'function' ? generateUniqueStudentId() : Math.floor(1000 + Math.random() * 9000),
+        name: name,
+        phone: phone,
+        group: group,
+        startDate: startDate,
+        balance: balance,
+        status: "Sinov darsida"
+    };
+
+    let students = localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : [];
+    students.push(newStudent);
+    localStorage.setItem('students', JSON.stringify(students));
+    if(typeof logActivity==='function') logActivity("Qo'shildi", "Yangi talaba: "+name);
+    if(typeof showToast==='function') showToast(`${name} muvaffaqiyatli qo'shildi!`, 'success');
+
+    const nameEl = document.getElementById('student-name');
+    const phoneEl = document.getElementById('student-phone');
+    const balanceEl = document.getElementById('student-balance');
+
+    // Formani tozalash (faqat element mavjud bo'lsa)
+    if (nameEl) nameEl.value = '';
+    if (phoneEl) phoneEl.value = '';
+    if (balanceEl) balanceEl.value = '0';
+    
+    // Modalni yopish
+    let modalEl = document.getElementById('modal-student');
+    if (modalEl) {
+        let modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+    }
+
+    // Yangi talaba "Sinov darsida" holatida qo'shilgani uchun, shu filtrga o'tamiz
+    currentFilter = 'Sinov darsida';
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    const trialBtn = document.querySelector('.filter-btn[onclick*="Sinov darsida"]');
+    if (trialBtn) trialBtn.classList.add('active');
+
+    renderStudents();
+}
+
+        function deleteStudent(index) {
+            const students = getStudents();
+            const student = students[index];
+            if (!student) return;
+
+            showConfirmModal({
+                title: "Talabani guruhdan chiqarish",
+                message: `<strong>${student.name}</strong> faol talabalar ro'yxatidan chiqariladi va <strong>arxivga</strong> ko'chiriladi. To'lov tarixi, davomati va boshqa ma'lumotlari saqlanib qoladi — kerak bo'lsa keyinroq arxivdan tiklash mumkin.
+                    <div class="mt-2">
+                        <label style="font-size:12px;color:#626976;font-weight:600;">Sabab (ixtiyoriy)</label>
+                        <select id="archive-reason-input" class="form-select form-select-sm mt-1">
+                            <option>Kursni tark etdi</option>
+                            <option>Boshqa o'quv markazga o'tdi</option>
+                            <option>Vaqtinchalik to'xtatdi</option>
+                            <option>Kursni tugatdi</option>
+                            <option>Boshqa sabab</option>
+                        </select>
+                    </div>`,
+                confirmLabel: "Ha, arxivlash",
+                danger: true,
+                onConfirm: () => {
+                    const reasonEl = document.getElementById('archive-reason-input');
+                    const reason = reasonEl ? reasonEl.value : "Kursni tark etdi";
+
+                    // 1. Arxivga ko'chirish (statistikasi bilan birga)
+                    archiveStudent(student, reason);
+
+                    // 2. Faol talabalar ro'yxatidan olib tashlash
+                    students.splice(index, 1);
+                    localStorage.setItem('students', JSON.stringify(students));
+
+                    if (typeof logActivity === 'function') logActivity("O'chirildi", `${student.name} arxivga ko'chirildi (${reason})`);
+                    renderStudents();
+                    if (typeof showToast === 'function') showToast(`${student.name} arxivga ko'chirildi`, 'success');
+                }
+            });
+        }
+
+        // ---- ARXIV TIZIMI ----
+        function getArchivedStudents() {
+            return JSON.parse(localStorage.getItem('archived_students') || '[]');
+        }
+        function saveArchivedStudents(arr) {
+            localStorage.setItem('archived_students', JSON.stringify(arr));
+        }
+
+        function archiveStudent(student, reason) {
+            const sid = student.id;
+
+            // Statistikani hisoblash (arxivga "suratga olingan" holatda saqlash uchun)
+            const payments = JSON.parse(localStorage.getItem('payment_history') || '[]');
+            const myPayments = payments.filter(p => String(p.studentId) === String(sid));
+            const totalPaid = myPayments.reduce((a, p) => a + (Number(p.amount) || 0), 0);
+
+            const attendance = JSON.parse(localStorage.getItem('attendance') || '{}');
+            const groupAtt = (attendance[student.group] || {})[sid] || {};
+            const attDates = Object.keys(groupAtt);
+            const wasCount = attDates.filter(d => groupAtt[d] === 'was').length;
+            const attendancePct = attDates.length ? Math.round((wasCount / attDates.length) * 100) : null;
+
+            const archived = getArchivedStudents();
+            archived.unshift({
+                ...student,
+                archivedAt: new Date().toISOString(),
+                reason: reason || "Kursni tark etdi",
+                totalPaid,
+                attendancePct
+            });
+            saveArchivedStudents(archived);
+        }
+
+        function restoreFromArchive(archivedIndex) {
+            const archived = getArchivedStudents();
+            const entry = archived[archivedIndex];
+            if (!entry) return;
+
+            showConfirmModal({
+                title: "Talabani tiklash",
+                message: `<strong>${entry.name}</strong>ni faol talabalar ro'yxatiga qaytarishni xohlaysizmi?`,
+                confirmLabel: "Ha, tiklash",
+                danger: false,
+                onConfirm: () => {
+                    // Arxiv-maxsus maydonlarni olib tashlab, faol ro'yxatga qaytarish
+                    const { archivedAt, reason, totalPaid, attendancePct, ...studentData } = entry;
+                    const students = getStudents();
+                    students.push({ ...studentData, status: 'Faol' });
+                    localStorage.setItem('students', JSON.stringify(students));
+
+                    archived.splice(archivedIndex, 1);
+                    saveArchivedStudents(archived);
+
+                    if (typeof logActivity === 'function') logActivity("Yangilandi", `${entry.name} arxivdan tiklandi`);
+                    if (typeof showToast === 'function') showToast(`${entry.name} tiklandi`, 'success');
+                    renderStudents();
+                }
+            });
+        }
+
+        function permanentlyDeleteArchived(archivedIndex) {
+            const archived = getArchivedStudents();
+            const entry = archived[archivedIndex];
+            if (!entry) return;
+
+            showConfirmModal({
+                title: "Butunlay o'chirish",
+                message: `<strong>${entry.name}</strong>ning barcha ma'lumotlari (to'lov tarixi, davomat, baholar) butunlay o'chiriladi. Bu amalni <strong>qaytarib bo'lmaydi</strong>!`,
+                confirmLabel: "Ha, butunlay o'chirish",
+                danger: true,
+                onConfirm: () => {
+                    cascadeDeleteStudent(entry); // To'liq tozalash (payment, attendance, homework, grades, points, exam)
+                    archived.splice(archivedIndex, 1);
+                    saveArchivedStudents(archived);
+                    if (typeof logActivity === 'function') logActivity("O'chirildi", `${entry.name} arxivdan butunlay o'chirildi`);
+                    if (typeof showToast === 'function') showToast(`${entry.name} butunlay o'chirildi`, 'success');
+                    renderStudents();
+                }
+            });
+        }
+
+        function cascadeDeleteStudent(student) {
+            const sid = student.id;
+
+            // To'lovlar tarixidan o'chirish
+            const payments = JSON.parse(localStorage.getItem('payment_history') || '[]');
+            localStorage.setItem('payment_history', JSON.stringify(payments.filter(p => String(p.studentId) !== String(sid))));
+
+            // Davomatdan o'chirish (attendance[group][studentId])
+            const attendance = JSON.parse(localStorage.getItem('attendance') || '{}');
+            if (attendance[student.group] && attendance[student.group][sid]) {
+                delete attendance[student.group][sid];
+                localStorage.setItem('attendance', JSON.stringify(attendance));
+            }
+
+            // Uy vazifalari va baholar (alohida kalitlar)
+            localStorage.removeItem('homework_' + sid);
+            localStorage.removeItem('grades_' + sid);
+
+            // Gamifikatsiya ballari
+            const points = JSON.parse(localStorage.getItem('points') || '{}');
+            if (points[sid] !== undefined) {
+                delete points[sid];
+                localStorage.setItem('points', JSON.stringify(points));
+            }
+
+            // Test natijalari
+            const examResults = JSON.parse(localStorage.getItem('exam_results') || '[]');
+            localStorage.setItem('exam_results', JSON.stringify(examResults.filter(r => String(r.studentId) !== String(sid))));
+        }
+
+        // ---- GURUHGA NUSXALASH / KO'CHIRISH ----
+        let gaCurrentAction = null;
+        let gaCurrentStudentId = null;
+
+        function openGroupAction(actionType, studentId) {
+            const students = getStudents();
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+
+            gaCurrentAction = actionType;
+            gaCurrentStudentId = studentId;
+
+            const isCopy = actionType === 'copy';
+            document.getElementById('ga-modal-title').innerHTML = isCopy
+                ? '<i class="ti ti-copy me-2" style="color:var(--modme-orange);"></i>Boshqa guruhga nusxalash'
+                : '<i class="ti ti-arrow-right me-2" style="color:var(--modme-orange);"></i>Boshqa guruhga ko\'chirish';
+
+            document.getElementById('ga-student-info').innerHTML = `<i class="ti ti-user me-1"></i><strong>${student.name}</strong> · hozirgi guruh: <strong>${student.group}</strong>`;
+
+            document.getElementById('ga-explainer').innerHTML = isCopy
+                ? `<i class="ti ti-info-circle me-1"></i>Talaba <strong>ikkala guruhda ham</strong> qoladi (yangi mustaqil yozuv yaratiladi — masalan, ikkinchi kursga ham qatnashsa).`
+                : `<i class="ti ti-info-circle me-1"></i>Talaba <strong>${student.group}</strong> guruhidan chiqariladi va faqat yangi guruhda qoladi.`;
+
+            document.getElementById('ga-confirm-btn').innerHTML = isCopy
+                ? '<i class="ti ti-copy me-1"></i>Nusxalash'
+                : '<i class="ti ti-arrow-right me-1"></i>Ko\'chirish';
+
+            document.getElementById('ga-date-label').innerText = isCopy
+                ? "Yangi kursga qaysi sanadan qatnay boshlaydi"
+                : "Yangi guruhga qaysi sanadan o'tadi";
+
+            // Sana maydonini bugungi kun bilan to'ldiramiz (admin xohlasa o'zgartiradi)
+            const dateInput = document.getElementById('ga-effective-date');
+            dateInput.value = new Date().toISOString().split('T')[0];
+            dateInput.max = ''; // kelajak sanaga ham ruxsat (masalan keyingi oydan boshlanadigan o'tish)
+
+            // Guruhlar ro'yxati — joriy guruhdan boshqalari
+            const groups = JSON.parse(localStorage.getItem('groups') || '[]');
+            const sel = document.getElementById('ga-target-group');
+            const otherGroups = groups.filter(g => g.name !== student.group);
+            sel.innerHTML = otherGroups.length
+                ? otherGroups.map(g => `<option value="${g.name}">${g.name}</option>`).join('')
+                : '<option value="">Boshqa guruh mavjud emas</option>';
+
+            new bootstrap.Modal(document.getElementById('modal-group-action')).show();
+        }
+
+        function confirmGroupAction() {
+            const targetGroup = document.getElementById('ga-target-group').value;
+            if (!targetGroup) {
+                if (typeof showToast === 'function') showToast("Guruhni tanlang!", 'danger');
+                return;
+            }
+
+            const effectiveDate = document.getElementById('ga-effective-date').value;
+            if (!effectiveDate) {
+                if (typeof showToast === 'function') showToast("Sanani tanlang!", 'danger');
+                return;
+            }
+            const dateDisplay = (() => {
+                const d = new Date(effectiveDate);
+                return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+            })();
+
+            const students = getStudents();
+            const student = students.find(s => s.id === gaCurrentStudentId);
+            if (!student) return;
+
+            if (gaCurrentAction === 'copy') {
+                // Yangi mustaqil yozuv — boshqa kursga ham qatnashayotgani uchun
+                const newStudent = {
+                    ...student,
+                    id: typeof generateUniqueStudentId === 'function' ? generateUniqueStudentId() : Math.floor(1000 + Math.random() * 9000),
+                    group: targetGroup,
+                    balance: 0,
+                    status: 'Faol',
+                    startDate: effectiveDate
+                };
+                students.push(newStudent);
+                localStorage.setItem('students', JSON.stringify(students));
+                if (typeof logActivity === 'function') logActivity("Qo'shildi", `${student.name} → ${targetGroup} guruhiga nusxalandi (${dateDisplay} sanasidan)`);
+                if (typeof showToast === 'function') showToast(`${student.name} "${targetGroup}" guruhiga ${dateDisplay} sanasidan qo'shildi!`, 'success');
+            } else {
+                // Ko'chirish — eski guruhdan chiqib, yangisida paydo bo'ladi
+                const oldGroup = student.group;
+                const idx = students.findIndex(s => s.id === gaCurrentStudentId);
+                students[idx].group = targetGroup;
+                students[idx].groupChangeDate = effectiveDate; // qachondan boshlab yangi guruhda ekanini kuzatish uchun
+                localStorage.setItem('students', JSON.stringify(students));
+                if (typeof logActivity === 'function') logActivity("Yangilandi", `${student.name}: ${oldGroup} → ${targetGroup} ko'chirildi (${dateDisplay} sanasidan)`);
+                if (typeof showToast === 'function') showToast(`${student.name} "${targetGroup}" guruhiga ${dateDisplay} sanasidan ko'chirildi!`, 'success');
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('modal-group-action')).hide();
+            renderStudents();
+        }
+
+        // ---- SINOV O'QUVCHISINI FAOLLASHTIRISH ----
+        let activatingStudentId = null;
+
+        function openActivateModal(studentId) {
+            const students = getStudents();
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+
+            activatingStudentId = studentId;
+            document.getElementById('act-student-info').innerHTML = `<i class="ti ti-user me-1"></i><strong>${student.name}</strong> · guruh: <strong>${student.group}</strong>`;
+            document.getElementById('act-explainer').innerHTML = student.status === 'Muzlatilgan'
+                ? `<i class="ti ti-info-circle me-1"></i>Talaba "Muzlatilgan" holatidan qayta "Faol" holatga o'tkaziladi.`
+                : `<i class="ti ti-info-circle me-1"></i>Talaba "Sinov darsida" holatidan "Faol" holatga o'tkaziladi.`;
+            document.getElementById('act-date').value = new Date().toISOString().split('T')[0];
+
+            new bootstrap.Modal(document.getElementById('modal-activate')).show();
+        }
+
+        function confirmActivateStudent() {
+            const activationDate = document.getElementById('act-date').value;
+            if (!activationDate) {
+                if (typeof showToast === 'function') showToast("Faollashtirish sanasini tanlang!", 'danger');
+                return;
+            }
+
+            const students = getStudents();
+            const idx = students.findIndex(s => s.id === activatingStudentId);
+            if (idx === -1) return;
+
+            students[idx].status = 'Faol';
+            students[idx].activationDate = activationDate;
+            localStorage.setItem('students', JSON.stringify(students));
+
+            const dateDisplay = (() => {
+                const d = new Date(activationDate);
+                return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+            })();
+
+            if (typeof logActivity === 'function') logActivity("Yangilandi", `${students[idx].name} faollashtirildi (${dateDisplay} sanasidan)`);
+            if (typeof showToast === 'function') showToast(`${students[idx].name} faollashtirildi!`, 'success');
+
+            bootstrap.Modal.getInstance(document.getElementById('modal-activate')).hide();
+            renderStudents();
+        }
+
+        // ---- MUZLATISH (ro'yxat sahifasidan) ----
+        let freezingStudentId = null;
+
+        function openFreezeModalList(studentId) {
+            const students = getStudents();
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+
+            freezingStudentId = studentId;
+            document.getElementById('fz-student-info').innerHTML = `<i class="ti ti-user me-1"></i><strong>${student.name}</strong> · guruh: <strong>${student.group}</strong>`;
+            document.getElementById('fz-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('fz-reason').value = '';
+
+            new bootstrap.Modal(document.getElementById('modal-freeze-list')).show();
+        }
+
+        function confirmFreezeStudentList() {
+            const freezeDate = document.getElementById('fz-date').value;
+            const reason = document.getElementById('fz-reason').value.trim();
+
+            if (!freezeDate) {
+                if (typeof showToast === 'function') showToast("Muzlatish sanasini tanlang!", 'danger');
+                return;
+            }
+
+            const students = getStudents();
+            const idx = students.findIndex(s => s.id === freezingStudentId);
+            if (idx === -1) return;
+
+            students[idx].status = 'Muzlatilgan';
+            students[idx].freezeDate = freezeDate;
+            students[idx].freezeReason = reason || '';
+            localStorage.setItem('students', JSON.stringify(students));
+
+            const dateDisplay = (() => {
+                const d = new Date(freezeDate);
+                return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+            })();
+
+            if (typeof logActivity === 'function') logActivity("Yangilandi", `${students[idx].name} muzlatildi (${dateDisplay} sanasidan)${reason ? ' — ' + reason : ''}`);
+            if (typeof showToast === 'function') showToast(`${students[idx].name} muzlatildi (${dateDisplay} dan)`, 'success');
+
+            bootstrap.Modal.getInstance(document.getElementById('modal-freeze-list')).hide();
+            renderStudents();
+        }
+
+        // ---- To'lov tarixi bilan ishlash ----
+        function getPayments() {
+            // payment_history (yangi unified format) + payments (eski) ni birlashtirish
+            const hist = localStorage.getItem('payment_history') ? JSON.parse(localStorage.getItem('payment_history')) : [];
+            const old  = localStorage.getItem('payments') ? JSON.parse(localStorage.getItem('payments')) : [];
+            // Eski payments ni payment_history ga ko'chirish (bir marta migration)
+            if (old.length && !localStorage.getItem('payments_migrated')) {
+                const merged = [...hist, ...old].sort((a,b) => b.id - a.id);
+                localStorage.setItem('payment_history', JSON.stringify(merged));
+                localStorage.setItem('payments_migrated', '1');
+                localStorage.removeItem('payments');
+                return merged;
+            }
+            return hist;
+        }
+
+        function savePayments(payments) {
+            localStorage.setItem('payment_history', JSON.stringify(payments));
+        }
+
+        function openPaymentModal(studentId, studentName) {
+            document.getElementById('payment-student-id').value = studentId;
+            document.getElementById('payment-student-name').value = studentName;
+            document.getElementById('payment-amount').value = '';
+            let modal = new bootstrap.Modal(document.getElementById('modal-payment'));
+            modal.show();
+        }
+
+        function submitPayment() {
+            const studentId = parseInt(document.getElementById('payment-student-id').value);
+            const amount = parseInt(document.getElementById('payment-amount').value) || 0;
+            const method = document.getElementById('payment-method').value;
+
+            if (amount <= 0) { alert("Iltimos, to'lov summasini to'g'ri kiriting!"); return; }
+
+            const students = getStudents();
+            const studentIndex = students.findIndex(s => s.id === studentId);
+            if (studentIndex === -1) { alert("Talaba topilmadi!"); return; }
+
+            // Talaba balansini yangilaymiz
+            students[studentIndex].balance = (Number(students[studentIndex].balance) || 0) + amount;
+            localStorage.setItem('students', JSON.stringify(students));
+
+            // To'lov yozuvini tarixga qo'shamiz (payment_history)
+            const payments = getPayments();
+            const paymentRecord = {
+                id: Date.now(),
+                studentId: studentId,
+                studentName: students[studentIndex].name,
+                studentPhone: students[studentIndex].phone,
+                group: students[studentIndex].group,
+                amount: amount,
+                method: method,
+                note: '',
+                date: new Date().toISOString()
+            };
+            payments.unshift(paymentRecord);
+            savePayments(payments.slice(0, 500));
+            if (typeof logActivity === 'function') logActivity("To'landi", students[studentIndex].name + ': ' + amount.toLocaleString() + ' UZS');
+            if (typeof awardPointsForPayment === 'function') awardPointsForPayment(studentId, amount);
+
+            let modal = bootstrap.Modal.getInstance(document.getElementById('modal-payment'));
+            modal.hide();
+
+            renderStudents();
+
+            // To'lovdan keyin chekni ko'rsatishni so'raymiz
+            if (confirm("To'lov muvaffaqiyatli qabul qilindi! Elektron chekni ko'rasizmi?")) {
+                window.location.href = 'receipt.html?payment=' + paymentRecord.id;
+            }
+        }
+
+        function filterStatus(status, btn) {
+            currentFilter = status;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderStudents();
+        }
+
+        document.getElementById('search-input').addEventListener('input', renderStudents);
+        
+        window.onload = function() {
+    setTodayDate();       // Bugungi sanani qo'yish
+    updateGroupSelect();   // Guruhlar ro'yxatini yangilash 🎯
+    populateAdvFilterGroups(); // Kengaytirilgan filtr guruhlarini yuklash
+
+    // URL orqali kelgan filtr parametrini qo'llaymiz (masalan dashboard'dan o'tilganda)
+    const params = new URLSearchParams(window.location.search);
+    const filterParam = params.get('filter');
+    if (filterParam) {
+        currentFilter = filterParam;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        const matchingBtn = document.querySelector(`.filter-btn[onclick*="'${filterParam}'"]`);
+        if (matchingBtn) matchingBtn.classList.add('active');
+    }
+
+    renderStudents();     // Talabalarni chizish
+}; // <--- WINDOW.ONLOAD SHU YERDA TUGASHI SHART!
+
+// 🔄 Guruhlar ro'yxatini bazadan olib, talaba qo'shish oynasiga avtomat joylash
+function updateGroupSelect() {
+    let groups = localStorage.getItem('groups') ? JSON.parse(localStorage.getItem('groups')) : [];
+    let groupSelect = document.getElementById('student-group');
+    if (groupSelect && groups.length > 0) {
+        groupSelect.innerHTML = ''; // Eskilarini tozalash
+        groups.forEach(g => {
+            groupSelect.innerHTML += `<option>${g.name}</option>`;
+        });
+    }
+}
+    </script>
+
+    
+
+
+<!-- GLOBAL QIDIRUV -->
+<div id="search-overlay" class="search-overlay">
+    <div class="search-box">
+        <div class="search-input-wrap"><i class="ti ti-search"></i><input type="text" id="search-global-input" placeholder="Talaba, guruh, o'qituvchi..."><kbd style="font-size:11px;background:#f1f3f7;padding:2px 6px;border-radius:4px;">ESC</kbd></div>
+        <div class="search-results" id="search-global-results"></div>
+        <div class="search-hint"><span><kbd>Ctrl+K</kbd> Qidiruv</span><span><kbd>ESC</kbd> Yopish</span></div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const topBar = document.querySelector('.top-navbar');
+    if (topBar) {
+        const btn = document.createElement('button');
+        btn.className = 'btn-excel ms-2';
+        btn.innerHTML = '<i class="ti ti-file-spreadsheet"></i>Excel';
+        btn.onclick = function() {
+            if (typeof exportStudentsToExcel === 'function') exportStudentsToExcel();
+        };
+        const addBtn = topBar.querySelector('[data-bs-target="#modal-student"]');
+        if (addBtn) addBtn.parentNode.insertBefore(btn, addBtn);
+        else topBar.appendChild(btn);
+    }
+});
+</script>
+
+<!-- EXCEL IMPORT MODALI -->
+<div class="modal modal-blur fade" id="modal-import" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius:14px;">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="ti ti-file-import me-2 text-success"></i>Excel / CSV import</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Yuklash zonasi -->
+                <div id="import-dropzone" style="border:2px dashed #e5e8ef;border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:border-color .2s;background:#fafbfc;" onclick="document.getElementById('import-file').click()" ondragover="event.preventDefault();this.style.borderColor='#ff7a00'" ondragleave="this.style.borderColor='#e5e8ef'" ondrop="handleDrop(event)">
+                    <i class="ti ti-cloud-upload" style="font-size:40px;color:#d0d3db;display:block;margin-bottom:12px;"></i>
+                    <div class="fw-bold" style="font-size:15px;">CSV yoki Excel faylni shu yerga torting</div>
+                    <div class="text-muted small mt-1">yoki bosing va faylni tanlang</div>
+                    <input type="file" id="import-file" accept=".csv,.xlsx,.xls" style="display:none;" onchange="handleImportFile(this)">
+                </div>
+
+                <!-- Shablon yuklab olish -->
+                <div class="mt-3 p-3 rounded-2" style="background:#f0f9ff;border:1px solid #bae6fd;font-size:13px;">
+                    <i class="ti ti-info-circle me-1" style="color:#0284c7;"></i>
+                    <strong>Ustunlar tartibi:</strong> Ism, Telefon, Guruh, Qo'shilgan sana, Balans, Holati
+                    <button class="btn btn-sm btn-outline-primary ms-2" onclick="downloadTemplate()"><i class="ti ti-download me-1"></i>Shablon</button>
+                </div>
+
+                <!-- Preview -->
+                <div id="import-preview" style="display:none;margin-top:16px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-link text-secondary" data-bs-dismiss="modal">Bekor</button>
+                <button id="import-btn" class="btn text-white" style="background:#2bab41;display:none;" onclick="executeImport()">
+                    <i class="ti ti-check me-1"></i><span id="import-btn-label">Import qilish</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Import modal ochish tugmasini toolbar ga qo'shish
+document.addEventListener('DOMContentLoaded', function() {
+    const topBar = document.querySelector('.top-navbar');
+    if (topBar && !document.getElementById('import-open-btn')) {
+        const btn = document.createElement('button');
+        btn.id = 'import-open-btn';
+        btn.className = 'btn btn-outline-success';
+        btn.innerHTML = '<i class="ti ti-file-import me-1"></i>Import';
+        btn.setAttribute('data-bs-toggle','modal');
+        btn.setAttribute('data-bs-target','#modal-import');
+        const addBtn = topBar.querySelector('[data-bs-target="#modal-student"]');
+        if (addBtn) addBtn.parentNode.insertBefore(btn, addBtn);
+        else topBar.appendChild(btn);
+    }
+});
+
+let importRows = [];
+
+function handleDrop(e){
+    e.preventDefault();
+    document.getElementById('import-dropzone').style.borderColor='#e5e8ef';
+    const file = e.dataTransfer.files[0];
+    if(file) processImportFile(file);
+}
+
+function handleImportFile(input){
+    const file = input.files[0];
+    if(file) processImportFile(file);
+}
+
+function processImportFile(file){
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const text = e.target.result;
+        const lines = text.split('\n').filter(l=>l.trim());
+        importRows = [];
+        const errors = [];
+        // Header satrini o'tkazib yuborish
+        const dataLines = lines[0].toLowerCase().includes('ism') ? lines.slice(1) : lines;
+        dataLines.forEach((line, i) => {
+            const cols = line.split(',').map(c => c.replace(/^"|"$/g,'').trim());
+            if(cols.length < 2) { errors.push(`${i+2}-qator: Yetarli ustun yo'q`); return; }
+            const name = cols[0];
+            const phone = cols[1] || '';
+            const group = cols[2] || 'Tayinlanmagan';
+            const startDate = cols[3] || new Date().toLocaleDateString('uz-UZ');
+            const balance = Number(cols[4]) || 0;
+            const status = cols[5] || 'Faol';
+            if(!name){ errors.push(`${i+2}-qator: Ism bo'sh`); return; }
+            importRows.push({ name, phone, group, startDate, balance, status });
+        });
+
+        showImportPreview(importRows, errors);
+    };
+    reader.readAsText(file, 'UTF-8');
+}
+
+function showImportPreview(rows, errors){
+    const preview = document.getElementById('import-preview');
+    preview.style.display = 'block';
+    let html = `<div class="d-flex gap-2 mb-3">
+        <span class="badge bg-success-lt">${rows.length} ta talaba tayyor</span>
+        ${errors.length ? `<span class="badge bg-danger-lt">${errors.length} ta xato</span>` : ''}
+    </div>`;
+    if(errors.length){
+        html += `<div class="alert alert-warning py-2 mb-3" style="font-size:12px;"><strong>Xatolar:</strong> ${errors.join(' · ')}</div>`;
+    }
+    if(rows.length){
+        html += `<div style="max-height:220px;overflow-y:auto;border:1px solid #e5e8ef;border-radius:8px;">
+        <table class="table table-sm table-striped mb-0" style="font-size:12px;">
+            <thead><tr><th>#</th><th>Ism</th><th>Telefon</th><th>Guruh</th><th>Balans</th><th>Holati</th></tr></thead>
+            <tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.group}</td><td>${Number(r.balance).toLocaleString()}</td><td>${r.status}</td></tr>`).join('')}</tbody>
+        </table></div>`;
+        document.getElementById('import-btn').style.display = 'inline-flex';
+        document.getElementById('import-btn-label').innerText = `${rows.length} ta talabani import qilish`;
+    }
+    preview.innerHTML = html;
+}
+
+function executeImport(){
+    if(!importRows.length) return;
+    const existing = JSON.parse(localStorage.getItem('students') || '[]');
+    const maxId = existing.length ? Math.max(...existing.map(s=>s.id||0)) : 0;
+    const newStudents = importRows.map((r,i) => ({
+        id: maxId + i + 1,
+        name: r.name, phone: r.phone, group: r.group,
+        startDate: r.startDate, balance: r.balance, status: r.status,
+        points: 0
+    }));
+    const merged = [...existing, ...newStudents];
+    localStorage.setItem('students', JSON.stringify(merged));
+    if(typeof logActivity==='function') logActivity("Qo'shildi", `Excel import: ${newStudents.length} ta talaba`);
+    bootstrap.Modal.getInstance(document.getElementById('modal-import')).hide();
+    importRows = [];
+    document.getElementById('import-preview').style.display = 'none';
+    document.getElementById('import-btn').style.display = 'none';
+    if(typeof renderStudents === 'function') renderStudents();
+    alert(`✅ ${newStudents.length} ta talaba muvaffaqiyatli import qilindi!`);
+}
+
+function downloadTemplate(){
+    const csv = '\uFEFF' + 'Ism,Telefon,Guruh,Qo\'shilgan sana,Balans,Holati\nAli Valiyev,+998901234567,Matematika A1,01.09.2024,500000,Faol\nZulfiya Karimova,+998901234568,Matematika B2,15.09.2024,0,Sinov darsida\n';
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'talabalar_shablon.csv';
+    a.click();
+}
+</script>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM - Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        .stat-card { border:none;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.02);transition:transform .2s,box-shadow .2s;background:#fff; }
+        .stat-card:hover { transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.05); }
+        .stat-icon-wrapper { width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px;background-color:rgba(255,122,0,.1);color:var(--modme-orange); }
+        .lead-item { background:#f8fafc;border:1px solid #eef1f6;border-radius:8px;padding:10px 14px;margin-bottom:8px; }
+        .floating-window { background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.05);margin-bottom:22px; }
+        .floating-header { padding:14px 20px;border-bottom:1px solid #f1f1f4;display:flex;justify-content:space-between;align-items:center; }
+        .floating-body { padding:18px 20px; }
+        .ai-card { background:linear-gradient(135deg,#1e1e2d,#2d2d45);color:#fff;border-radius:14px;padding:20px;margin-bottom:22px; }
+        .ai-tag { background:var(--modme-orange);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:10px; }
+        .risk-item { display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08); }
+        .risk-item:last-child { border-bottom:none; }
+        .risk-bar { flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden; }
+        .risk-fill { height:100%;border-radius:3px; }
+        .activity-item { display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f3f7;font-size:12px; }
+        .activity-item:last-child { border-bottom:none; }
+        .activity-dot { width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar-fixed">
+    <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+    <ul class="sidebar-menu">
+        <li class="sidebar-item active"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+        <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+        <li class="sidebar-item"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+        <li class="sidebar-item"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+        <li class="sidebar-item"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+        <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+        <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+        <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+        <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+        <li class="sidebar-item" style="margin-top:auto;padding-bottom:16px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+    </ul>
+</div>
+
+<div class="mobile-bottom-nav">
+    <div class="nav-items">
+        <a href="dashboard.html" class="active"><i class="ti ti-dashboard"></i>Bosh</a>
+        <a href="leads.html"><i class="ti ti-users-group"></i>Lidlar</a>
+        <a href="student.html"><i class="ti ti-backpack"></i>Talabalar</a>
+        <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+        <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="top-navbar">
+        <div class="d-flex align-items-center gap-2">
+            <i class="ti ti-map-pin text-muted"></i>
+            <select id="branch-selector" class="form-select border-0 bg-transparent fw-bold text-dark p-0 pe-3" style="box-shadow:none;cursor:pointer;min-width:160px;"></select>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button id="search-global-btn" class="btn btn-icon btn-ghost-secondary rounded-circle" title="Qidiruv (Ctrl+K)"><i class="ti ti-search"></i></button>
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <button class="btn btn-icon btn-ghost-secondary rounded-circle" onclick="showShortcuts()"><i class="ti ti-keyboard"></i></button>
+            <div class="position-relative notif-btn">
+                <button id="notif-btn" class="btn btn-icon btn-ghost-secondary rounded-circle"><i class="ti ti-bell"></i><span class="notif-badge"></span></button>
+                <div id="notif-dropdown" class="notif-dropdown">
+                    <div class="notif-header"><span><i class="ti ti-bell me-2"></i>Xabarnomalar</span></div>
+                    <div id="notif-panel"></div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+                <div class="d-none d-xl-block">
+                    <div id="navbar-name" class="fw-bold" style="font-size:13px;">Behruz Berdiyev</div>
+                    <small id="navbar-role" class="text-muted" style="font-size:11px;">Administrator</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-cards mb-3">
+        <div class="col-6 col-xl-3"><a href="student.html" class="card stat-card p-3" style="text-decoration:none;display:block;"><div class="stat-icon-wrapper"><i class="ti ti-users"></i></div><div class="text-muted small fw-bold">Aktiv talabalar</div><div id="aktiv-soni" class="h1 fw-bold text-dark my-1">0</div></a></div>
+        <div class="col-6 col-xl-3"><a href="groups.html" class="card stat-card p-3" style="text-decoration:none;display:block;"><div class="stat-icon-wrapper" style="background:rgba(32,107,196,.1);color:#206bc4;"><i class="ti ti-books"></i></div><div class="text-muted small fw-bold">Guruhlar</div><div id="guruhlar-soni" class="h1 fw-bold text-dark my-1">0</div></a></div>
+        <div class="col-6 col-xl-3"><a href="student.html?filter=Qarzdor" class="card stat-card p-3" style="text-decoration:none;display:block;"><div class="stat-icon-wrapper" style="background:rgba(214,57,57,.1);color:#d63939;"><i class="ti ti-alert-triangle"></i></div><div class="text-muted small fw-bold">Qarzdorlar</div><div id="qarzdorlar-soni" class="h1 fw-bold text-danger my-1">0</div></a></div>
+        <div class="col-6 col-xl-3"><a href="student.html?filter=Sinov%20darsida" class="card stat-card p-3" style="text-decoration:none;display:block;"><div class="stat-icon-wrapper" style="background:rgba(43,171,65,.1);color:#2bab41;"><i class="ti ti-presentation"></i></div><div class="text-muted small fw-bold">Sinov darsida</div><div id="sinov-soni" class="h1 fw-bold text-success my-1">0</div></a></div>
+    </div>
+    <div class="row row-cards mb-4">
+        <div class="col-6 col-xl-3"><a href="finance.html" class="card stat-card p-3" style="text-decoration:none;display:block;"><div class="text-muted small fw-bold">Joriy oy daromad</div><div id="month-income" class="h2 fw-bold text-success my-1">0 UZS</div></a></div>
+        <div class="col-6 col-xl-3"><a href="student.html?filter=Muzlatilgan" class="card stat-card p-3" style="text-decoration:none;display:block;"><div class="text-muted small fw-bold">Muzlatilganlar</div><div id="muzlatilgan-soni" class="h2 fw-bold text-warning my-1">0</div></a></div>
+        <div class="col-6 col-xl-3"><a href="leads.html" class="card stat-card p-3" style="text-decoration:none;display:block;"><div class="text-muted small fw-bold">Yangi lidlar</div><div id="yangi-lidlar" class="h2 fw-bold text-primary my-1">0</div></a></div>
+        <div class="col-6 col-xl-3"><a href="teachers.html" class="card stat-card p-3" style="text-decoration:none;display:block;"><div class="text-muted small fw-bold">O'qituvchilar</div><div id="oqituvchilar-soni" class="h2 fw-bold text-dark my-1">0</div></a></div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="ai-card">
+                <div class="ai-tag"><i class="ti ti-sparkles me-1"></i>AI Tahlil</div>
+                <div class="fw-bold mb-1" style="font-size:15px;">Chiqib ketish xavfi</div>
+                <div style="font-size:12px;opacity:.7;margin-bottom:14px;">Davomat va balans asosida</div>
+                <div id="ai-risk-list"></div>
+            </div>
+            <div class="floating-window">
+                <div class="floating-header"><span class="fw-bold text-dark"><i class="ti ti-list-check me-2 text-primary"></i>So'nggi faoliyat</span></div>
+                <div class="floating-body" style="max-height:220px;overflow-y:auto;" id="activity-log-panel"><div class="text-muted small text-center py-3">Hali faoliyat yo'q</div></div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="floating-window">
+                <div class="floating-header"><span class="fw-bold text-dark"><i class="ti ti-chart-line me-2 text-success"></i>To'lovlar dinamikasi</span><span class="badge bg-orange-lt">Yillik</span></div>
+                <div class="floating-body"><div id="dashboard-chart"></div></div>
+            </div>
+            <div class="floating-window">
+                <div class="floating-header"><span class="fw-bold text-dark"><i class="ti ti-user-plus me-2 text-warning"></i>Yangi Lidlar</span><a href="leads.html" class="btn btn-sm" style="background:var(--modme-orange);color:#fff;">Barchasi</a></div>
+                <div class="floating-body" style="max-height:200px;overflow-y:auto;" id="dashboard-leads"><div class="text-muted small text-center py-3">Lidlar yo'q</div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- GLOBAL QIDIRUV -->
+<div id="search-overlay" class="search-overlay">
+    <div class="search-box">
+        <div class="search-input-wrap"><i class="ti ti-search"></i><input type="text" id="search-global-input" placeholder="Talaba, guruh, o'qituvchi..."><kbd style="font-size:11px;background:#f1f3f7;padding:2px 6px;border-radius:4px;color:#626976;">ESC</kbd></div>
+        <div class="search-results" id="search-global-results"></div>
+        <div class="search-hint"><span><kbd>↑↓</kbd> Navigatsiya</span><span><kbd>Enter</kbd> Ochish</span><span><kbd>ESC</kbd> Yopish</span></div>
+    </div>
+</div>
+
+<!-- SHORTCUTS MODAL -->
+<div id="shortcuts-modal" class="shortcuts-modal">
+    <div class="shortcuts-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:16px;"><i class="ti ti-keyboard me-2"></i>Klaviatura yorliqlari</div>
+        <div class="shortcut-row"><span>Global qidiruv</span><kbd>Ctrl+K</kbd></div>
+        <div class="shortcut-row"><span>Dashboard</span><kbd>D</kbd></div>
+        <div class="shortcut-row"><span>Lidlar</span><kbd>L</kbd></div>
+        <div class="shortcut-row"><span>Guruhlar</span><kbd>G</kbd></div>
+        <div class="shortcut-row"><span>Talabalar</span><kbd>S</kbd></div>
+        <div class="shortcut-row"><span>Moliya</span><kbd>F</kbd></div>
+        <div class="shortcut-row"><span>Hisobotlar</span><kbd>R</kbd></div>
+        <button class="btn btn-outline-secondary mt-3 w-100" onclick="document.getElementById('shortcuts-modal').classList.remove('open')">Yopish</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+<script src="shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const students = JSON.parse(localStorage.getItem('students') || '[]');
+    const groups   = JSON.parse(localStorage.getItem('groups')   || '[]');
+    const leads    = JSON.parse(localStorage.getItem('leads')    || '[]');
+    const teachers = JSON.parse(localStorage.getItem('teachers') || '[]');
+
+    document.getElementById('aktiv-soni').innerText       = students.filter(s=>s.status==='Faol').length;
+    document.getElementById('guruhlar-soni').innerText    = groups.length;
+    document.getElementById('qarzdorlar-soni').innerText  = students.filter(s=>s.balance<0).length;
+    document.getElementById('sinov-soni').innerText       = students.filter(s=>s.status==='Sinov darsida').length;
+    document.getElementById('muzlatilgan-soni').innerText = students.filter(s=>s.status==='Muzlatilgan').length;
+    document.getElementById('yangi-lidlar').innerText     = leads.filter(l=>l.stage==='Yangi').length;
+    document.getElementById('oqituvchilar-soni').innerText= teachers.length;
+    const income = students.filter(s=>s.balance>0).reduce((a,s)=>a+Number(s.balance),0);
+    document.getElementById('month-income').innerText = income.toLocaleString()+' UZS';
+
+    // AI xavf — REAL FORMULA (random emas)
+    // Hisobga olinadigan omillar: balans, davomat foizi, oxirgi to'lovdan o'tgan kun, muzlatilgan holat
+    const riskList = document.getElementById('ai-risk-list');
+    const allAttendance = JSON.parse(localStorage.getItem('attendance') || '{}');
+    const allPayments   = JSON.parse(localStorage.getItem('payment_history') || '[]');
+    const today = new Date();
+
+    function calcRiskScore(s) {
+        let score = 0;
+
+        // 1) Balans omili (0-35 ball)
+        if (s.balance < 0) score += 35;
+        else if (s.balance === 0) score += 15;
+
+        // 2) Davomat omili (0-35 ball) — so'nggi 30 kun
+        const groupAtt = (allAttendance[s.group] || {})[s.id] || {};
+        const dates = Object.keys(groupAtt);
+        if (dates.length > 0) {
+            const wasCount = dates.filter(d => groupAtt[d] === 'was').length;
+            const attPct = wasCount / dates.length;
+            if (attPct < 0.5) score += 35;
+            else if (attPct < 0.75) score += 20;
+            else if (attPct < 0.9) score += 8;
+        }
+
+        // 3) Oxirgi to'lovdan o'tgan kun (0-20 ball)
+        const myPayments = allPayments.filter(p => String(p.studentId) === String(s.id));
+        if (myPayments.length > 0) {
+            const lastPay = myPayments.reduce((latest, p) => new Date(p.date) > new Date(latest.date) ? p : latest);
+            const daysSince = Math.floor((today - new Date(lastPay.date)) / 86400000);
+            if (daysSince > 45) score += 20;
+            else if (daysSince > 30) score += 10;
+        } else {
+            score += 10; // Hech qachon to'lov qilmagan
+        }
+
+        // 4) Muzlatilgan holat (0-10 ball)
+        if (s.status === 'Muzlatilgan') score += 10;
+
+        return Math.min(score, 95);
+    }
+
+    const riskSt = students.filter(s=>s.status==='Faol').map(s => ({...s, risk: calcRiskScore(s)}))
+        .filter(s => s.risk > 0)
+        .sort((a,b)=>b.risk-a.risk).slice(0,5);
+    riskList.innerHTML = riskSt.length ? riskSt.map(s=>{
+        const c=s.risk>=60?'#e53935':s.risk>=30?'#ff7a00':'#2bab41';
+        return `<div class="risk-item"><div style="font-size:12px;min-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.name}</div><div class="risk-bar"><div class="risk-fill" style="width:${s.risk}%;background:${c};"></div></div><div style="font-size:12px;font-weight:700;color:${c};min-width:34px;text-align:right;">${s.risk}%</div></div>`;
+    }).join('') : '<div style="font-size:12px;opacity:.6;text-align:center;padding:10px 0;">Xavf ostidagi talabalar yo\'q ✓</div>';
+
+    // Faoliyat logi
+    const logPanel = document.getElementById('activity-log-panel');
+    const logs = JSON.parse(localStorage.getItem('crm_activity_log') || '[]');
+    const logColors={'Qo\'shildi':'#2bab41','O\'chirildi':'#d63939','Yangilandi':'#206bc4','To\'landi':'#2bab41'};
+    logPanel.innerHTML = logs.length ? logs.slice(0,20).map(l=>{
+        const c=logColors[l.action]||'#99a1ad';
+        const time=new Date(l.time).toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'});
+        return `<div class="activity-item"><div class="activity-dot" style="background:${c};"></div><div style="flex:1;"><div style="font-weight:600;">${l.detail}</div><div style="color:#99a1ad;">${l.user} · ${time}</div></div></div>`;
+    }).join('') : '<div class="text-muted small text-center py-3">Hali faoliyat yo\'q</div>';
+
+    // Lidlar
+    const leadsPanel = document.getElementById('dashboard-leads');
+    const SRC={'Facebook':'bg-blue-lt','Instagram':'bg-pink-lt','Telegram':'bg-purple-lt','Tanish orqali':'bg-green-lt','Boshqa':'bg-secondary-lt'};
+    const newLeads=leads.filter(l=>l.stage==='Yangi').slice(0,5);
+    leadsPanel.innerHTML = newLeads.length ? newLeads.map(l=>`<div class="lead-item d-flex justify-content-between align-items-center"><div><div class="fw-bold" style="font-size:13px;">${l.name}</div><small class="text-muted"><i class="ti ti-phone me-1"></i>${l.phone}</small></div><span class="badge ${SRC[l.source]||'bg-secondary-lt'}">${l.source}</span></div>`).join('') : '<div class="text-muted small text-center py-3">Yangi lid yo\'q</div>';
+
+    // Grafik — TUZATISH: avval soxta qattiq yozilgan raqamlar ko'rsatilardi.
+    // Endi so'nggi 12 oylik HAQIQIY to'lovlar tarixidan (payment_history) hisoblanadi.
+    const MONTH_SHORT_UZ=['Yan','Fev','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
+    const paymentHistoryForChart = JSON.parse(localStorage.getItem('payment_history') || '[]');
+    const chartMonths = [];
+    const chartToday = new Date();
+    for (let i = 11; i >= 0; i--) {
+        const d = new Date(chartToday.getFullYear(), chartToday.getMonth() - i, 1);
+        chartMonths.push({ year: d.getFullYear(), month: d.getMonth(), label: MONTH_SHORT_UZ[d.getMonth()] });
+    }
+    const chartSeriesData = chartMonths.map(m => paymentHistoryForChart
+        .filter(p => { const pd = new Date(p.date); return pd.getFullYear()===m.year && pd.getMonth()===m.month; })
+        .reduce((sum,p) => sum + (Number(p.amount)||0), 0)
+    );
+
+    new ApexCharts(document.querySelector('#dashboard-chart'),{
+        chart:{type:'area',height:180,toolbar:{show:false},fontFamily:'inherit'},
+        series:[{name:"To'lovlar",data:chartSeriesData}],
+        xaxis:{categories:chartMonths.map(m=>m.label)},
+        colors:['#ff7a00'],stroke:{curve:'smooth',width:2},
+        fill:{type:'gradient',gradient:{shadeIntensity:1,opacityFrom:0.3,opacityTo:0,stops:[0,100]}},
+        markers:{size:0},grid:{strokeDashArray:4},
+        yaxis:{labels:{formatter:v=>v>=1000000?(v/1000000).toFixed(1)+'M':v.toLocaleString()}},
+        noData:{text:"Hali to'lov tarixi yo'q"}
+    }).render();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM - Guruhlar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        :root { --modme-orange: #ff7a00; --sidebar-bg: #1e1e2d; }
+        body { background-color: #f6f8fb; font-family: system-ui, -apple-system, sans-serif; }
+        
+        
+        .sidebar-brand span { color: var(--modme-orange); }
+        
+        
+        
+        
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: #fff; padding: 12px 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .group-card { border-radius: 14px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.3s ease; }
+        .group-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-fixed">
+        <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+            <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+            <li class="sidebar-item"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+            <li class="sidebar-item active"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+            <li class="sidebar-item"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+            <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+            <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+            <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+            <li class="sidebar-item"><a href="timetable.html" class="sidebar-link"><i class="ti ti-calendar-week"></i><span>Jadval</span></a></li>
+            <li class="sidebar-item"><a href="salary.html" class="sidebar-link"><i class="ti ti-moneybag"></i><span>Ish haqi</span></a></li>
+            <li class="sidebar-item"><a href="exam.html" class="sidebar-link"><i class="ti ti-pencil-check"></i><span>Testlar</span></a></li>
+            <li class="sidebar-item"><a href="certificate.html" class="sidebar-link"><i class="ti ti-award"></i><span>Sertifikat</span></a></li>
+            <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+            <li class="sidebar-item" style="margin-top:auto;padding-bottom:12px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+        </ul>
+    </div>
+
+    <div class="mobile-bottom-nav">
+        <div class="nav-items">
+            <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+            <a href="leads.html"><i class="ti ti-users-group"></i>Lidlar</a>
+            <a href="student.html"><i class="ti ti-backpack"></i>Talabalar</a>
+            <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+            <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center"><i class="ti ti-map-pin me-2 text-muted"></i><span class="fw-bold">Yunusobod filiali / Guruhlar</span></div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="search-global-btn" class="btn btn-icon btn-ghost-secondary rounded-circle" title="Ctrl+K"><i class="ti ti-search"></i></button>
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+                <div id="navbar-name" class="fw-bold d-none d-xl-block" style="font-size: 13px;">Behruz Berdiyev</div>
+            </div>
+        </div>
+
+        <div id="teacher-filter-banner" class="alert alert-info d-none d-flex justify-content-between align-items-center" role="alert">
+            <span><i class="ti ti-filter me-2"></i><span id="teacher-filter-text"></span> bo'yicha filtrlangan</span>
+            <button class="btn btn-sm btn-outline-secondary" onclick="clearTeacherFilter()">Filtrni tozalash</button>
+        </div>
+
+        <div class="card p-3 mb-4 border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="row g-3 align-items-center justify-content-between">
+                <div class="col-md-8 d-flex flex-wrap gap-2 align-items-center">
+                    <div class="input-icon" style="min-width: 250px;">
+                        <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+                        <input type="text" id="group-search" class="form-control" placeholder="Guruh nomini qidirish..." oninput="renderGroups()">
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn text-white" style="background-color: var(--modme-orange);" onclick="openAddGroupModal()">
+                        <i class="ti ti-plus me-2"></i>Yangi guruh ochish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row row-cards" id="groups-container">
+            </div>
+    </div>
+
+    <div class="modal modal-blur fade" id="modal-group" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 14px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold fs-3">Yangi guruh ochish</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Guruh nomi</label>
+                        <input type="text" id="group-name" class="form-control" placeholder="Masalan: Math-01 (SAT)">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">O'qituvchi</label>
+                        <select id="group-teacher" class="form-select">
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Dars kunlari</label>
+                                <select id="group-days" class="form-select">
+                                    <option>Juft kunlar (Se-Pay-Sha)</option>
+                                    <option>Toq kunlar (Du-Chor-Ju)</option>
+                                    <option>Har kuni (Intensiv)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Dars vaqti</label>
+                                <input type="text" id="group-time" class="form-control" placeholder="Masalan: 15:00 - 17:00">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Kurs narxi (oylik, UZS)</label>
+                        <input type="number" id="group-price" class="form-control" placeholder="Masalan: 450000" min="0">
+                    </div>
+                    <div class="card bg-light border-0 p-3 mb-1" style="border-radius:10px;">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="ti ti-discount-2 me-2 text-danger"></i>
+                            <span class="fw-bold" style="font-size:13px;">Chegirma (ixtiyoriy)</span>
+                        </div>
+                        <div class="text-muted mb-2" style="font-size:11px;">Hamma talaba bir xil narxda o'qimasligi mumkin — shu guruh uchun vaqtinchalik chegirma belgilang.</div>
+                        <div class="row g-2">
+                            <div class="col-5">
+                                <select id="group-discount-type" class="form-select form-select-sm">
+                                    <option value="percent">% (foiz)</option>
+                                    <option value="amount">UZS (summa)</option>
+                                </select>
+                            </div>
+                            <div class="col-7">
+                                <input type="number" id="group-discount-value" class="form-control form-control-sm" placeholder="Masalan: 15" min="0">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Boshlanish sanasi</label>
+                                <input type="date" id="group-discount-start" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Tugash sanasi</label>
+                                <input type="date" id="group-discount-end" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="button" class="btn text-white" style="background-color: var(--modme-orange);" onclick="addGroup()">Guruhni ochish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GURUHNI TAHRIRLASH MODALI -->
+    <div class="modal modal-blur fade" id="modal-edit-group" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 14px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold fs-3"><i class="ti ti-edit me-2" style="color:var(--modme-orange);"></i>Guruhni tahrirlash</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning py-2 mb-3" style="font-size:12px;">
+                        <i class="ti ti-info-circle me-1"></i>Guruh nomini o'zgartirsangiz, barcha bog'liq talabalar va dars jadvali avtomatik yangilanadi.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Guruh nomi</label>
+                        <input type="text" id="edit-group-name" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">O'qituvchi</label>
+                        <select id="edit-group-teacher" class="form-select">
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Dars kunlari</label>
+                                <select id="edit-group-days" class="form-select">
+                                    <option>Juft kunlar (Se-Pay-Sha)</option>
+                                    <option>Toq kunlar (Du-Chor-Ju)</option>
+                                    <option>Har kuni (Intensiv)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Dars vaqti</label>
+                                <input type="text" id="edit-group-time" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Kurs narxi (oylik, UZS)</label>
+                        <input type="number" id="edit-group-price" class="form-control" min="0">
+                    </div>
+                    <div class="card bg-light border-0 p-3 mb-1" style="border-radius:10px;">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="ti ti-discount-2 me-2 text-danger"></i>
+                            <span class="fw-bold" style="font-size:13px;">Chegirma (ixtiyoriy)</span>
+                        </div>
+                        <div class="text-muted mb-2" style="font-size:11px;">Hamma talaba bir xil narxda o'qimasligi mumkin — shu guruh uchun vaqtinchalik chegirma belgilang.</div>
+                        <div class="row g-2">
+                            <div class="col-5">
+                                <select id="edit-group-discount-type" class="form-select form-select-sm">
+                                    <option value="percent">% (foiz)</option>
+                                    <option value="amount">UZS (summa)</option>
+                                </select>
+                            </div>
+                            <div class="col-7">
+                                <input type="number" id="edit-group-discount-value" class="form-control form-control-sm" placeholder="Masalan: 15" min="0">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Boshlanish sanasi</label>
+                                <input type="date" id="edit-group-discount-start" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Tugash sanasi</label>
+                                <input type="date" id="edit-group-discount-end" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="clearDiscountFields('edit-')" style="font-size:11px;"><i class="ti ti-x me-1"></i>Chegirmani bekor qilish</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="button" class="btn text-white" style="background-color: var(--modme-orange);" onclick="saveEditGroup()"><i class="ti ti-check me-1"></i>Saqlash</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+    <script src="shared.js"></script>
+
+    <script>
+        // Dastlabki namunaviy guruhlar
+        let defaultGroups = [
+            { name: "Math-01 (SAT)", teacher: "Muzaffar Egamberdiyev", days: "Juft kunlar (Se-Pay-Sha)", time: "15:00 - 17:00", price: 450000 },
+            { name: "Math-02 (Olimpiada)", teacher: "Muzaffar Egamberdiyev", days: "Toq kunlar (Du-Chor-Ju)", time: "16:30 - 18:30", price: 500000 },
+            { name: "Inter-03", teacher: "Behruz Berdiyev", days: "Juft kunlar (Se-Pay-Sha)", time: "09:00 - 11:00", price: 400000 }
+        ];
+
+        if (!localStorage.getItem('groups')) {
+            localStorage.setItem('groups', JSON.stringify(defaultGroups));
+        }
+
+        function getGroups() {
+            return JSON.parse(localStorage.getItem('groups') || '[]');
+        }
+
+        function getStudents() {
+            return localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : [];
+        }
+
+        function getTeachers() {
+            return JSON.parse(localStorage.getItem('teachers') || '[]');
+        }
+
+        // O'qituvchi dropdown'ini har doim haqiqiy ro'yxatdan to'ldirish
+        // (oldin hardcoded 2 ta nom edi — yangi qo'shilgan o'qituvchilar ko'rinmas edi)
+        function populateTeacherDropdown(selectId, selectedValue) {
+            const teachers = getTeachers();
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            if (!teachers.length) {
+                sel.innerHTML = '<option value="">Avval O\'qituvchilar bo\'limidan qo\'shing</option>';
+                return;
+            }
+            sel.innerHTML = teachers.map(t => `<option>${t.name}</option>`).join('');
+            if (selectedValue && teachers.some(t => t.name === selectedValue)) {
+                sel.value = selectedValue;
+            } else if (selectedValue) {
+                // O'chirilgan/topilmagan o'qituvchi — ro'yxat oxiriga vaqtinchalik qo'shamiz
+                sel.innerHTML += `<option selected>${selectedValue} (arxivlangan)</option>`;
+            }
+        }
+
+        function openAddGroupModal() {
+            populateTeacherDropdown('group-teacher');
+            new bootstrap.Modal(document.getElementById('modal-group')).show();
+        }
+
+        function renderGroups() {
+            const groups = getGroups();
+            const students = getStudents();
+            const container = document.getElementById('groups-container');
+            const searchQuery = document.getElementById('group-search').value.toLowerCase();
+            
+            container.innerHTML = '';
+
+            groups.forEach((group, index) => {
+                const matchesSearch = group.name.toLowerCase().includes(searchQuery) ||
+                                       (group.teacher && group.teacher.toLowerCase().includes(searchQuery));
+                if (!matchesSearch) return;
+
+                // 🎯 ENG MUHIM JOYI: Shu guruhga tegishli faol o'quvchilar sonini avtomat hisoblaydi!
+                let studentCount = students.filter(s => s.group === group.name && s.status === 'Faol').length;
+                let priceDisplay = typeof formatGroupPriceHTML === 'function' ? formatGroupPriceHTML(group) : (group.price ? Number(group.price).toLocaleString() + ' UZS' : 'Belgilanmagan');
+
+                container.innerHTML += `
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card group-card" style="cursor:pointer;" onclick="openGroupDetail('${group.name}')">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h3 class="fw-bold text-dark mb-1">${group.name}</h3>
+                                        <div class="text-muted small"><i class="ti ti-school me-1"></i>${group.teacher}</div>
+                                    </div>
+                                    <span class="badge bg-orange-lt fs-4 px-2 py-1">${studentCount} ta o'quvchi</span>
+                                </div>
+                                <hr class="my-2" style="opacity: 0.1;">
+                                <div class="row g-2 text-muted small">
+                                    <div class="col-6 d-flex align-items-center"><i class="ti ti-calendar me-1 text-primary"></i>${group.days.split(' ')[0]} kunlar</div>
+                                    <div class="col-6 d-flex align-items-center"><i class="ti ti-clock me-1 text-success"></i>${group.time}</div>
+                                </div>
+                                <div class="d-flex align-items-center text-muted small mt-2">
+                                    <i class="ti ti-cash me-1 text-orange"></i><span class="fw-bold text-dark">${priceDisplay}</span>&nbsp;/ oy
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <span class="text-primary small fw-bold"><i class="ti ti-clipboard-list me-1"></i>Davomatni ko'rish</span>
+                                    <div class="d-flex gap-1">
+                                        <button class="btn btn-sm btn-white text-secondary" onclick="event.stopPropagation(); openEditGroup(${index})" title="Tahrirlash"><i class="ti ti-edit"></i></button>
+                                        <button class="btn btn-sm btn-white text-danger" onclick="event.stopPropagation(); deleteGroup(${index})" title="O'chirish"><i class="ti ti-trash"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function openGroupDetail(groupName) {
+            window.location.href = 'group-detail.html?group=' + encodeURIComponent(groupName);
+        }
+
+        // Chegirma maydonlarini o'qish va tekshirish (Add va Edit modallar uchun umumiy)
+        function readDiscountFields(prefix) {
+            const typeEl = document.getElementById(prefix + 'group-discount-type');
+            const valueEl = document.getElementById(prefix + 'group-discount-value');
+            const startEl = document.getElementById(prefix + 'group-discount-start');
+            const endEl = document.getElementById(prefix + 'group-discount-end');
+
+            const discountType = typeEl.value;
+            let discountValue = parseInt(valueEl.value) || 0;
+            const discountStart = startEl.value;
+            const discountEnd = endEl.value;
+
+            if (discountValue <= 0) {
+                // Chegirma kiritilmagan — bo'sh qaytaramiz
+                return { discountType: 'percent', discountValue: 0, discountStart: '', discountEnd: '', error: null };
+            }
+            if (discountValue < 0) discountValue = 0;
+            if (discountType === 'percent' && discountValue > 100) {
+                return { error: "Foiz chegirma 100% dan oshmasligi kerak!" };
+            }
+            if (discountStart && discountEnd && new Date(discountEnd) < new Date(discountStart)) {
+                return { error: "Tugash sanasi boshlanish sanasidan oldin bo'lishi mumkin emas!" };
+            }
+            return { discountType, discountValue, discountStart, discountEnd, error: null };
+        }
+
+        function clearDiscountFields(prefix) {
+            document.getElementById(prefix + 'group-discount-value').value = '';
+            document.getElementById(prefix + 'group-discount-start').value = '';
+            document.getElementById(prefix + 'group-discount-end').value = '';
+            document.getElementById(prefix + 'group-discount-type').value = 'percent';
+        }
+
+        function addGroup() {
+            const name = document.getElementById('group-name').value.trim();
+            const teacher = document.getElementById('group-teacher').value;
+            const days = document.getElementById('group-days').value;
+            const time = document.getElementById('group-time').value.trim();
+            let price = parseInt(document.getElementById('group-price').value) || 0;
+            if (price < 0) price = 0;
+
+            if (!name || !time) {
+                if (typeof showToast === 'function') showToast("Iltimos, guruh nomi va vaqtini kiriting!", 'danger');
+                else alert("Iltimos, guruh nomi va vaqtini kiriting!");
+                return;
+            }
+
+            if (!teacher) {
+                if (typeof showToast === 'function') showToast("Iltimos, o'qituvchini tanlang! (Avval O'qituvchilar bo'limidan qo'shing)", 'danger');
+                else alert("Iltimos, o'qituvchini tanlang!");
+                return;
+            }
+
+            // Duplikat guruh nomi tekshiruvi
+            const existing = getGroups().find(g => g.name.toLowerCase() === name.toLowerCase());
+            if (existing) {
+                if (typeof showToast === 'function') showToast(`"${name}" nomli guruh allaqachon mavjud!`, 'danger');
+                else alert(`"${name}" nomli guruh allaqachon mavjud!`);
+                return;
+            }
+
+            const discount = readDiscountFields('');
+            if (discount.error) {
+                if (typeof showToast === 'function') showToast(discount.error, 'danger');
+                else alert(discount.error);
+                return;
+            }
+
+            const groups = getGroups();
+            groups.push({
+                name, teacher, days, time, price,
+                discountType: discount.discountValue ? discount.discountType : undefined,
+                discountValue: discount.discountValue || undefined,
+                discountStart: discount.discountStart || undefined,
+                discountEnd: discount.discountEnd || undefined
+            });
+            localStorage.setItem('groups', JSON.stringify(groups));
+            if (typeof logActivity === 'function') logActivity("Qo'shildi", `Yangi guruh: ${name}${discount.discountValue ? ' (chegirma bilan)' : ''}`);
+            if (typeof showToast === 'function') showToast(`"${name}" guruhi ochildi!`, 'success');
+
+            // Formani tozalash va yopish
+            document.getElementById('group-name').value = '';
+            document.getElementById('group-time').value = '';
+            document.getElementById('group-price').value = '';
+            clearDiscountFields('');
+
+            let modal = bootstrap.Modal.getInstance(document.getElementById('modal-group'));
+            modal.hide();
+            
+            renderGroups();
+        }
+
+        function deleteGroup(index) {
+            const groups = getGroups();
+            const deletedGroupName = groups[index].name;
+            const affectedCount = getStudents().filter(s => s.group === deletedGroupName).length;
+
+            const msg = affectedCount > 0
+                ? `<strong>${deletedGroupName}</strong> guruhini o'chirsangiz, unga biriktirilgan <strong>${affectedCount} ta talaba</strong> "Guruhsiz" holatga o'tadi. Dars jadvalidagi darslar ham o'chiriladi.`
+                : `<strong>${deletedGroupName}</strong> guruhini o'chirishni xohlaysizmi?`;
+
+            showConfirmModal({
+                title: "Guruhni o'chirish",
+                message: msg,
+                confirmLabel: "Ha, o'chirish",
+                danger: true,
+                onConfirm: () => {
+                    groups.splice(index, 1);
+                    localStorage.setItem('groups', JSON.stringify(groups));
+
+                    // SINXRONIZATSIYA 1: Talabalarni "Guruhsiz" qilib belgilash
+                    let students = getStudents();
+                    students = students.map(s => {
+                        if (s.group === deletedGroupName) s.group = "Guruhsiz";
+                        return s;
+                    });
+                    localStorage.setItem('students', JSON.stringify(students));
+
+                    // SINXRONIZATSIYA 2: Dars jadvalidan o'chirish
+                    const timetable = JSON.parse(localStorage.getItem('timetable') || '[]');
+                    localStorage.setItem('timetable', JSON.stringify(timetable.filter(l => l.group !== deletedGroupName)));
+
+                    // SINXRONIZATSIYA 3: Davomat ma'lumotidan o'chirish
+                    const attendance = JSON.parse(localStorage.getItem('attendance') || '{}');
+                    if (attendance[deletedGroupName]) {
+                        delete attendance[deletedGroupName];
+                        localStorage.setItem('attendance', JSON.stringify(attendance));
+                    }
+
+                    if (typeof logActivity === 'function') logActivity("O'chirildi", `Guruh: ${deletedGroupName} (${affectedCount} talaba "Guruhsiz" qilindi)`);
+                    renderGroups();
+                    if (typeof showToast === 'function') showToast(`${deletedGroupName} o'chirildi`, 'success');
+                }
+            });
+        }
+
+        // ---- GURUHNI TAHRIRLASH (rename + sinxronizatsiya) ----
+        let editingGroupIndex = null;
+
+        function openEditGroup(index) {
+            editingGroupIndex = index;
+            const groups = getGroups();
+            const g = groups[index];
+            document.getElementById('edit-group-name').value = g.name;
+            populateTeacherDropdown('edit-group-teacher', g.teacher);
+            document.getElementById('edit-group-days').value = g.days;
+            document.getElementById('edit-group-time').value = g.time;
+            document.getElementById('edit-group-price').value = g.price || '';
+
+            // Mavjud chegirma ma'lumotlarini to'ldirish
+            document.getElementById('edit-group-discount-type').value = g.discountType || 'percent';
+            document.getElementById('edit-group-discount-value').value = g.discountValue || '';
+            document.getElementById('edit-group-discount-start').value = g.discountStart || '';
+            document.getElementById('edit-group-discount-end').value = g.discountEnd || '';
+
+            new bootstrap.Modal(document.getElementById('modal-edit-group')).show();
+        }
+
+        function saveEditGroup() {
+            const groups = getGroups();
+            const oldGroup = groups[editingGroupIndex];
+            const oldName = oldGroup.name;
+            const newName = document.getElementById('edit-group-name').value.trim();
+
+            if (!newName) { if(typeof showToast==='function') showToast('Guruh nomini kiriting!', 'danger'); return; }
+
+            const discount = readDiscountFields('edit-');
+            if (discount.error) {
+                if (typeof showToast === 'function') showToast(discount.error, 'danger');
+                else alert(discount.error);
+                return;
+            }
+
+            groups[editingGroupIndex] = {
+                name: newName,
+                teacher: document.getElementById('edit-group-teacher').value,
+                days: document.getElementById('edit-group-days').value,
+                time: document.getElementById('edit-group-time').value,
+                price: parseInt(document.getElementById('edit-group-price').value) || 0,
+                discountType: discount.discountValue ? discount.discountType : undefined,
+                discountValue: discount.discountValue || undefined,
+                discountStart: discount.discountStart || undefined,
+                discountEnd: discount.discountEnd || undefined
+            };
+            localStorage.setItem('groups', JSON.stringify(groups));
+
+            // Agar nom o'zgargan bo'lsa — TO'LIQ SINXRONIZATSIYA
+            if (oldName !== newName) {
+                // Talabalarning group maydonini yangilash
+                let students = getStudents();
+                students = students.map(s => {
+                    if (s.group === oldName) s.group = newName;
+                    return s;
+                });
+                localStorage.setItem('students', JSON.stringify(students));
+
+                // Dars jadvalidagi guruh nomini yangilash
+                const timetable = JSON.parse(localStorage.getItem('timetable') || '[]');
+                timetable.forEach(l => { if (l.group === oldName) l.group = newName; });
+                localStorage.setItem('timetable', JSON.stringify(timetable));
+
+                // Davomat kalitini ko'chirish (eski nom → yangi nom)
+                const attendance = JSON.parse(localStorage.getItem('attendance') || '{}');
+                if (attendance[oldName]) {
+                    attendance[newName] = attendance[oldName];
+                    delete attendance[oldName];
+                    localStorage.setItem('attendance', JSON.stringify(attendance));
+                }
+
+                if (typeof logActivity === 'function') logActivity("Yangilandi", `Guruh nomi: ${oldName} → ${newName} (barcha bog'liq ma'lumot sinxronlandi)`);
+            } else {
+                if (typeof logActivity === 'function') logActivity("Yangilandi", `Guruh: ${newName}`);
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('modal-edit-group')).hide();
+            renderGroups();
+            if (typeof showToast === 'function') showToast('Guruh ma\'lumotlari yangilandi', 'success');
+        }
+
+        window.onload = function () {
+            const params = new URLSearchParams(window.location.search);
+            const teacherParam = params.get('teacher');
+            if (teacherParam) {
+                document.getElementById('group-search').value = teacherParam;
+                document.getElementById('teacher-filter-banner').classList.remove('d-none');
+                document.getElementById('teacher-filter-text').innerText = teacherParam;
+            }
+            renderGroups();
+        };
+
+        function clearTeacherFilter() {
+            document.getElementById('group-search').value = '';
+            document.getElementById('teacher-filter-banner').classList.add('d-none');
+            window.history.replaceState({}, '', 'groups.html');
+            renderGroups();
+        }
+    </script>
+
+    
+
+
+<!-- GLOBAL QIDIRUV -->
+<div id="search-overlay" class="search-overlay">
+    <div class="search-box">
+        <div class="search-input-wrap"><i class="ti ti-search"></i><input type="text" id="search-global-input" placeholder="Talaba, guruh, o'qituvchi..."><kbd style="font-size:11px;background:#f1f3f7;padding:2px 6px;border-radius:4px;">ESC</kbd></div>
+        <div class="search-results" id="search-global-results"></div>
+        <div class="search-hint"><span><kbd>Ctrl+K</kbd> Qidiruv</span><span><kbd>ESC</kbd> Yopish</span></div>
+    </div>
+</div>
+</body>
+</html>

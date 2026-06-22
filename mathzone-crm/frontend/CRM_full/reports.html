@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM - Hisobotlar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        :root { --modme-orange: #ff7a00; --sidebar-bg: #1e1e2d; }
+        body { background-color: #f6f8fb; font-family: system-ui, -apple-system, sans-serif; }
+        
+        
+        .sidebar-brand span { color: var(--modme-orange); }
+        
+        
+        
+        
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: #fff; padding: 12px 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .report-card { border-radius: 14px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 20px; background: #fff; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-fixed">
+        <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+            <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+            <li class="sidebar-item"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+            <li class="sidebar-item"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+            <li class="sidebar-item"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+            <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+            <li class="sidebar-item active"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+            <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+            <li class="sidebar-item"><a href="timetable.html" class="sidebar-link"><i class="ti ti-calendar-week"></i><span>Jadval</span></a></li>
+            <li class="sidebar-item"><a href="salary.html" class="sidebar-link"><i class="ti ti-moneybag"></i><span>Ish haqi</span></a></li>
+            <li class="sidebar-item"><a href="exam.html" class="sidebar-link"><i class="ti ti-pencil-check"></i><span>Testlar</span></a></li>
+            <li class="sidebar-item"><a href="certificate.html" class="sidebar-link"><i class="ti ti-award"></i><span>Sertifikat</span></a></li>
+            <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+            <li class="sidebar-item" style="margin-top:auto;padding-bottom:12px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+        </ul>
+    </div>
+
+    <div class="mobile-bottom-nav">
+        <div class="nav-items">
+            <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+            <a href="leads.html"><i class="ti ti-users-group"></i>Lidlar</a>
+            <a href="student.html"><i class="ti ti-backpack"></i>Talabalar</a>
+            <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+            <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center"><i class="ti ti-map-pin me-2 text-muted"></i><span class="fw-bold">Yunusobod filiali / Hisobotlar</span></div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="search-global-btn" class="btn btn-icon btn-ghost-secondary rounded-circle" title="Ctrl+K"><i class="ti ti-search"></i></button>
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+                <div class="d-none d-xl-block"><div id="navbar-name" class="fw-bold" style="font-size: 13px;">Behruz Berdiyev</div></div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-lg-6">
+                <div class="report-card">
+                    <h3 class="fw-bold mb-3">Talabalar holati bo'yicha</h3>
+                    <div id="status-chart"></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="report-card">
+                    <h3 class="fw-bold mb-3">Guruhlar bo'yicha talabalar soni</h3>
+                    <div id="groups-chart"></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="report-card">
+                    <h3 class="fw-bold mb-3">Lidlar bosqichlari bo'yicha</h3>
+                    <div id="leads-chart"></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="report-card">
+                    <h3 class="fw-bold mb-3">Umumiy ko'rsatkichlar</h3>
+                    <div class="row g-3 mt-1">
+                        <div class="col-6">
+                            <div class="text-muted small uppercase fw-bold">Jami talabalar</div>
+                            <div id="total-students" class="h1 fw-bold text-dark my-1">0</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small uppercase fw-bold">Jami guruhlar</div>
+                            <div id="total-groups" class="h1 fw-bold text-dark my-1">0</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small uppercase fw-bold">Jami o'qituvchilar</div>
+                            <div id="total-teachers" class="h1 fw-bold text-dark my-1">0</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small uppercase fw-bold">Jami lidlar</div>
+                            <div id="total-leads" class="h1 fw-bold text-dark my-1">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getData(key) {
+            return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : [];
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const students = getData('students');
+            const groups = getData('groups');
+            const teachers = getData('teachers');
+            const leads = getData('leads');
+
+            document.getElementById('total-students').innerText = students.length;
+            document.getElementById('total-groups').innerText = groups.length;
+            document.getElementById('total-teachers').innerText = teachers.length;
+            document.getElementById('total-leads').innerText = leads.length;
+
+            // 1. Talabalar holati bo'yicha (donut)
+            const statusCounts = {};
+            students.forEach(s => { statusCounts[s.status] = (statusCounts[s.status] || 0) + 1; });
+            new ApexCharts(document.querySelector("#status-chart"), {
+                chart: { type: 'donut', height: 260, fontFamily: 'inherit' },
+                series: Object.values(statusCounts),
+                labels: Object.keys(statusCounts),
+                colors: ['#2bab41', '#ff7a00', '#626976', '#99a1ad'],
+                legend: { position: 'bottom' }
+            }).render();
+
+            // 2. Guruhlar bo'yicha talabalar soni (bar)
+            const groupCounts = groups.map(g => students.filter(s => s.group === g.name && s.status === 'Faol').length);
+            new ApexCharts(document.querySelector("#groups-chart"), {
+                chart: { type: 'bar', height: 260, toolbar: { show: false }, fontFamily: 'inherit' },
+                series: [{ name: "Talabalar", data: groupCounts }],
+                xaxis: { categories: groups.map(g => g.name) },
+                colors: ['#ff7a00'],
+                plotOptions: { bar: { borderRadius: 6, columnWidth: '50%' } }
+            }).render();
+
+            // 3. Lidlar bosqichlari bo'yicha (bar)
+            const STAGES = ["Yangi", "Bog'lanildi", "Sinov darsi", "Mijozga aylandi", "Bekor qilindi"];
+            const stageCounts = STAGES.map(stage => leads.filter(l => l.stage === stage).length);
+            new ApexCharts(document.querySelector("#leads-chart"), {
+                chart: { type: 'bar', height: 260, toolbar: { show: false }, fontFamily: 'inherit' },
+                series: [{ name: "Lidlar", data: stageCounts }],
+                xaxis: { categories: STAGES },
+                colors: ['#206bc4'],
+                plotOptions: { bar: { borderRadius: 6, columnWidth: '50%', horizontal: true } }
+            }).render();
+        });
+    </script>
+
+    
+
+
+<!-- GLOBAL QIDIRUV -->
+<div id="search-overlay" class="search-overlay">
+    <div class="search-box">
+        <div class="search-input-wrap"><i class="ti ti-search"></i><input type="text" id="search-global-input" placeholder="Talaba, guruh, o'qituvchi..."><kbd style="font-size:11px;background:#f1f3f7;padding:2px 6px;border-radius:4px;">ESC</kbd></div>
+        <div class="search-results" id="search-global-results"></div>
+        <div class="search-hint"><span><kbd>Ctrl+K</kbd> Qidiruv</span><span><kbd>ESC</kbd> Yopish</span></div>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const topBar = document.querySelector('.top-navbar');
+    if (topBar) {
+        const btn = document.createElement('button');
+        btn.className = 'btn-excel';
+        btn.innerHTML = '<i class="ti ti-file-spreadsheet"></i>Excel';
+        btn.onclick = function() {
+            const students = JSON.parse(localStorage.getItem('students') || '[]');
+            const groups   = JSON.parse(localStorage.getItem('groups')   || '[]');
+            const rows = [['Ism','Guruh','Balans','Holati','Qo\'shilgan sana']];
+            students.forEach(s => rows.push([s.name, s.group, s.balance, s.status, s.startDate]));
+            if (typeof downloadCSV === 'function') downloadCSV(rows, 'hisobot');
+            else {
+                const bom='\uFEFF', csv=rows.map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+                const blob=new Blob([bom+csv],{type:'text/csv;charset=utf-8;'});
+                const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='hisobot.csv'; a.click();
+            }
+        };
+        topBar.appendChild(btn);
+    }
+});
+</script>
+
+<style>
+@media print {
+    .sidebar-fixed, .mobile-bottom-nav, .top-navbar .btn, .no-print { display:none !important; }
+    .main-content { margin-left:0 !important; padding:0 !important; }
+    .report-card { box-shadow:none !important; border:1px solid #e5e8ef !important; break-inside:avoid; }
+    body { background:#fff !important; }
+    @page { size:A4; margin:15mm; }
+}
+</style>
+
+<script>
+// Reports sahifasini kuchaytirish
+document.addEventListener('DOMContentLoaded', function() {
+    const topBar = document.querySelector('.top-navbar');
+    if (topBar && !document.getElementById('report-extra-btns')) {
+        const btnGroup = document.createElement('div');
+        btnGroup.id = 'report-extra-btns';
+        btnGroup.className = 'd-flex gap-2 flex-wrap';
+        btnGroup.innerHTML = `
+            <button class="btn btn-outline-secondary" onclick="window.print()"><i class="ti ti-printer me-1"></i>Chop etish</button>
+            <button class="btn-excel" onclick="exportFinanceToExcel()"><i class="ti ti-file-spreadsheet"></i>Moliya</button>
+            <button class="btn-excel" onclick="exportStudentsToExcel()"><i class="ti ti-file-spreadsheet"></i>Talabalar</button>
+            <button class="btn btn-outline-primary" onclick="exportExamResults()"><i class="ti ti-file-spreadsheet me-1"></i>Testlar</button>
+        `;
+        topBar.appendChild(btnGroup);
+    }
+
+    // Hisobotlar jadvalini yaratish
+    const container = document.querySelector('.main-content');
+    if (container && !document.getElementById('extra-reports')) {
+        const extraDiv = document.createElement('div');
+        extraDiv.id = 'extra-reports';
+        extraDiv.className = 'row g-3 mt-2';
+        extraDiv.innerHTML = `
+            <!-- Guruhlar statistikasi -->
+            <div class="col-12">
+                <div class="report-card">
+                    <h4 class="fw-bold mb-3"><i class="ti ti-books me-2 text-primary"></i>Guruhlar bo'yicha hisobot</h4>
+                    <div id="groups-report-table"></div>
+                </div>
+            </div>
+            <!-- Test natijalari -->
+            <div class="col-12">
+                <div class="report-card">
+                    <h4 class="fw-bold mb-3"><i class="ti ti-pencil-check me-2 text-warning"></i>Test natijalari (Top 10)</h4>
+                    <div id="exam-report-table"></div>
+                </div>
+            </div>
+            <!-- Oy bo'yicha daromad -->
+            <div class="col-12">
+                <div class="report-card">
+                    <h4 class="fw-bold mb-3"><i class="ti ti-chart-bar me-2 text-success"></i>To'lov tarixi</h4>
+                    <div id="payment-report-table"></div>
+                </div>
+            </div>`;
+        container.appendChild(extraDiv);
+        renderExtraReports();
+    }
+});
+
+function renderExtraReports() {
+    const groups   = JSON.parse(localStorage.getItem('groups')   || '[]');
+    const students = JSON.parse(localStorage.getItem('students') || '[]');
+    const results  = JSON.parse(localStorage.getItem('exam_results') || '[]');
+    const payments = JSON.parse(localStorage.getItem('payment_history') || '[]');
+    const MONTHS=['Yan','Feb','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
+
+    // Guruhlar
+    const grEl = document.getElementById('groups-report-table');
+    if (grEl) {
+        grEl.innerHTML = groups.length ? `<div style="overflow-x:auto;"><table class="table table-striped" style="font-size:13px;">
+            <thead><tr><th>Guruh</th><th>O'qituvchi</th><th>Talabalar</th><th>Aktiv</th><th>Qarzdor</th><th>Jami balans</th></tr></thead>
+            <tbody>${groups.map(g => {
+                const gst = students.filter(s => s.group === g.name);
+                const active = gst.filter(s => s.status === 'Faol').length;
+                const debts  = gst.filter(s => s.balance < 0).length;
+                const total  = gst.reduce((a,s) => a + (Number(s.balance)||0), 0);
+                return `<tr><td class="fw-bold">${g.name}</td><td>${g.teacher||'—'}</td><td>${gst.length}</td><td>${active}</td><td class="${debts?'text-danger':''}">${debts}</td><td class="${total>=0?'text-success':'text-danger'} fw-bold">${total.toLocaleString()} UZS</td></tr>`;
+            }).join('')}</tbody>
+        </table></div>` : '<div class="text-muted text-center py-3">Guruhlar yo\'q</div>';
+    }
+
+    // Test natijalari
+    const exEl = document.getElementById('exam-report-table');
+    if (exEl) {
+        const top = [...results].sort((a,b) => b.score - a.score).slice(0, 10);
+        exEl.innerHTML = top.length ? `<table class="table" style="font-size:13px;">
+            <thead><tr><th>#</th><th>Talaba</th><th>Ball</th><th>To'g'ri/Jami</th><th>Sana</th></tr></thead>
+            <tbody>${top.map((r,i) => {
+                const d = new Date(r.date);
+                const cls = r.score>=70?'text-success':r.score>=50?'text-warning':'text-danger';
+                return `<tr><td>${i+1}</td><td>${r.studentName}</td><td class="${cls} fw-bold">${r.score}%</td><td>${r.correct}/${r.total}</td><td>${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}</td></tr>`;
+            }).join('')}</tbody>
+        </table>` : '<div class="text-muted text-center py-3">Test natijalari yo\'q</div>';
+    }
+
+    // To'lovlar
+    const pyEl = document.getElementById('payment-report-table');
+    if (pyEl) {
+        pyEl.innerHTML = payments.length ? `<table class="table" style="font-size:13px;">
+            <thead><tr><th>Talaba</th><th>Miqdor</th><th>Usul</th><th>Izoh</th><th>Sana</th></tr></thead>
+            <tbody>${payments.slice(0,20).map(p => {
+                const d = new Date(p.date);
+                return `<tr><td>${p.studentName}</td><td class="text-success fw-bold">${Number(p.amount).toLocaleString()} UZS</td><td>${p.method||'—'}</td><td>${p.note||'—'}</td><td>${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}</td></tr>`;
+            }).join('')}</tbody>
+        </table>` : '<div class="text-muted text-center py-3">To\'lovlar tarixi yo\'q</div>';
+    }
+}
+
+function exportExamResults(){
+    const results = JSON.parse(localStorage.getItem('exam_results') || '[]');
+    if(!results.length){ alert('Test natijalari yo\'q!'); return; }
+    const rows=[['Talaba','Ball (%)','To\'g\'ri','Jami','Vaqt','Sana']];
+    results.forEach(r=>{
+        const d=new Date(r.date);
+        rows.push([r.studentName,r.score,r.correct,r.total,r.timeTaken||'—',`${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`]);
+    });
+    if(typeof downloadCSV==='function') downloadCSV(rows,'test_natijalari');
+}
+</script>

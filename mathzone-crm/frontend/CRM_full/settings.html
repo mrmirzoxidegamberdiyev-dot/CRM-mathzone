@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM - Sozlamalar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <style>
+        :root { --modme-orange: #ff7a00; --sidebar-bg: #1e1e2d; }
+        body { background-color: #f6f8fb; font-family: system-ui, -apple-system, sans-serif; }
+        
+        
+        .sidebar-brand span { color: var(--modme-orange); }
+        
+        
+        
+        
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: #fff; padding: 12px 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .branch-item { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #eef1f6; border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-fixed">
+        <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+            <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+            <li class="sidebar-item"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+            <li class="sidebar-item"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+            <li class="sidebar-item"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+            <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+            <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+            <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+            <li class="sidebar-item"><a href="timetable.html" class="sidebar-link"><i class="ti ti-calendar-week"></i><span>Jadval</span></a></li>
+            <li class="sidebar-item"><a href="salary.html" class="sidebar-link"><i class="ti ti-moneybag"></i><span>Ish haqi</span></a></li>
+            <li class="sidebar-item"><a href="exam.html" class="sidebar-link"><i class="ti ti-pencil-check"></i><span>Testlar</span></a></li>
+            <li class="sidebar-item"><a href="certificate.html" class="sidebar-link"><i class="ti ti-award"></i><span>Sertifikat</span></a></li>
+            <li class="sidebar-item active"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+            <li class="sidebar-item" style="margin-top:auto;padding-bottom:12px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+        </ul>
+    </div>
+
+    <div class="mobile-bottom-nav">
+        <div class="nav-items">
+            <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+            <a href="leads.html"><i class="ti ti-users-group"></i>Lidlar</a>
+            <a href="student.html"><i class="ti ti-backpack"></i>Talabalar</a>
+            <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+            <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center"><i class="ti ti-map-pin me-2 text-muted"></i><span class="fw-bold">Sozlamalar</span></div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="search-global-btn" class="btn btn-icon btn-ghost-secondary rounded-circle" title="Ctrl+K"><i class="ti ti-search"></i></button>
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+                <div class="d-none d-xl-block"><div id="navbar-name" class="fw-bold" style="font-size: 13px;">Behruz Berdiyev</div></div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-lg-6">
+                <div class="card p-4 border-0 shadow-sm" style="border-radius: 14px;">
+                    <h3 class="fw-bold mb-3"><i class="ti ti-building-store me-2 text-orange"></i>Filiallar</h3>
+                    <div id="branches-list"></div>
+                    <div class="d-flex gap-2 mt-3">
+                        <input type="text" id="branch-name" class="form-control" placeholder="Yangi filial nomi">
+                        <button class="btn text-white" style="background-color: var(--modme-orange);" onclick="addBranch()">
+                            <i class="ti ti-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card p-4 border-0 shadow-sm" style="border-radius: 14px;">
+                    <h3 class="fw-bold mb-3"><i class="ti ti-user-circle me-2 text-orange"></i>Profil</h3>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">F.I.Sh</label>
+                        <input type="text" id="profile-name" class="form-control" value="Behruz Berdiyev">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Lavozim</label>
+                        <input type="text" id="profile-role" class="form-control" value="Administrator">
+                    </div>
+                    <button class="btn text-white" style="background-color: var(--modme-orange);" onclick="saveProfile()">
+                        <i class="ti ti-check me-2"></i>Saqlash
+                    </button>
+                </div>
+
+                <div class="card p-4 border-0 shadow-sm mt-3" style="border-radius: 14px;">
+                    <h3 class="fw-bold mb-3"><i class="ti ti-database me-2 text-danger"></i>Ma'lumotlar</h3>
+                    <p class="text-muted small">Barcha talabalar, guruhlar, lidlar va boshqa ma'lumotlarni o'chirib, dasturni dastlabki holatga qaytarish.</p>
+                    <button class="btn btn-outline-danger" onclick="resetAllData()">
+                        <i class="ti ti-trash me-2"></i>Barcha ma'lumotlarni tozalash
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+    <script src="shared.js"></script>
+
+    <script>
+        let defaultBranches = ["Yunusobod filiali", "Sergeli filiali", "Chilonzor filiali"];
+
+        if (!localStorage.getItem('branches')) {
+            localStorage.setItem('branches', JSON.stringify(defaultBranches));
+        }
+
+        function getBranches() {
+            return localStorage.getItem('branches') ? JSON.parse(localStorage.getItem('branches')) : [];
+        }
+
+        function renderBranches() {
+            const branches = getBranches();
+            const list = document.getElementById('branches-list');
+            list.innerHTML = branches.map((b, i) => `
+                <div class="branch-item">
+                    <span class="fw-bold">${b}</span>
+                    <button class="btn btn-sm btn-icon btn-white text-danger" onclick="deleteBranch(${i})"><i class="ti ti-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function addBranch() {
+            const input = document.getElementById('branch-name');
+            const name = input.value.trim();
+            if (!name) {
+                if (typeof showToast === 'function') showToast("Iltimos, filial nomini kiriting!", 'danger');
+                else alert("Iltimos, filial nomini kiriting!");
+                return;
+            }
+
+            const branches = getBranches();
+            if (branches.some(b => b.toLowerCase() === name.toLowerCase())) {
+                if (typeof showToast === 'function') showToast(`"${name}" nomli filial allaqachon mavjud!`, 'danger');
+                else alert(`"${name}" nomli filial allaqachon mavjud!`);
+                return;
+            }
+
+            branches.push(name);
+            localStorage.setItem('branches', JSON.stringify(branches));
+            if (typeof logActivity === 'function') logActivity("Qo'shildi", "Yangi filial: " + name);
+            if (typeof showToast === 'function') showToast(`"${name}" filiali qo'shildi`, 'success');
+            input.value = '';
+            renderBranches();
+        }
+
+        function deleteBranch(index) {
+            const branches = getBranches();
+            const name = branches[index];
+            if (!name) return;
+            if (branches.length <= 1) {
+                if (typeof showToast === 'function') showToast("Kamida 1 ta filial qolishi kerak!", 'danger');
+                else alert("Kamida 1 ta filial qolishi kerak!");
+                return;
+            }
+
+            const doDelete = () => {
+                branches.splice(index, 1);
+                localStorage.setItem('branches', JSON.stringify(branches));
+                // Agar o'chirilgan filial joriy tanlangan bo'lsa — birinchisiga almashtiramiz
+                if (localStorage.getItem('crm_branch') === name) {
+                    localStorage.setItem('crm_branch', branches[0]);
+                }
+                if (typeof logActivity === 'function') logActivity("O'chirildi", "Filial: " + name);
+                if (typeof showToast === 'function') showToast(`"${name}" filiali o'chirildi`, 'success');
+                renderBranches();
+            };
+
+            if (typeof showConfirmModal === 'function') {
+                showConfirmModal({ title: "Filialni o'chirish", message: `<strong>${name}</strong>ni o'chirishni xohlaysizmi?`, confirmLabel: "Ha, o'chirish", danger: true, onConfirm: doDelete });
+            } else if (confirm("Ushbu filialni o'chirishni xohlaysizmi?")) {
+                doDelete();
+            }
+        }
+
+        function saveProfile() {
+            const name = document.getElementById('profile-name').value;
+            const role = document.getElementById('profile-role').value;
+            localStorage.setItem('profile', JSON.stringify({ name, role }));
+
+            // Joriy sahifadagi navbar'ni ham darhol yangilaymiz
+            const nameEl = document.getElementById('navbar-name');
+            const roleEl = document.getElementById('navbar-role');
+            const avatarEl = document.getElementById('navbar-avatar');
+            if (nameEl && name) nameEl.innerText = name;
+            if (roleEl && role) roleEl.innerText = role;
+            if (avatarEl && name) {
+                avatarEl.innerText = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            }
+
+            alert("Profil saqlandi!");
+        }
+
+        function resetAllData() {
+            // TUZATISH: avval faqat 6 ta kalit tozalanardi (students, groups, leads, teachers, points, branches).
+            // Qolgan barcha ma'lumotlar (to'lovlar, davomat, baholar, uy vazifa, testlar, jadval, ish haqi, arxiv...)
+            // localStorage'da QOLIB KETARDI. Bu nafaqat "to'liq tozalash" va'dasini bajarmasdi, balki yangi
+            // qo'shiladigan talabalar tasodifiy eski ID bilan mos kelib, ularga begona to'lov/baho tarixi
+            // "yopishib qolishi" kabi xavfli holatga ham olib kelishi mumkin edi.
+            const PRESERVE_KEYS = ['crm_session', 'crm_dark']; // faqat foydalanuvchi/sessiya sozlamalari saqlanadi
+
+            const doReset = () => {
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (!PRESERVE_KEYS.includes(key)) keysToRemove.push(key);
+                }
+                keysToRemove.forEach(k => localStorage.removeItem(k));
+                if (typeof showToast === 'function') showToast(`Barcha ma'lumotlar tozalandi (${keysToRemove.length} ta jadval). Sahifa qayta yuklanadi...`, 'success');
+                setTimeout(() => location.reload(), 1200);
+            };
+
+            if (typeof showConfirmModal === 'function') {
+                showConfirmModal({
+                    title: "Butun tizimni tozalash",
+                    message: "<strong>DIQQAT:</strong> Talabalar, guruhlar, o'qituvchilar, to'lovlar, davomat, baholar, testlar, dars jadvali, ish haqi va arxiv — BARCHA ma'lumot butunlay o'chiriladi. Bu amalni qaytarib bo'lmaydi! Oldin \"Backup yuklab olish\" tugmasi orqali zaxira nusxa olishni unutmang.",
+                    confirmLabel: "Ha, hammasini o'chirish",
+                    danger: true,
+                    onConfirm: doReset
+                });
+            } else if (confirm("DIQQAT: Barcha ma'lumotlar butunlay o'chiriladi. Davom etasizmi?")) {
+                doReset();
+            }
+        }
+
+        window.onload = function () {
+            renderBranches();
+            const profile = localStorage.getItem('profile') ? JSON.parse(localStorage.getItem('profile')) : null;
+            if (profile) {
+                document.getElementById('profile-name').value = profile.name;
+                document.getElementById('profile-role').value = profile.role;
+            }
+        };
+    </script>
+
+    
+
+
+<!-- GLOBAL QIDIRUV -->
+<div id="search-overlay" class="search-overlay">
+    <div class="search-box">
+        <div class="search-input-wrap"><i class="ti ti-search"></i><input type="text" id="search-global-input" placeholder="Talaba, guruh, o'qituvchi..."><kbd style="font-size:11px;background:#f1f3f7;padding:2px 6px;border-radius:4px;">ESC</kbd></div>
+        <div class="search-results" id="search-global-results"></div>
+        <div class="search-hint"><span><kbd>Ctrl+K</kbd> Qidiruv</span><span><kbd>ESC</kbd> Yopish</span></div>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+// Settings sahifasiga foydalanuvchilar va parol o'zgartirish bo'limini qo'shish
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('.row.g-3');
+    if (!container) return;
+
+    const newCol = document.createElement('div');
+    newCol.className = 'col-lg-6';
+    newCol.innerHTML = `
+        <div class="card p-4 border-0 shadow-sm" style="border-radius:14px;">
+            <h3 class="fw-bold mb-3"><i class="ti ti-lock me-2 text-orange"></i>Parol o'zgartirish</h3>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Yangi parol</label>
+                <input type="password" id="new-password" class="form-control" placeholder="Yangi parol kiriting">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Parolni tasdiqlang</label>
+                <input type="password" id="confirm-password" class="form-control" placeholder="Qayta kiriting">
+            </div>
+            <button class="btn btn-outline-primary" onclick="changePassword()">
+                <i class="ti ti-check me-2"></i>Parolni o'zgartirish
+            </button>
+        </div>
+
+        <div class="card p-4 border-0 shadow-sm mt-3" style="border-radius:14px;">
+            <h3 class="fw-bold mb-3"><i class="ti ti-moon me-2 text-dark"></i>Ko'rinish</h3>
+            <div class="d-flex align-items-center justify-content-between">
+                <span>Tungi rejim (Dark mode)</span>
+                <button id="dark-toggle-settings" class="btn btn-sm btn-outline-secondary" onclick="toggleDarkSettings()">
+                    ${localStorage.getItem('crm_dark')==='1' ? '☀️ Kunduzgi' : '🌙 Tungi'}
+                </button>
+            </div>
+        </div>
+
+        <div class="card p-4 border-0 shadow-sm mt-3" style="border-radius:14px;">
+            <h3 class="fw-bold mb-3"><i class="ti ti-logout me-2 text-danger"></i>Sessiya</h3>
+            <p class="text-muted small">Hisobdan chiqish va login sahifasiga qaytish.</p>
+            <button class="btn btn-outline-danger" onclick="logout()">
+                <i class="ti ti-logout me-2"></i>Chiqish
+            </button>
+        </div>
+    `;
+    container.appendChild(newCol);
+
+    // Faoliyat logi bo'limi
+    const logCol = document.createElement('div');
+    logCol.className = 'col-12';
+    logCol.innerHTML = `
+        <div class="card p-4 border-0 shadow-sm" style="border-radius:14px;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="fw-bold m-0"><i class="ti ti-list-check me-2 text-primary"></i>Faoliyat logi (Audit trail)</h3>
+                <button class="btn btn-sm btn-outline-danger" onclick="clearLog()"><i class="ti ti-trash me-1"></i>Tozalash</button>
+            </div>
+            <div id="settings-activity-log" style="max-height:300px;overflow-y:auto;"></div>
+        </div>
+    `;
+    container.appendChild(logCol);
+
+    renderSettingsLog();
+});
+
+function changePassword() {
+    const np = document.getElementById('new-password').value;
+    const cp = document.getElementById('confirm-password').value;
+    if (!np) { alert('Yangi parol kiriting!'); return; }
+    if (np !== cp) { alert('Parollar mos kelmadi!'); return; }
+    if (np.length < 4) { alert('Parol kamida 4 belgidan iborat bo\'lishi kerak!'); return; }
+    // Demo: localStorage ga saqlash
+    const session = JSON.parse(localStorage.getItem('crm_session') || '{}');
+    session.passwordChanged = true;
+    localStorage.setItem('crm_session', JSON.stringify(session));
+    alert('✅ Parol muvaffaqiyatli o\'zgartirildi!');
+    document.getElementById('new-password').value = '';
+    document.getElementById('confirm-password').value = '';
+}
+
+function toggleDarkSettings() {
+    const on = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('crm_dark', on ? '1' : '0');
+    document.getElementById('dark-toggle-settings').innerText = on ? '☀️ Kunduzgi' : '🌙 Tungi';
+}
+
+function renderSettingsLog() {
+    const logs = JSON.parse(localStorage.getItem('crm_activity_log') || '[]');
+    const el = document.getElementById('settings-activity-log');
+    if (!el) return;
+    const colors={'Qo\'shildi':'#2bab41','O\'chirildi':'#d63939','Yangilandi':'#206bc4','To\'landi':'#2bab41'};
+    el.innerHTML = logs.length ? `<table class="table table-sm table-striped" style="font-size:12px;">
+        <thead><tr><th>Vaqt</th><th>Foydalanuvchi</th><th>Harakatlar</th><th>Tavsif</th></tr></thead>
+        <tbody>${logs.map(l=>{
+            const c=colors[l.action]||'#99a1ad';
+            const dt=new Date(l.time);
+            const dateStr=`${dt.getDate()}.${dt.getMonth()+1}.${dt.getFullYear()} ${dt.getHours()}:${String(dt.getMinutes()).padStart(2,'0')}`;
+            return `<tr><td style="color:#99a1ad;">${dateStr}</td><td>${l.user}</td><td><span class="badge" style="background:${c}20;color:${c};">${l.action}</span></td><td>${l.detail}</td></tr>`;
+        }).join('')}</tbody>
+    </table>` : '<div class="text-muted small text-center py-3">Hali faoliyat yo\'q</div>';
+}
+
+function clearLog() {
+    if (confirm('Faoliyat logini tozalashni xohlaysizmi?')) {
+        localStorage.removeItem('crm_activity_log');
+        renderSettingsLog();
+    }
+}
+</script>
+<script>
+// Settings dagi sidebar'ga parent portal tugmasi qo'shish
+document.addEventListener('DOMContentLoaded', function() {
+    const menu = document.querySelector('.sidebar-menu');
+    if (menu) {
+        const li = document.createElement('li');
+        li.className = 'sidebar-item';
+        li.innerHTML = '<a href="parent.html" target="_blank" class="sidebar-link"><i class="ti ti-heart"></i><span>Ota-onalar</span></a>';
+        menu.appendChild(li);
+    }
+});
+</script>
+
+<script>
+// Settings ga backup/restore panel qo'shish
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('.row.g-3');
+    if (!container) return;
+
+    const backupCol = document.createElement('div');
+    backupCol.className = 'col-12';
+    backupCol.innerHTML = `
+        <div class="card p-4 border-0 shadow-sm" style="border-radius:14px;">
+            <h3 class="fw-bold mb-3"><i class="ti ti-database me-2" style="color:#206bc4;"></i>Ma'lumotlar zaxirasi (Backup)</h3>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:16px;">
+                        <div class="fw-bold mb-1" style="color:#0c4a6e;"><i class="ti ti-download me-2"></i>Backup yaratish</div>
+                        <div class="text-muted small mb-3">Barcha ma'lumotlarni JSON faylga saqlang</div>
+                        <button class="btn text-white w-100" style="background:#206bc4;" onclick="backupAllData()">
+                            <i class="ti ti-database-export me-2"></i>Backup yuklab olish
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:16px;">
+                        <div class="fw-bold mb-1" style="color:#14532d;"><i class="ti ti-upload me-2"></i>Backup tiklash</div>
+                        <div class="text-muted small mb-3">Oldingi backup faylidan ma'lumotlarni tiklang</div>
+                        <input type="file" id="restore-file" accept=".json" style="display:none;" onchange="handleRestore(this)">
+                        <button class="btn btn-outline-success w-100" onclick="document.getElementById('restore-file').click()">
+                            <i class="ti ti-database-import me-2"></i>Backup faylni yuklash
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="backup-status" class="mt-3" style="display:none;"></div>
+            <div class="mt-3 p-3 rounded-2" style="background:#f8fafc;font-size:12px;color:#626976;">
+                <i class="ti ti-info-circle me-1"></i>
+                <strong>Maslahat:</strong> Har kuni backup yaratib, xavfsiz joyda saqlang. Ma'lumotlar yo'qolsa, faqat backup orqali tiklanadi.
+            </div>
+        </div>
+    `;
+    container.appendChild(backupCol);
+
+    // Avtomatik backup tekshiruvi
+    if (typeof autoBackupCheck === 'function') autoBackupCheck();
+});
+
+async function handleRestore(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('backup-status');
+
+    if (!confirm(`"${file.name}" faylidan ma'lumotlarni tiklashni xohlaysizmi? Joriy ma'lumotlar o'rnini bosadi!`)) {
+        input.value = '';
+        return;
+    }
+
+    statusEl.style.display = 'block';
+    statusEl.innerHTML = '<div class="alert alert-info py-2"><i class="ti ti-loader me-2"></i>Tiklanmoqda...</div>';
+
+    try {
+        const date = await restoreBackup(file);
+        statusEl.innerHTML = `<div class="alert alert-success py-2"><i class="ti ti-check me-2"></i>Backup muvaffaqiyatli tiklandi! (${new Date(date).toLocaleString('uz-UZ')})</div>`;
+        setTimeout(() => { statusEl.style.display = 'none'; location.reload(); }, 2000);
+    } catch(err) {
+        statusEl.innerHTML = `<div class="alert alert-danger py-2"><i class="ti ti-x me-2"></i>${err}</div>`;
+    }
+    input.value = '';
+}
+</script>
+<script>
+// Settings ga "Onboarding turni qayta ko'rish" tugmasini qo'shish
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('.row.g-3');
+    if (!container) return;
+    const tourCol = document.createElement('div');
+    tourCol.className = 'col-lg-6';
+    tourCol.innerHTML = `
+        <div class="card p-4 border-0 shadow-sm" style="border-radius:14px;">
+            <h3 class="fw-bold mb-3"><i class="ti ti-route me-2" style="color:#7c3aed;"></i>Yo'riqnoma tur</h3>
+            <p class="text-muted small">CRM bilan tanishish uchun qisqa qadam-baqadam turni qayta ko'ring.</p>
+            <button class="btn btn-outline-primary" onclick="if(typeof startOnboardingTour==='function'){startOnboardingTour();}else{alert('Avval dashboard sahifasiga o\\'ting');}">
+                <i class="ti ti-player-play me-2"></i>Turni boshlash
+            </button>
+        </div>`;
+    container.appendChild(tourCol);
+});
+</script>

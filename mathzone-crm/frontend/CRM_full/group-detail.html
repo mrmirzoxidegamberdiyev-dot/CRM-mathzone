@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM - Guruh tafsilotlari</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        :root { --modme-orange: #ff7a00; --sidebar-bg: #1e1e2d; }
+        body { background-color: #f6f8fb; font-family: system-ui, -apple-system, sans-serif; }
+        
+        
+        .sidebar-brand span { color: var(--modme-orange); }
+        
+        
+        
+        
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: #fff; padding: 12px 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .back-link { color: #626976; text-decoration: none; font-size: 13px; }
+        .back-link:hover { color: var(--modme-orange); }
+        .status-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 6px; flex-shrink: 0; }
+        .status-dot.green { background-color: #2bab41; }
+        .status-dot.red { background-color: #d63939; }
+        .status-dot.gray { background-color: #ccced4; }
+
+        .attendance-table-wrap { overflow-x: auto; }
+        table.attendance-table { border-collapse: separate; border-spacing: 0; width: 100%; }
+        table.attendance-table th, table.attendance-table td { padding: 6px 4px; white-space: nowrap; border-bottom: 1px solid #f1f3f7; text-align: center; }
+        table.attendance-table th { font-size: 10px; text-transform: none; color: #99a1ad; font-weight: 700; line-height: 1.3; }
+        table.attendance-table th.name-col, table.attendance-table td.name-col { text-align: left; position: sticky; left: 0; background: #fff; z-index: 2; min-width: 180px; padding: 8px 12px; }
+
+        .att-cell { width: 20px; height: 20px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; font-weight: bold; border: none; transition: all 0.15s ease; padding: 0; }
+        .att-cell.was { background-color: #d3f3da; color: #1f7a30; }
+        .att-cell.not { background-color: #fbdada; color: #b32626; }
+        .att-cell.empty { background-color: #f1f3f7; color: transparent; }
+        .att-cell:hover { transform: scale(1.15); }
+        .att-cell.future { background-color: #fafbfc; color: #d0d3db; cursor: not-allowed; border: 1px dashed #e5e8ef; }
+        .att-cell.future:hover { transform: none; }
+        th.future-col, td .att-cell.future { opacity: .55; }
+
+        .student-row-name { font-weight: 600; font-size: 13px; color: #1a1f24; }
+        .summary-pill { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-fixed">
+        <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+            <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+            <li class="sidebar-item"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+            <li class="sidebar-item active"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+            <li class="sidebar-item"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+            <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+            <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+            <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+            <li class="sidebar-item"><a href="timetable.html" class="sidebar-link"><i class="ti ti-calendar-week"></i><span>Jadval</span></a></li>
+            <li class="sidebar-item"><a href="salary.html" class="sidebar-link"><i class="ti ti-moneybag"></i><span>Ish haqi</span></a></li>
+            <li class="sidebar-item"><a href="exam.html" class="sidebar-link"><i class="ti ti-pencil-check"></i><span>Testlar</span></a></li>
+            <li class="sidebar-item"><a href="certificate.html" class="sidebar-link"><i class="ti ti-award"></i><span>Sertifikat</span></a></li>
+            <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+            <li class="sidebar-item" style="margin-top:auto;padding-bottom:12px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+        </ul>
+    </div>
+
+    <div class="mobile-bottom-nav">
+        <div class="nav-items">
+            <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+            <a href="leads.html"><i class="ti ti-users-group"></i>Lidlar</a>
+            <a href="student.html"><i class="ti ti-backpack"></i>Talabalar</a>
+            <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+            <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center"><i class="ti ti-map-pin me-2 text-muted"></i><span class="fw-bold">Yunusobod filiali / Guruhlar / <span id="group-title-crumb"></span></span></div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="search-global-btn" class="btn btn-icon btn-ghost-secondary rounded-circle" title="Ctrl+K"><i class="ti ti-search"></i></button>
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+                <div id="navbar-name" class="fw-bold d-none d-xl-block" style="font-size: 13px;">Behruz Berdiyev</div>
+            </div>
+        </div>
+
+        <a href="groups.html" class="back-link d-inline-flex align-items-center mb-3"><i class="ti ti-arrow-left me-1"></i>Guruhlarga qaytish</a>
+
+        <div class="card border-0 shadow-sm p-4 mb-3" style="border-radius: 14px;">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div>
+                    <h2 class="fw-bold mb-1" id="group-title">Guruh</h2>
+                    <div class="text-muted small" id="group-meta"></div>
+                </div>
+                <div class="d-flex gap-4">
+                    <div class="text-center">
+                        <div class="text-muted small uppercase fw-bold">O'quvchilar</div>
+                        <div id="meta-student-count" class="h2 fw-bold text-dark mb-0">0</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-muted small uppercase fw-bold">Davomat (oy)</div>
+                        <div id="meta-attendance-pct" class="h2 fw-bold text-success mb-0">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm p-3 mb-3" style="border-radius: 14px;">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(-1)"><i class="ti ti-chevron-left"></i></button>
+                    <span id="current-month-label" class="fw-bold" style="min-width: 130px; text-align:center;"></span>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(1)"><i class="ti ti-chevron-right"></i></button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="goToCurrentMonth()">Joriy oy</button>
+                </div>
+                <div class="d-flex align-items-center gap-3 small text-muted">
+                    <span><span class="status-dot green"></span>Keldi</span>
+                    <span><span class="status-dot red"></span>Kelmadi</span>
+                    <span><span class="status-dot gray"></span>Belgilanmagan</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm" style="border-radius: 14px; overflow:hidden;">
+            <div class="attendance-table-wrap">
+                <table class="attendance-table" id="attendance-table">
+                    <thead><tr id="attendance-head"></tr></thead>
+                    <tbody id="attendance-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+    <script src="shared.js"></script>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const groupName = params.get('group') || '';
+        let currentDate = new Date();
+
+        const MONTH_NAMES_UZ = ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"];
+
+        function getGroups() {
+            return localStorage.getItem('groups') ? JSON.parse(localStorage.getItem('groups')) : [];
+        }
+        function getStudents() {
+            return localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : [];
+        }
+        function getAttendance() {
+            return localStorage.getItem('attendance') ? JSON.parse(localStorage.getItem('attendance')) : {};
+        }
+        function saveAttendance(data) {
+            localStorage.setItem('attendance', JSON.stringify(data));
+        }
+
+        // attendance ma'lumoti tuzilishi: { "GuruhNomi": { "studentId": { "YYYY-MM-DD": "was" | "not" } } }
+
+        function loadGroupHeader() {
+            const groups = getGroups();
+            const group = groups.find(g => g.name === groupName);
+
+            document.getElementById('group-title-crumb').innerText = groupName || 'Noma\'lum guruh';
+            document.getElementById('group-title').innerText = groupName || 'Guruh topilmadi';
+
+            if (group) {
+                document.getElementById('group-meta').innerHTML =
+                    `<i class="ti ti-school me-1"></i>${group.teacher} &nbsp;&middot;&nbsp; <i class="ti ti-calendar me-1"></i>${group.days} &nbsp;&middot;&nbsp; <i class="ti ti-clock me-1"></i>${group.time}`;
+            }
+        }
+
+        function getDaysInMonth(year, month) {
+            return new Date(year, month + 1, 0).getDate();
+        }
+
+        function getGroupWeekdays(group) {
+            // Guruh kunlariga mos hafta kun raqamlarini qaytaradi (0=Yak...6=Shan)
+            if (!group || !group.days) return null; // null = barcha kunlar (noma'lum holat uchun)
+            if (group.days.includes('Juft')) return [2, 4, 6]; // Seshanba, Payshanba, Shanba
+            if (group.days.includes('Toq')) return [1, 3, 5];  // Dushanba, Chorshanba, Juma
+            return null;
+        }
+
+        function formatDateKey(year, month, day) {
+            const mm = String(month + 1).padStart(2, '0');
+            const dd = String(day).padStart(2, '0');
+            return `${year}-${mm}-${dd}`;
+        }
+
+        function renderAttendanceTable() {
+            const groups = getGroups();
+            const group = groups.find(g => g.name === groupName);
+            const groupWeekdays = getGroupWeekdays(group);
+            const todayMidnight = new Date();
+            todayMidnight.setHours(0,0,0,0);
+
+            const students = getStudents().filter(s => s.group === groupName && s.status === 'Faol');
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const daysInMonth = getDaysInMonth(year, month);
+
+            document.getElementById('current-month-label').innerText = `${MONTH_NAMES_UZ[month]} ${year}`;
+            document.getElementById('meta-student-count').innerText = students.length;
+
+            // Faqat guruh darsi bo'ladigan kunlarni ro'yxatga olamiz
+            const WEEKDAY_SHORT_UZ = ['Yak', 'Dush', 'Sesh', 'Chor', 'Pay', 'Jum', 'Shan'];
+            let activeDays = [];
+            for (let d = 1; d <= daysInMonth; d++) {
+                const weekday = new Date(year, month, d).getDay();
+                if (!groupWeekdays || groupWeekdays.includes(weekday)) {
+                    activeDays.push(d);
+                }
+            }
+
+            // Sarlavha qatori (faqat dars kunlari)
+            const head = document.getElementById('attendance-head');
+            let headHtml = '<th class="name-col">F.I.Sh.</th>';
+            activeDays.forEach(d => {
+                const weekday = new Date(year, month, d).getDay();
+                headHtml += `<th><div>${d}</div><div style="font-weight:400; color:#c0c4cc;">${WEEKDAY_SHORT_UZ[weekday]}</div></th>`;
+            });
+            head.innerHTML = headHtml;
+
+            const attendance = getAttendance();
+            const groupAttendance = attendance[groupName] || {};
+
+            const body = document.getElementById('attendance-body');
+
+            if (students.length === 0) {
+                body.innerHTML = `<tr><td colspan="${activeDays.length + 1}" class="text-center text-muted py-4">Bu guruhda hali faol o'quvchi yo'q</td></tr>`;
+                document.getElementById('meta-attendance-pct').innerText = '0%';
+                return;
+            }
+
+            let totalMarked = 0;
+            let totalWas = 0;
+
+            body.innerHTML = students.map(student => {
+                const studentRecord = groupAttendance[student.id] || {};
+
+                // Umumiy holat nuqtasi (shu oydagi oxirgi belgilangan kun asosida)
+                let lastStatus = 'gray';
+                for (let i = activeDays.length - 1; i >= 0; i--) {
+                    const key = formatDateKey(year, month, activeDays[i]);
+                    if (studentRecord[key] === 'was') { lastStatus = 'green'; break; }
+                    if (studentRecord[key] === 'not') { lastStatus = 'red'; break; }
+                }
+
+                let cellsHtml = '';
+                activeDays.forEach(d => {
+                    const key = formatDateKey(year, month, d);
+                    const status = studentRecord[key] || '';
+                    const cellDate = new Date(year, month, d);
+                    cellDate.setHours(0,0,0,0);
+                    const isFuture = cellDate > todayMidnight;
+
+                    let cellClass = 'empty';
+                    let cellLabel = '';
+                    if (status === 'was') { cellClass = 'was'; cellLabel = '✓'; totalMarked++; totalWas++; }
+                    else if (status === 'not') { cellClass = 'not'; cellLabel = '✕'; totalMarked++; }
+
+                    if (isFuture) {
+                        cellsHtml += `<td><button class="att-cell future" title="${d} ${MONTH_NAMES_UZ[month]} — bu dars hali bo'lib o'tmagan" disabled>🔒</button></td>`;
+                    } else {
+                        cellsHtml += `<td><button class="att-cell ${cellClass}" title="${student.name} - ${d} ${MONTH_NAMES_UZ[month]} ${year}" onclick="toggleAttendance('${student.id}', '${key}')">${cellLabel}</button></td>`;
+                    }
+                });
+
+                return `
+                    <tr>
+                        <td class="name-col">
+                            <div class="d-flex align-items-center">
+                                <span class="status-dot ${lastStatus}"></span>
+                                <span class="student-row-name">${student.name}</span>
+                            </div>
+                        </td>
+                        ${cellsHtml}
+                    </tr>
+                `;
+            }).join('');
+
+            const pct = totalMarked > 0 ? Math.round((totalWas / totalMarked) * 100) : 0;
+            document.getElementById('meta-attendance-pct').innerText = pct + '%';
+        }
+
+        function toggleAttendance(studentId, dateKey) {
+            // Himoya: kelajakdagi sana uchun yo'qlama qilishni bloklash
+            const todayStr = (() => { const t=new Date(); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`; })();
+            if (dateKey > todayStr) {
+                if (typeof showToast === 'function') showToast("Hali bo'lib o'tmagan darsga yo'qlama qilib bo'lmaydi!", 'warning');
+                return;
+            }
+
+            const attendance = getAttendance();
+            if (!attendance[groupName]) attendance[groupName] = {};
+            if (!attendance[groupName][studentId]) attendance[groupName][studentId] = {};
+
+            const current = attendance[groupName][studentId][dateKey];
+            // Aylanma: bo'sh -> keldi -> kelmadi -> bo'sh
+            let next;
+            if (!current) next = 'was';
+            else if (current === 'was') next = 'not';
+            else next = null;
+
+            if (next) {
+                attendance[groupName][studentId][dateKey] = next;
+            } else {
+                delete attendance[groupName][studentId][dateKey];
+            }
+
+            saveAttendance(attendance);
+            renderAttendanceTable();
+        }
+
+        function changeMonth(offset) {
+            currentDate.setMonth(currentDate.getMonth() + offset);
+            renderAttendanceTable();
+        }
+
+        function goToCurrentMonth() {
+            currentDate = new Date();
+            renderAttendanceTable();
+        }
+
+        window.onload = function () {
+            loadGroupHeader();
+            renderAttendanceTable();
+        };
+    </script>
+
+    
+
+
+<!-- GLOBAL QIDIRUV -->
+<div id="search-overlay" class="search-overlay">
+    <div class="search-box">
+        <div class="search-input-wrap"><i class="ti ti-search"></i><input type="text" id="search-global-input" placeholder="Talaba, guruh, o'qituvchi..."><kbd style="font-size:11px;background:#f1f3f7;padding:2px 6px;border-radius:4px;">ESC</kbd></div>
+        <div class="search-results" id="search-global-results"></div>
+        <div class="search-hint"><span><kbd>Ctrl+K</kbd> Qidiruv</span><span><kbd>ESC</kbd> Yopish</span></div>
+    </div>
+</div>
+</body>
+</html>
