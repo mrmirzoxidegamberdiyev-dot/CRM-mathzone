@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM - Lidlar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        :root { --modme-orange: #ff7a00; --sidebar-bg: #1e1e2d; }
+        body { background-color: #f6f8fb; font-family: system-ui, -apple-system, sans-serif; }
+        
+        
+        .sidebar-brand span { color: var(--modme-orange); }
+        
+        
+        
+        
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: #fff; padding: 12px 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .filter-btn.active { background-color: var(--modme-orange) !important; color: white !important; border-color: var(--modme-orange) !important; }
+        .lead-col { background: #f8fafc; border-radius: 12px; padding: 14px; min-height: 400px; }
+        .lead-col-header { font-weight: bold; font-size: 13px; text-transform: uppercase; color: #626976; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .lead-card { background: #fff; border: 1px solid #eef1f6; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-fixed">
+        <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+            <li class="sidebar-item active"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+            <li class="sidebar-item"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+            <li class="sidebar-item"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+            <li class="sidebar-item"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+            <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+            <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+            <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+            <li class="sidebar-item"><a href="timetable.html" class="sidebar-link"><i class="ti ti-calendar-week"></i><span>Jadval</span></a></li>
+            <li class="sidebar-item"><a href="salary.html" class="sidebar-link"><i class="ti ti-moneybag"></i><span>Ish haqi</span></a></li>
+            <li class="sidebar-item"><a href="exam.html" class="sidebar-link"><i class="ti ti-pencil-check"></i><span>Testlar</span></a></li>
+            <li class="sidebar-item"><a href="certificate.html" class="sidebar-link"><i class="ti ti-award"></i><span>Sertifikat</span></a></li>
+            <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+            <li class="sidebar-item" style="margin-top:auto;padding-bottom:12px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+        </ul>
+    </div>
+
+    <div class="mobile-bottom-nav">
+        <div class="nav-items">
+            <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+            <a href="leads.html"><i class="ti ti-users-group"></i>Lidlar</a>
+            <a href="student.html"><i class="ti ti-backpack"></i>Talabalar</a>
+            <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+            <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center"><i class="ti ti-map-pin me-2 text-muted"></i><span class="fw-bold">Yunusobod filiali / Lidlar</span></div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="search-global-btn" class="btn btn-icon btn-ghost-secondary rounded-circle" title="Ctrl+K"><i class="ti ti-search"></i></button>
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+                <div class="d-none d-xl-block"><div id="navbar-name" class="fw-bold" style="font-size: 13px;">Behruz Berdiyev</div></div>
+            </div>
+        </div>
+
+        <div class="card p-3 mb-4 border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="row g-3 align-items-center justify-content-between">
+                <div class="col-md-8 d-flex flex-wrap gap-2 align-items-center">
+                    <div class="input-icon" style="min-width: 250px;">
+                        <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+                        <input type="text" id="lead-search" class="form-control" placeholder="Ism yoki telefon orqali qidirish..." oninput="renderLeads()">
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn text-white" style="background-color: var(--modme-orange);" data-bs-toggle="modal" data-bs-target="#modal-lead">
+                        <i class="ti ti-user-plus me-2"></i>Yangi lid qo'shish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lidlar bosqichlari (Kanban ustunlari) -->
+        <div class="row g-3" id="leads-board">
+            </div>
+    </div>
+
+    <div class="modal modal-blur fade" id="modal-lead" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 14px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold fs-3">Yangi lid qo'shish</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ism</label>
+                        <input type="text" id="lead-name" class="form-control" placeholder="Masalan: Ruslan Ahmedov">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Telefon raqami</label>
+                        <input type="text" id="lead-phone" class="form-control" placeholder="+998 90 123 45 67" data-phone-mask>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Manba</label>
+                                <select id="lead-source" class="form-select">
+                                    <option>Facebook</option>
+                                    <option>Instagram</option>
+                                    <option>Telegram</option>
+                                    <option>Tanish orqali</option>
+                                    <option>Boshqa</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Bosqich</label>
+                                <select id="lead-stage" class="form-select">
+                                    <option>Yangi</option>
+                                    <option>Bog'lanildi</option>
+                                    <option>Sinov darsi</option>
+                                    <option>Mijozga aylandi</option>
+                                    <option>Bekor qilindi</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Izoh</label>
+                        <textarea id="lead-note" class="form-control" rows="2" placeholder="Qo'shimcha izoh..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="button" class="btn text-white" style="background-color: var(--modme-orange);" onclick="addLead()">Saqlash</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TALABAGA AYLANTIRISH — GURUH TANLASH MODALI -->
+    <div class="modal modal-blur fade" id="modal-convert" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 14px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold fs-3"><i class="ti ti-user-plus me-2" style="color:var(--modme-orange);"></i>Talaba sifatida qo'shish</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="convert-lead-info" class="alert alert-light py-2 mb-3" style="font-size:13px;"></div>
+                    <div id="convert-duplicate-warning" class="alert alert-warning py-2 mb-3" style="font-size:12px;display:none;"></div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Qaysi guruhga biriktiramiz? <span class="text-danger">*</span></label>
+                        <select id="convert-group-select" class="form-select"></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="button" class="btn text-white" style="background-color: var(--modme-orange);" onclick="finalizeConvertToStudent()"><i class="ti ti-check me-1"></i>Talaba qilib qo'shish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+    <script src="shared.js"></script>
+
+    <script>
+        const STAGES = ["Yangi", "Bog'lanildi", "Sinov darsi", "Mijozga aylandi", "Bekor qilindi"];
+        const SOURCE_BADGE = {
+            "Facebook": "bg-blue-lt",
+            "Instagram": "bg-pink-lt",
+            "Telegram": "bg-purple-lt",
+            "Tanish orqali": "bg-green-lt",
+            "Boshqa": "bg-secondary-lt"
+        };
+
+        let defaultLeads = [
+            { id: 1, name: "Ruslan", phone: "+99899 900 90 90", source: "Facebook", stage: "Yangi", note: "" },
+            { id: 2, name: "Jahongir", phone: "+99899 900 90 91", source: "Telegram", stage: "Yangi", note: "" },
+            { id: 3, name: "Madina", phone: "+99890 111 22 33", source: "Instagram", stage: "Bog'lanildi", note: "Ertaga qaytar" },
+            { id: 4, name: "Aziz", phone: "+99893 222 33 44", source: "Tanish orqali", stage: "Sinov darsi", note: "" }
+        ];
+
+        if (!localStorage.getItem('leads')) {
+            localStorage.setItem('leads', JSON.stringify(defaultLeads));
+        }
+
+        function getLeads() {
+            return localStorage.getItem('leads') ? JSON.parse(localStorage.getItem('leads')) : [];
+        }
+
+        function renderLeads() {
+            const leads = getLeads();
+            const board = document.getElementById('leads-board');
+            const searchQuery = document.getElementById('lead-search').value.toLowerCase();
+            board.innerHTML = '';
+
+            STAGES.forEach(stage => {
+                const stageLeads = leads.filter(l =>
+                    l.stage === stage &&
+                    (l.name.toLowerCase().includes(searchQuery) || l.phone.includes(searchQuery))
+                );
+
+                let cardsHtml = stageLeads.map(lead => {
+                    const idx = leads.indexOf(lead);
+                    const badgeClass = SOURCE_BADGE[lead.source] || "bg-secondary-lt";
+                    const convertBtn = lead.stage === 'Mijozga aylandi'
+                        ? `<button class="btn btn-sm btn-success" style="font-size:11px;" onclick="convertToStudent(${idx})"><i class="ti ti-user-plus me-1"></i>Talaba qilish</button>`
+                        : '';
+                    return `
+                        <div class="lead-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-bold" style="font-size:13px;">${lead.name}</div>
+                                    <small class="text-muted"><i class="ti ti-phone me-1"></i>${lead.phone}</small>
+                                </div>
+                                <span class="badge ${badgeClass}">${lead.source}</span>
+                            </div>
+                            ${lead.note ? `<div class="text-muted small mt-2">${lead.note}</div>` : ''}
+                            ${convertBtn ? `<div class="mt-2">${convertBtn}</div>` : ''}
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <select class="form-select form-select-sm" style="font-size:11px; max-width: 140px;" onchange="moveLead(${idx}, this.value)">
+                                    ${STAGES.map(s => `<option ${s === lead.stage ? 'selected' : ''}>${s}</option>`).join('')}
+                                </select>
+                                <button class="btn btn-sm btn-icon btn-white text-danger" onclick="deleteLead(${idx})"><i class="ti ti-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                board.innerHTML += `
+                    <div class="col-md-6 col-xl">
+                        <div class="lead-col">
+                            <div class="lead-col-header">
+                                <span>${stage}</span>
+                                <span class="badge bg-orange-lt">${stageLeads.length}</span>
+                            </div>
+                            ${cardsHtml || '<div class="text-muted small text-center py-4">Lid yo\'q</div>'}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function getGroups() {
+            return localStorage.getItem('groups') ? JSON.parse(localStorage.getItem('groups')) : [];
+        }
+
+        function getStudents() {
+            return localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : [];
+        }
+
+        let convertingLeadIndex = null;
+
+        function convertToStudent(index) {
+            const leads = getLeads();
+            const lead = leads[index];
+            if (!lead) return;
+
+            convertingLeadIndex = index;
+            document.getElementById('convert-lead-info').innerHTML = `<i class="ti ti-user me-1"></i><strong>${lead.name}</strong> · <i class="ti ti-phone me-1 ms-1"></i>${lead.phone}`;
+
+            // Duplikat tekshiruvi — shu telefon raqamli talaba mavjudmi
+            const normalizedPhone = typeof normalizePhone === 'function' ? normalizePhone(lead.phone) : lead.phone;
+            const existing = getStudents().find(s => (typeof normalizePhone === 'function' ? normalizePhone(s.phone) : s.phone) === normalizedPhone);
+            const warnEl = document.getElementById('convert-duplicate-warning');
+            if (existing) {
+                warnEl.style.display = 'block';
+                warnEl.innerHTML = `<i class="ti ti-alert-triangle me-1"></i>Diqqat: <strong>${existing.name}</strong> shu telefon raqam bilan talabalar ro'yxatida allaqachon bor!`;
+            } else {
+                warnEl.style.display = 'none';
+            }
+
+            // Guruhlar ro'yxati — admin tanlashi shart, avtomatik birinchisi tanlanmaydi
+            const groups = getGroups();
+            const sel = document.getElementById('convert-group-select');
+            sel.innerHTML = groups.length
+                ? '<option value="">-- Guruhni tanlang --</option>' + groups.map(g => `<option value="${g.name}">${g.name}</option>`).join('')
+                : '<option value="">Avval Guruhlar bo\'limidan guruh oching</option>';
+
+            new bootstrap.Modal(document.getElementById('modal-convert')).show();
+        }
+
+        function finalizeConvertToStudent() {
+            const targetGroup = document.getElementById('convert-group-select').value;
+            if (!targetGroup) {
+                if (typeof showToast === 'function') showToast("Iltimos, guruhni tanlang!", 'danger');
+                return;
+            }
+
+            const leads = getLeads();
+            const lead = leads[convertingLeadIndex];
+            if (!lead) return;
+
+            const newStudent = {
+                id: typeof generateUniqueStudentId === 'function' ? generateUniqueStudentId() : Math.floor(1000 + Math.random() * 9000),
+                name: lead.name,
+                phone: lead.phone,
+                group: targetGroup,
+                startDate: new Date().toISOString().split('T')[0],
+                balance: 0,
+                status: "Sinov darsida"
+            };
+
+            const students = getStudents();
+            students.push(newStudent);
+            localStorage.setItem('students', JSON.stringify(students));
+
+            // Lidni ro'yxatdan olib tashlaymiz, chunki u endi talaba
+            leads.splice(convertingLeadIndex, 1);
+            localStorage.setItem('leads', JSON.stringify(leads));
+
+            if (typeof logActivity === 'function') logActivity("Qo'shildi", `Lid → Talaba: ${newStudent.name} (${targetGroup})`);
+
+            bootstrap.Modal.getInstance(document.getElementById('modal-convert')).hide();
+            renderLeads();
+
+            if (typeof showConfirmModal === 'function') {
+                showConfirmModal({
+                    title: "Muvaffaqiyatli qo'shildi!",
+                    message: `<strong>${newStudent.name}</strong> talaba sifatida "${targetGroup}" guruhiga qo'shildi. Uning profiliga o'tasizmi?`,
+                    confirmLabel: "Profilga o'tish",
+                    cancelLabel: "Bu yerda qolish",
+                    onConfirm: () => { window.location.href = 'student-detail.html?id=' + newStudent.id; }
+                });
+            } else if (confirm(`"${newStudent.name}" muvaffaqiyatli talaba sifatida qo'shildi! Talaba profiliga o'tasizmi?`)) {
+                window.location.href = 'student-detail.html?id=' + newStudent.id;
+            }
+        }
+
+        function addLead() {
+            const nameEl = document.getElementById('lead-name');
+            const phoneEl = document.getElementById('lead-phone');
+            const sourceEl = document.getElementById('lead-source');
+            const stageEl = document.getElementById('lead-stage');
+            const noteEl = document.getElementById('lead-note');
+
+            const name = nameEl.value.trim();
+            const phone = phoneEl.value.trim();
+
+            if (!name || !phone) {
+                if (typeof showToast === 'function') showToast("Iltimos, lidning ismi va telefon raqamini kiriting!", 'danger');
+                else alert("Iltimos, lidning ismi va telefon raqamini kiriting!");
+                return;
+            }
+
+            if (typeof isValidUzPhone === 'function' && !isValidUzPhone(phone)) {
+                if (typeof showToast === 'function') showToast("Telefon raqam noto'g'ri formatda!", 'danger');
+                else alert("Telefon raqam noto'g'ri formatda!");
+                phoneEl.focus();
+                return;
+            }
+
+            // Duplikat tekshiruvi
+            const normalizedPhone = typeof normalizePhone === 'function' ? normalizePhone(phone) : phone;
+            const existing = getLeads().find(l => (typeof normalizePhone === 'function' ? normalizePhone(l.phone) : l.phone) === normalizedPhone);
+            if (existing) {
+                if (typeof showConfirmModal === 'function') {
+                    showConfirmModal({
+                        title: "Bunday lid allaqachon bor",
+                        message: `<strong>${existing.name}</strong> shu telefon raqam bilan allaqachon ro'yxatda. Baribir qo'shasizmi?`,
+                        confirmLabel: "Ha, qo'shish",
+                        onConfirm: () => proceedAddLead(name, phone, sourceEl, stageEl, noteEl)
+                    });
+                    return;
+                } else if (!confirm(`"${existing.name}" shu telefon bilan bor. Baribir qo'shasizmi?`)) {
+                    return;
+                }
+            }
+
+            proceedAddLead(name, phone, sourceEl, stageEl, noteEl);
+        }
+
+        function proceedAddLead(name, phone, sourceEl, stageEl, noteEl) {
+            const leads = getLeads();
+            leads.push({
+                id: Date.now(),
+                name: name,
+                phone: phone,
+                source: sourceEl.value,
+                stage: stageEl.value,
+                note: noteEl.value
+            });
+            localStorage.setItem('leads', JSON.stringify(leads));
+            if (typeof logActivity === 'function') logActivity("Qo'shildi", "Yangi lid: " + name);
+            if (typeof showToast === 'function') showToast(`${name} lid sifatida qo'shildi!`, 'success');
+
+            document.getElementById('lead-name').value = '';
+            document.getElementById('lead-phone').value = '';
+            document.getElementById('lead-note').value = '';
+
+            let modal = bootstrap.Modal.getInstance(document.getElementById('modal-lead'));
+            if (modal) modal.hide();
+
+            renderLeads();
+        }
+
+        function moveLead(index, newStage) {
+            const leads = getLeads();
+            leads[index].stage = newStage;
+            localStorage.setItem('leads', JSON.stringify(leads));
+            renderLeads();
+        }
+
+        function deleteLead(index) {
+            const leads = getLeads();
+            const lead = leads[index];
+            if (!lead) return;
+
+            const doDelete = () => {
+                leads.splice(index, 1);
+                localStorage.setItem('leads', JSON.stringify(leads));
+                if (typeof logActivity === 'function') logActivity("O'chirildi", "Lid: " + lead.name);
+                renderLeads();
+                if (typeof showToast === 'function') showToast(`${lead.name} o'chirildi`, 'success');
+            };
+
+            if (typeof showConfirmModal === 'function') {
+                showConfirmModal({
+                    title: "Lidni o'chirish",
+                    message: `<strong>${lead.name}</strong>ni o'chirishni xohlaysizmi?`,
+                    confirmLabel: "Ha, o'chirish",
+                    danger: true,
+                    onConfirm: doDelete
+                });
+            } else if (confirm("Ushbu lidni o'chirishni xohlaysizmi?")) {
+                doDelete();
+            }
+        }
+
+        window.onload = renderLeads;
+    </script>
+
+    
+
+
+<!-- GLOBAL QIDIRUV -->
+<div id="search-overlay" class="search-overlay">
+    <div class="search-box">
+        <div class="search-input-wrap"><i class="ti ti-search"></i><input type="text" id="search-global-input" placeholder="Talaba, guruh, o'qituvchi..."><kbd style="font-size:11px;background:#f1f3f7;padding:2px 6px;border-radius:4px;">ESC</kbd></div>
+        <div class="search-results" id="search-global-results"></div>
+        <div class="search-hint"><span><kbd>Ctrl+K</kbd> Qidiruv</span><span><kbd>ESC</kbd> Yopish</span></div>
+    </div>
+</div>
+</body>
+</html>

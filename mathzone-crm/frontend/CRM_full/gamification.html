@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM - Gamifikatsiya</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        :root { --modme-orange: #ff7a00; --sidebar-bg: #1e1e2d; }
+        body { background-color: #f6f8fb; font-family: system-ui, -apple-system, sans-serif; }
+        
+        
+        .sidebar-brand span { color: var(--modme-orange); }
+        
+        
+        
+        
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: #fff; padding: 12px 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .rank-item { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #eef1f6; border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; }
+        .rank-number { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; background: #f1f3f7; color: #626976; }
+        .rank-number.gold { background: #fff4e0; color: #ff7a00; }
+        .rank-number.silver { background: #eef1f6; color: #626976; }
+        .rank-number.bronze { background: #fdeee2; color: #d4742a; }
+        .point-badge { font-weight: bold; color: var(--modme-orange); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-fixed">
+        <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+            <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+            <li class="sidebar-item"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+            <li class="sidebar-item"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+            <li class="sidebar-item"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+            <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+            <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+            <li class="sidebar-item active"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+            <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+            <li class="sidebar-item" style="margin-top:auto;padding-bottom:12px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+        </ul>
+    </div>
+
+    <div class="mobile-bottom-nav">
+        <div class="nav-items">
+            <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+            <a href="leads.html"><i class="ti ti-users-group"></i>Lidlar</a>
+            <a href="student.html"><i class="ti ti-backpack"></i>Talabalar</a>
+            <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+            <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center"><i class="ti ti-map-pin me-2 text-muted"></i><span class="fw-bold">Yunusobod filiali / Gamifikatsiya</span></div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="search-global-btn" class="btn btn-icon btn-ghost-secondary rounded-circle" title="Ctrl+K"><i class="ti ti-search"></i></button>
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+                <div class="d-none d-xl-block"><div id="navbar-name" class="fw-bold" style="font-size: 13px;">Behruz Berdiyev</div></div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-lg-7">
+                <div class="card p-4 border-0 shadow-sm" style="border-radius: 14px;">
+                    <h3 class="fw-bold mb-3"><i class="ti ti-trophy me-2 text-warning"></i>Reyting jadvali</h3>
+                    <div id="leaderboard"></div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card p-4 border-0 shadow-sm mb-3" style="border-radius: 14px;">
+                    <h3 class="fw-bold mb-3"><i class="ti ti-coin me-2 text-orange"></i>Ball qo'shish (qo'lda)</h3>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Talaba</label>
+                        <select id="point-student" class="form-select"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ball miqdori</label>
+                        <input type="number" id="point-amount" class="form-control" value="10">
+                        <small class="text-muted">Manfiy son kiritsangiz — ball ayiriladi (jazo uchun)</small>
+                    </div>
+                    <button class="btn text-white w-100" style="background-color: var(--modme-orange);" onclick="addPoints()">
+                        <i class="ti ti-plus me-2"></i>Ball qo'shish
+                    </button>
+                </div>
+
+                <div class="card p-4 border-0 shadow-sm" style="border-radius: 14px;">
+                    <h3 class="fw-bold mb-3"><i class="ti ti-bolt me-2 text-success"></i>Avtomatik ballar</h3>
+                    <div style="font-size:12px;color:#626976;line-height:1.8;">
+                        <div><i class="ti ti-star-filled me-2" style="color:#2bab41;"></i>5 baho = <strong>+10 ball</strong></div>
+                        <div><i class="ti ti-star-filled me-2" style="color:#206bc4;"></i>4 baho = <strong>+5 ball</strong></div>
+                        <div><i class="ti ti-pencil-check me-2" style="color:#ff7a00;"></i>Test 90%+ = <strong>+15 ball</strong></div>
+                        <div><i class="ti ti-pencil-check me-2" style="color:#206bc4;"></i>Test 70-89% = <strong>+8 ball</strong></div>
+                        <div><i class="ti ti-cash me-2" style="color:#2bab41;"></i>Vaqtida to'lov (oyning 1-10 kuni) = <strong>+5 ball</strong></div>
+                    </div>
+                    <hr class="my-3" style="opacity:.1;">
+                    <div class="fw-bold mb-2" style="font-size:13px;"><i class="ti ti-history me-1"></i>So'nggi avtomatik ballar</div>
+                    <div id="auto-points-log" style="max-height:200px;overflow-y:auto;font-size:12px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+    <script src="shared.js"></script>
+
+    <script>
+        function getStudents() {
+            return localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : [];
+        }
+
+        function getPoints() {
+            return localStorage.getItem('points') ? JSON.parse(localStorage.getItem('points')) : {};
+        }
+
+        function savePoints(points) {
+            localStorage.setItem('points', JSON.stringify(points));
+        }
+
+        function renderLeaderboard() {
+            const students = getStudents().filter(s => s.status === 'Faol');
+            const points = getPoints();
+
+            const ranked = students
+                .map(s => ({ name: s.name, group: s.group, score: points[s.id] || 0, id: s.id }))
+                .sort((a, b) => b.score - a.score);
+
+            const board = document.getElementById('leaderboard');
+            if (ranked.length === 0) {
+                board.innerHTML = '<div class="text-muted text-center py-4">Hali faol talaba yo\'q</div>';
+                return;
+            }
+
+            board.innerHTML = ranked.map((r, i) => {
+                const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                return `
+                    <div class="rank-item">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="rank-number ${rankClass}">${i + 1}</span>
+                            <div>
+                                <div class="fw-bold" style="font-size:14px;">${r.name}</div>
+                                <small class="text-muted">${r.group}</small>
+                            </div>
+                        </div>
+                        <span class="point-badge"><i class="ti ti-star me-1"></i>${r.score} ball</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function fillStudentSelect() {
+            const students = getStudents().filter(s => s.status === 'Faol');
+            const select = document.getElementById('point-student');
+            select.innerHTML = students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        }
+
+        function addPoints() {
+            const studentId = document.getElementById('point-student').value;
+            const amount = parseInt(document.getElementById('point-amount').value) || 0;
+            if (!studentId) {
+                if (typeof showToast === 'function') showToast("Talaba topilmadi. Avval Talabalar bo'limidan talaba qo'shing.", 'danger');
+                else alert("Talaba topilmadi. Avval Talabalar bo'limidan talaba qo'shing.");
+                return;
+            }
+            if (amount === 0) {
+                if (typeof showToast === 'function') showToast("Ball miqdorini kiriting!", 'warning');
+                return;
+            }
+
+            const points = getPoints();
+            // Manfiy ball berilsa ham, umumiy ball 0 dan pastga tushmasin
+            points[studentId] = Math.max((points[studentId] || 0) + amount, 0);
+            savePoints(points);
+
+            const students = getStudents();
+            const student = students.find(s => String(s.id) === String(studentId));
+            if (typeof logActivity === 'function' && student) logActivity("Yangilandi", `${student.name}: ${amount > 0 ? '+' : ''}${amount} ball (qo'lda)`);
+            if (typeof showToast === 'function' && student) showToast(`${student.name}: ${amount > 0 ? '+' : ''}${amount} ball berildi`, amount > 0 ? 'success' : 'warning');
+
+            renderLeaderboard();
+        }
+
+        function renderAutoPointsLog() {
+            const log = JSON.parse(localStorage.getItem('points_log') || '[]');
+            const el = document.getElementById('auto-points-log');
+            if (!el) return;
+            if (!log.length) { el.innerHTML = '<div class="text-muted text-center py-2">Hali avtomatik ball yo\'q</div>'; return; }
+            const students = getStudents();
+            el.innerHTML = log.slice(0, 10).map(l => {
+                const s = students.find(x => String(x.id) === String(l.studentId));
+                const name = s ? s.name : 'Noma\'lum talaba';
+                const d = new Date(l.date);
+                const dt = `${d.getDate()}.${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                const color = l.amount > 0 ? '#2bab41' : '#d63939';
+                return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f3f7;">
+                    <div><div class="fw-bold">${name}</div><div style="color:#99a1ad;">${l.reason}</div></div>
+                    <div style="text-align:right;"><div style="color:${color};font-weight:700;">${l.amount>0?'+':''}${l.amount}</div><div style="color:#c0c4cc;font-size:10px;">${dt}</div></div>
+                </div>`;
+            }).join('');
+        }
+
+        window.onload = function () {
+            fillStudentSelect();
+            renderLeaderboard();
+            renderAutoPointsLog();
+        };
+    </script>
+
+    
+
+
+<!-- GLOBAL QIDIRUV -->
+<div id="search-overlay" class="search-overlay">
+    <div class="search-box">
+        <div class="search-input-wrap"><i class="ti ti-search"></i><input type="text" id="search-global-input" placeholder="Talaba, guruh, o'qituvchi..."><kbd style="font-size:11px;background:#f1f3f7;padding:2px 6px;border-radius:4px;">ESC</kbd></div>
+        <div class="search-results" id="search-global-results"></div>
+        <div class="search-hint"><span><kbd>Ctrl+K</kbd> Qidiruv</span><span><kbd>ESC</kbd> Yopish</span></div>
+    </div>
+</div>
+</body>
+</html>

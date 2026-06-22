@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM — Dars jadvali</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        .tt-grid { display:grid; grid-template-columns:64px repeat(6,minmax(110px,1fr)); border:0.5px solid #e5e8ef; border-radius:12px; overflow:hidden; background:#fff; min-width:740px; }
+        .tt-head { background:#f8fafc; font-size:12px; font-weight:700; color:#626976; padding:10px 8px; text-align:center; border-bottom:0.5px solid #e5e8ef; border-right:0.5px solid #e5e8ef; }
+        .tt-head:last-child { border-right:none; }
+        .tt-time { font-size:11px; color:#99a1ad; padding:8px 6px; text-align:center; border-bottom:0.5px solid #f1f3f7; border-right:0.5px solid #e5e8ef; background:#fafbfc; display:flex; align-items:center; justify-content:center; }
+        .tt-cell { border-bottom:0.5px solid #f1f3f7; border-right:0.5px solid #e5e8ef; padding:4px; min-height:56px; cursor:pointer; transition:background .12s; position:relative; }
+        .tt-cell:last-child { border-right:none; }
+        .tt-cell:hover { background:#fff8f3; }
+        .tt-cell.has-class { background:#fff; }
+        .class-card { border-radius:7px; padding:5px 8px; font-size:11px; height:100%; min-height:48px; }
+        .class-name { font-weight:700; font-size:12px; margin-bottom:2px; }
+        .class-sub { font-size:10px; opacity:.8; }
+        .legend { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
+        .legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:#626976; }
+        .legend-dot { width:12px; height:12px; border-radius:3px; }
+        .add-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:9999; align-items:center; justify-content:center; }
+        .add-modal-overlay.open { display:flex; }
+        .add-modal { background:#fff; border-radius:16px; padding:28px; width:380px; max-width:95vw; box-shadow:0 20px 50px rgba(0,0,0,.15); }
+        .conflict-badge { position:absolute; top:4px; right:4px; width:16px; height:16px; background:#e53935; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+        .conflict-badge i { font-size:10px; color:#fff; }
+        .room-stat { background:#f8fafc; border-radius:10px; padding:12px 14px; text-align:center; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar-fixed">
+    <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+    <ul class="sidebar-menu">
+        <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+        <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+        <li class="sidebar-item"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+        <li class="sidebar-item active"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+        <li class="sidebar-item"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+        <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+        <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+        <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+        <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+        <li class="sidebar-item" style="margin-top:auto;padding-bottom:12px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+    </ul>
+</div>
+
+<div class="mobile-bottom-nav">
+    <div class="nav-items">
+        <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+        <a href="groups.html" class="active"><i class="ti ti-books"></i>Guruhlar</a>
+        <a href="student.html"><i class="ti ti-backpack"></i>Talabalar</a>
+        <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+        <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="top-navbar">
+        <div class="d-flex align-items-center gap-2">
+            <i class="ti ti-map-pin text-muted"></i>
+            <span class="fw-bold">Dars jadvali</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <button class="btn text-white" style="background:#ff7a00;" onclick="openAddModal()">
+                <i class="ti ti-plus me-1"></i>Dars qo'shish
+            </button>
+            <button class="btn btn-outline-secondary" onclick="clearSchedule()">
+                <i class="ti ti-trash me-1"></i>Tozalash
+            </button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+            <div id="navbar-name" class="fw-bold d-none d-xl-block" style="font-size:13px;"></div>
+        </div>
+    </div>
+
+    <!-- Xona statistikasi -->
+    <div class="row g-2 mb-3" id="room-stats"></div>
+
+    <!-- Konflikt ogohlantirishi -->
+    <div id="conflict-alert" style="display:none;" class="alert alert-danger py-2 mb-3">
+        <i class="ti ti-alert-triangle me-2"></i><span id="conflict-msg"></span>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend" id="legend"></div>
+
+    <!-- Filtr -->
+    <div class="d-flex gap-2 mb-3 flex-wrap">
+        <select id="filter-room" class="form-select" style="width:auto;" onchange="renderTimetable()">
+            <option value="">Barcha xonalar</option>
+        </select>
+        <select id="filter-teacher" class="form-select" style="width:auto;" onchange="renderTimetable()">
+            <option value="">Barcha o'qituvchilar</option>
+        </select>
+    </div>
+
+    <!-- Jadval -->
+    <div style="overflow-x:auto;">
+        <div class="tt-grid" id="timetable-grid"></div>
+    </div>
+
+    <div class="mt-3" style="font-size:12px;color:#99a1ad;">
+        <i class="ti ti-info-circle me-1"></i>Katak ustiga bosing — dars qo'shish yoki ko'rish uchun
+    </div>
+</div>
+
+<!-- Dars qo'shish modali -->
+<div id="add-modal" class="add-modal-overlay">
+    <div class="add-modal">
+        <div style="font-size:16px;font-weight:700;margin-bottom:18px;"><i class="ti ti-calendar-plus me-2" style="color:#ff7a00;"></i>Dars qo'shish</div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Guruh</label>
+            <select id="m-group" class="form-select"></select>
+        </div>
+        <div class="row g-2 mb-3">
+            <div class="col-6">
+                <label class="form-label fw-bold">Kun</label>
+                <select id="m-day" class="form-select">
+                    <option value="1">Dushanba</option>
+                    <option value="2">Seshanba</option>
+                    <option value="3">Chorshanba</option>
+                    <option value="4">Payshanba</option>
+                    <option value="5">Juma</option>
+                    <option value="6">Shanba</option>
+                </select>
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold">Vaqt</label>
+                <select id="m-time" class="form-select" onchange="checkConflictLive()"></select>
+            </div>
+        </div>
+        <div class="row g-2 mb-3">
+            <div class="col-6">
+                <label class="form-label fw-bold">Xona</label>
+                <select id="m-room" class="form-select" onchange="checkConflictLive()"></select>
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold">Davomiyligi</label>
+                <select id="m-duration" class="form-select">
+                    <option value="60">1 soat</option>
+                    <option value="90" selected>1.5 soat</option>
+                    <option value="120">2 soat</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="modal-conflict" class="alert alert-danger py-2 mb-3" style="display:none;font-size:12px;"></div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-link text-secondary" onclick="closeAddModal()">Bekor</button>
+            <button class="btn text-white flex-fill" style="background:#ff7a00;" onclick="saveLesson()"><i class="ti ti-check me-1"></i>Saqlash</button>
+        </div>
+    </div>
+</div>
+
+<!-- Dars detail modali -->
+<div id="detail-modal" class="add-modal-overlay">
+    <div class="add-modal">
+        <div id="detail-content"></div>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-link text-secondary" onclick="document.getElementById('detail-modal').classList.remove('open')">Yopish</button>
+            <button class="btn btn-outline-danger" id="detail-delete-btn"><i class="ti ti-trash me-1"></i>O'chirish</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+<script src="shared.js"></script>
+<script>
+const DAYS = ['','Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba'];
+const TIMES = ['08:00','09:00','09:30','10:00','11:00','11:30','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00'];
+
+// Rang palitasi (guruhlar uchun)
+const COLORS = [
+    {bg:'#fff0e6',border:'#ff7a00',text:'#c85a00'},
+    {bg:'#e8f0fd',border:'#206bc4',text:'#1a5fa8'},
+    {bg:'#e8f7ee',border:'#2bab41',text:'#1a6b35'},
+    {bg:'#f3e8ff',border:'#7c3aed',text:'#5b21b6'},
+    {bg:'#fef3c7',border:'#d97706',text:'#92400e'},
+    {bg:'#ffe4e6',border:'#e11d48',text:'#9f1239'},
+    {bg:'#e0f2fe',border:'#0284c7',text:'#075985'},
+    {bg:'#f0fdf4',border:'#16a34a',text:'#14532d'},
+];
+
+let groupColorMap = {};
+
+function getSchedule() { return JSON.parse(localStorage.getItem('timetable') || '[]'); }
+function saveSchedule(s) { localStorage.setItem('timetable', JSON.stringify(s)); }
+function getGroups()   { return JSON.parse(localStorage.getItem('groups')   || '[]'); }
+function getRooms()    { return JSON.parse(localStorage.getItem('rooms')    || '["1-xona","2-xona","3-xona"]'); }
+
+function assignColors() {
+    const groups = getGroups();
+    groups.forEach((g, i) => { groupColorMap[g.name] = COLORS[i % COLORS.length]; });
+}
+
+function renderLegend() {
+    const groups = getGroups();
+    const el = document.getElementById('legend');
+    el.innerHTML = groups.map(g => {
+        const c = groupColorMap[g.name] || COLORS[0];
+        return `<div class="legend-item"><div class="legend-dot" style="background:${c.bg};border:1.5px solid ${c.border};"></div>${g.name}</div>`;
+    }).join('');
+}
+
+function renderRoomStats() {
+    const rooms = getRooms();
+    const schedule = getSchedule();
+    const el = document.getElementById('room-stats');
+    el.innerHTML = rooms.map(room => {
+        const cnt = schedule.filter(l => l.room === room).length;
+        const pct = TIMES.length > 0 ? Math.round(cnt / (TIMES.length * 6) * 100) : 0;
+        return `<div class="col-6 col-md-3 col-xl-2">
+            <div class="room-stat">
+                <div class="fw-bold" style="font-size:13px;">${room}</div>
+                <div style="font-size:11px;color:#99a1ad;">${cnt} dars / hafta</div>
+                <div style="background:#f1f3f7;border-radius:4px;height:4px;margin-top:6px;overflow:hidden;">
+                    <div style="width:${Math.min(pct*3,100)}%;height:100%;background:#ff7a00;border-radius:4px;"></div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function renderTimetable() {
+    const schedule  = getSchedule();
+    const roomFilter    = document.getElementById('filter-room').value;
+    const teacherFilter = document.getElementById('filter-teacher').value;
+    const grid = document.getElementById('timetable-grid');
+
+    // Header
+    let html = '<div class="tt-head">Vaqt</div>';
+    for (let d = 1; d <= 6; d++) html += `<div class="tt-head">${DAYS[d]}</div>`;
+
+    // Rows
+    TIMES.forEach(time => {
+        html += `<div class="tt-time">${time}</div>`;
+        for (let d = 1; d <= 6; d++) {
+            let lessons = schedule.filter(l => l.day == d && l.time === time);
+            if (roomFilter)    lessons = lessons.filter(l => l.room === roomFilter);
+            if (teacherFilter) lessons = lessons.filter(l => l.teacher === teacherFilter);
+
+            const hasConflict = schedule.filter(l => l.day == d && l.time === time).length > 1;
+
+            html += `<div class="tt-cell ${lessons.length?'has-class':''}" onclick="cellClick(${d},'${time}')">`;
+            if (hasConflict && !roomFilter) {
+                html += `<div class="conflict-badge"><i class="ti ti-alert-triangle"></i></div>`;
+            }
+            lessons.forEach(l => {
+                const c = groupColorMap[l.group] || COLORS[0];
+                html += `<div class="class-card" style="background:${c.bg};border-left:3px solid ${c.border};cursor:pointer;" onclick="event.stopPropagation();showDetail(${JSON.stringify(l).replace(/"/g,'&quot;')})">
+                    <div class="class-name" style="color:${c.text};">${l.group}</div>
+                    <div class="class-sub" style="color:${c.text};">${l.room} · ${l.teacher||''}</div>
+                </div>`;
+            });
+            html += '</div>';
+        }
+    });
+
+    grid.innerHTML = html;
+
+    // Konflikt tekshiruvi
+    checkAllConflicts();
+    renderRoomStats();
+}
+
+function checkAllConflicts() {
+    const schedule = getSchedule();
+    const conflicts = [];
+    const rooms = getRooms();
+
+    // Bir xona, bir vaqtda ikki dars?
+    rooms.forEach(room => {
+        for (let d=1;d<=6;d++) {
+            TIMES.forEach(time => {
+                const cls = schedule.filter(l => l.room===room && l.day==d && l.time===time);
+                if (cls.length > 1) {
+                    conflicts.push(`${room}: ${DAYS[d]} ${time} — ${cls.map(c=>c.group).join(' va ')} bir vaqtda!`);
+                }
+            });
+        }
+    });
+
+    // Bir o'qituvchi, bir vaqtda ikki dars?
+    const teachers = [...new Set(schedule.filter(l=>l.teacher).map(l=>l.teacher))];
+    teachers.forEach(teacher => {
+        for (let d=1;d<=6;d++) {
+            TIMES.forEach(time => {
+                const cls = schedule.filter(l => l.teacher===teacher && l.day==d && l.time===time);
+                if (cls.length > 1) {
+                    conflicts.push(`${teacher}: ${DAYS[d]} ${time} — bir vaqtda ikki dars!`);
+                }
+            });
+        }
+    });
+
+    const alertEl = document.getElementById('conflict-alert');
+    if (conflicts.length) {
+        alertEl.style.display = 'block';
+        document.getElementById('conflict-msg').innerText = `${conflicts.length} ta konflikt: ${conflicts[0]}${conflicts.length>1?' va boshqalar':''}`;
+    } else {
+        alertEl.style.display = 'none';
+    }
+}
+
+function cellClick(day, time) {
+    document.getElementById('m-day').value = day;
+    document.getElementById('m-time').value = time;
+    openAddModal();
+}
+
+function showDetail(lesson) {
+    if (typeof lesson === 'string') lesson = JSON.parse(lesson.replace(/&quot;/g,'"'));
+    const c = groupColorMap[lesson.group] || COLORS[0];
+    document.getElementById('detail-content').innerHTML = `
+        <div style="background:${c.bg};border-radius:10px;padding:14px;margin-bottom:16px;">
+            <div style="font-size:16px;font-weight:700;color:${c.text};">${lesson.group}</div>
+            <div style="font-size:13px;color:${c.text};opacity:.8;">${DAYS[lesson.day]} · ${lesson.time}</div>
+        </div>
+        <div style="font-size:13px;line-height:2;">
+            <div><i class="ti ti-door me-2 text-muted"></i><strong>Xona:</strong> ${lesson.room}</div>
+            <div><i class="ti ti-school me-2 text-muted"></i><strong>O'qituvchi:</strong> ${lesson.teacher||'—'}</div>
+            <div><i class="ti ti-clock me-2 text-muted"></i><strong>Davomiyligi:</strong> ${lesson.duration||90} daqiqa</div>
+        </div>`;
+
+    document.getElementById('detail-delete-btn').onclick = () => {
+        if (!confirm("Bu darsni o'chirishni xohlaysizmi?")) return;
+        const s = getSchedule().filter(l => !(l.day==lesson.day&&l.time===lesson.time&&l.group===lesson.group&&l.room===lesson.room));
+        saveSchedule(s);
+        document.getElementById('detail-modal').classList.remove('open');
+        renderTimetable();
+        if(typeof logActivity==='function') logActivity("O'chirildi", `Dars: ${lesson.group} — ${DAYS[lesson.day]} ${lesson.time}`);
+    };
+    document.getElementById('detail-modal').classList.add('open');
+}
+
+function openAddModal() {
+    const groups   = getGroups();
+    const rooms    = getRooms();
+    const teachers = JSON.parse(localStorage.getItem('teachers') || '[]');
+
+    const gSel = document.getElementById('m-group');
+    gSel.innerHTML = groups.length ? groups.map(g=>`<option>${g.name}</option>`).join('') : '<option>Guruh yo\'q</option>';
+
+    const tSel = document.getElementById('m-time');
+    tSel.innerHTML = TIMES.map(t=>`<option>${t}</option>`).join('');
+
+    const rSel = document.getElementById('m-room');
+    rSel.innerHTML = rooms.map(r=>`<option>${r}</option>`).join('');
+
+    document.getElementById('add-modal').classList.add('open');
+    document.getElementById('modal-conflict').style.display = 'none';
+}
+
+function closeAddModal() { document.getElementById('add-modal').classList.remove('open'); }
+
+function checkConflictLive() {
+    const day  = parseInt(document.getElementById('m-day').value);
+    const time = document.getElementById('m-time').value;
+    const room = document.getElementById('m-room').value;
+    const schedule = getSchedule();
+    const conflict = schedule.find(l => l.day==day && l.time===time && l.room===room);
+    const el = document.getElementById('modal-conflict');
+    if (conflict) {
+        el.style.display = 'block';
+        el.innerHTML = `<i class="ti ti-alert-triangle me-1"></i>${room} da ${DAYS[day]} ${time} da "${conflict.group}" guruhi bor!`;
+    } else {
+        el.style.display = 'none';
+    }
+}
+
+function saveLesson() {
+    const group    = document.getElementById('m-group').value;
+    const day      = parseInt(document.getElementById('m-day').value);
+    const time     = document.getElementById('m-time').value;
+    const room     = document.getElementById('m-room').value;
+    const duration = parseInt(document.getElementById('m-duration').value);
+
+    if (!group) { alert("Guruhni tanlang!"); return; }
+
+    const groups   = getGroups();
+    const groupObj = groups.find(g => g.name === group) || {};
+
+    const lesson = { group, day, time, room, teacher: groupObj.teacher||'', duration };
+    const schedule = getSchedule();
+    schedule.push(lesson);
+    saveSchedule(schedule);
+    closeAddModal();
+    renderTimetable();
+    if(typeof logActivity==='function') logActivity("Qo'shildi", `Dars: ${group} — ${DAYS[day]} ${time} (${room})`);
+}
+
+function clearSchedule() {
+    if (!confirm("Barcha dars jadvalini tozalashni xohlaysizmi?")) return;
+    saveSchedule([]);
+    renderTimetable();
+}
+
+function populateFilters() {
+    const rooms    = getRooms();
+    const schedule = getSchedule();
+    const teachers = [...new Set(schedule.filter(l=>l.teacher).map(l=>l.teacher))];
+
+    const rSel = document.getElementById('filter-room');
+    rSel.innerHTML = '<option value="">Barcha xonalar</option>' + rooms.map(r=>`<option>${r}</option>`).join('');
+
+    const tSel = document.getElementById('filter-teacher');
+    tSel.innerHTML = '<option value="">Barcha o\'qituvchilar</option>' + teachers.map(t=>`<option>${t}</option>`).join('');
+}
+
+// Demo darslarni qo'shish (agar jadval bo'sh bo'lsa)
+function addDemoLessons() {
+    if (getSchedule().length) return;
+    const groups = getGroups();
+    if (!groups.length) return;
+    const rooms = getRooms();
+    const demoDays = [[1,'09:00'],[1,'11:00'],[2,'10:00'],[3,'09:00'],[3,'14:00'],[4,'11:00'],[5,'09:00'],[5,'16:00'],[6,'10:00']];
+    const lessons = demoDays.map((d,i) => ({
+        group: groups[i%groups.length].name,
+        day: d[0], time: d[1],
+        room: rooms[i%rooms.length],
+        teacher: groups[i%groups.length].teacher||'',
+        duration: 90
+    }));
+    saveSchedule(lessons);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    assignColors();
+    addDemoLessons();
+    populateFilters();
+    renderLegend();
+    renderTimetable();
+
+    // Modal tashqarisiga bosish
+    document.getElementById('add-modal').addEventListener('click', e => { if(e.target===document.getElementById('add-modal')) closeAddModal(); });
+    document.getElementById('detail-modal').addEventListener('click', e => { if(e.target===document.getElementById('detail-modal')) document.getElementById('detail-modal').classList.remove('open'); });
+});
+</script>
+</body>
+</html>

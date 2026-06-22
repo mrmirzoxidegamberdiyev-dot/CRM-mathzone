@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM - Talaba profili</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        .profile-avatar { width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;background:rgba(255,122,0,.12);color:var(--modme-orange); }
+        .info-pill { background:#f8fafc;border-radius:10px;padding:12px 16px; }
+        .payment-row { display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-radius:10px;background:#f8fafc;margin-bottom:8px; }
+        .hw-item { background:#f8fafc;border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start; }
+        .hw-grade { width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0; }
+        .grade-a { background:#d3f3da;color:#1f7a30; }
+        .grade-b { background:#e8f0fd;color:#1a5fa8; }
+        .grade-c { background:#fff8e1;color:#b45309; }
+        .grade-d { background:#fbdada;color:#b32626; }
+        .tab-btn { padding:7px 18px;border-radius:8px;border:none;background:transparent;font-size:13px;cursor:pointer;color:#626976;font-weight:500; }
+        .tab-btn.active { background:var(--modme-orange);color:#fff; }
+        .tab-section { display:none; }
+        .tab-section.active { display:block; }
+    </style>
+</head>
+<body>
+<div class="sidebar-fixed">
+    <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+    <ul class="sidebar-menu">
+        <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+        <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+        <li class="sidebar-item"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+        <li class="sidebar-item"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+        <li class="sidebar-item active"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+        <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+        <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+        <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+        <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+    </ul>
+</div>
+
+<div class="mobile-bottom-nav">
+    <div class="nav-items">
+        <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+        <a href="student.html" class="active"><i class="ti ti-backpack"></i>Talabalar</a>
+        <a href="groups.html"><i class="ti ti-books"></i>Guruhlar</a>
+        <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+        <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="top-navbar">
+        <div class="d-flex align-items-center">
+            <i class="ti ti-map-pin me-2 text-muted"></i>
+            <span class="fw-bold">Talabalar / <span id="crumb-name"></span></span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+            <div id="navbar-name" class="fw-bold d-none d-xl-block" style="font-size:13px;"></div>
+        </div>
+    </div>
+
+    <a href="student.html" class="back-link d-inline-flex align-items-center mb-3" style="color:#626976;text-decoration:none;font-size:13px;"><i class="ti ti-arrow-left me-1"></i>Talabalarga qaytish</a>
+
+    <div id="not-found" class="card border-0 shadow-sm p-5 text-center text-muted d-none">
+        <i class="ti ti-user-off" style="font-size:48px;display:block;margin-bottom:12px;color:#d0d3db;"></i>Talaba topilmadi.
+    </div>
+
+    <div id="profile-content">
+        <!-- Profil header -->
+        <div class="card border-0 shadow-sm p-4 mb-3" style="border-radius:14px;">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <span id="profile-avatar" class="profile-avatar">--</span>
+                    <div>
+                        <h2 class="fw-bold mb-1" id="profile-name">Talaba</h2>
+                        <div class="text-muted small"><i class="ti ti-phone me-1"></i><span id="profile-phone"></span></div>
+                        <div class="mt-1">
+                            <a id="parent-portal-link" href="parent.html" target="_blank" class="badge bg-orange-lt" style="font-size:11px;text-decoration:none;"><i class="ti ti-external-link me-1"></i>Ota-onalar portali</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex gap-3 flex-wrap">
+                    <div class="text-center">
+                        <div class="text-muted small fw-bold">Holati</div>
+                        <div id="profile-status" class="h5 fw-bold mb-0 mt-1"></div>
+                        <div id="profile-status-action" class="mt-1"></div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-muted small fw-bold">Balans</div>
+                        <div id="profile-balance" class="h5 fw-bold mb-0 mt-1"></div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-muted small fw-bold">Davomat</div>
+                        <div id="profile-att-pct" class="h5 fw-bold mb-0 mt-1 text-primary">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info pills -->
+        <div class="row g-3 mb-3">
+            <div class="col-6 col-md-3"><div class="info-pill"><div class="text-muted small">Guruh</div><div class="fw-bold" id="profile-group">-</div></div></div>
+            <div class="col-6 col-md-3"><div class="info-pill"><div class="text-muted small">Qo'shilgan sana</div><div class="fw-bold" id="profile-startdate">-</div></div></div>
+            <div class="col-6 col-md-3"><div class="info-pill"><div class="text-muted small">Kurs narxi</div><div class="fw-bold" id="profile-price">-</div></div></div>
+            <div class="col-6 col-md-3"><div class="info-pill"><div class="text-muted small">O'qituvchi</div><div class="fw-bold" id="profile-teacher">-</div></div></div>
+        </div>
+
+        <!-- TABLAR -->
+        <div class="d-flex gap-2 mb-3 flex-wrap">
+            <button class="tab-btn active" onclick="switchTab('payments')"><i class="ti ti-cash me-1"></i>To'lovlar</button>
+            <button class="tab-btn" onclick="switchTab('attendance')"><i class="ti ti-calendar-check me-1"></i>Davomat</button>
+            <button class="tab-btn" onclick="switchTab('homework')"><i class="ti ti-notebook me-1"></i>Uy vazifalari</button>
+            <button class="tab-btn" onclick="switchTab('grades')"><i class="ti ti-star me-1"></i>Baholar</button>
+            <button class="tab-btn" onclick="switchTab('notes')"><i class="ti ti-note me-1"></i>Eslatmalar <span id="notes-count-badge" class="badge bg-danger ms-1" style="display:none;"></span></button>
+        </div>
+
+        <!-- To'lovlar tab -->
+        <div id="tab-payments" class="tab-section active">
+            <div class="card border-0 shadow-sm p-4" style="border-radius:14px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="fw-bold m-0"><i class="ti ti-history me-2" style="color:var(--modme-orange);"></i>To'lovlar tarixi</h3>
+                    <button class="btn btn-sm text-white" style="background:var(--modme-orange);" data-bs-toggle="modal" data-bs-target="#modal-quick-pay"><i class="ti ti-plus me-1"></i>To'lov qo'shish</button>
+                </div>
+                <div id="payments-list"><div class="text-muted text-center py-4">To'lovlar yo'q</div></div>
+            </div>
+        </div>
+
+        <!-- Davomat tab -->
+        <div id="tab-attendance" class="tab-section">
+            <div class="card border-0 shadow-sm p-4" style="border-radius:14px;">
+                <h3 class="fw-bold mb-3"><i class="ti ti-calendar-stats me-2 text-success"></i>Davomat statistikasi</h3>
+                <div class="row g-3 mb-3">
+                    <div class="col-4 text-center"><div class="h2 fw-bold text-success mb-0" id="att-pct">0%</div><div class="text-muted small">Qatnashdi</div></div>
+                    <div class="col-4 text-center"><div class="h2 fw-bold text-primary mb-0" id="att-was">0</div><div class="text-muted small">Keldi</div></div>
+                    <div class="col-4 text-center"><div class="h2 fw-bold text-danger mb-0" id="att-not">0</div><div class="text-muted small">Kelmadi</div></div>
+                </div>
+                <div id="att-calendar"></div>
+            </div>
+        </div>
+
+        <!-- Uy vazifalari tab -->
+        <div id="tab-homework" class="tab-section">
+            <div class="card border-0 shadow-sm p-4" style="border-radius:14px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="fw-bold m-0"><i class="ti ti-notebook me-2 text-primary"></i>Uy vazifalari</h3>
+                    <button class="btn btn-sm btn-outline-primary" onclick="addHomework()"><i class="ti ti-plus me-1"></i>Vazifa qo'shish</button>
+                </div>
+                <div id="homework-list"><div class="text-muted text-center py-4">Uy vazifalari yo'q</div></div>
+            </div>
+        </div>
+
+        <!-- Baholar tab -->
+        <div id="tab-grades" class="tab-section">
+            <div class="card border-0 shadow-sm p-4" style="border-radius:14px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="fw-bold m-0"><i class="ti ti-star me-2 text-warning"></i>Baholar</h3>
+                    <button class="btn btn-sm btn-outline-warning" onclick="addGrade()"><i class="ti ti-plus me-1"></i>Baho qo'shish</button>
+                </div>
+                <div id="grades-list"><div class="text-muted text-center py-4">Baholar yo'q</div></div>
+            </div>
+        </div>
+
+        <!-- Eslatmalar tab -->
+        <div id="tab-notes" class="tab-section">
+            <div class="card border-0 shadow-sm p-4" style="border-radius:14px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="fw-bold m-0"><i class="ti ti-note me-2 text-danger"></i>Eslatmalar</h3>
+                </div>
+                <div class="mb-3 p-3" style="background:#f8fafc;border-radius:10px;">
+                    <div class="mb-2">
+                        <textarea id="note-text" class="form-control form-control-sm" rows="2" placeholder="Masalan: Qarzdor, 25-iyungacha to'lashga va'da berdi..."></textarea>
+                    </div>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-7">
+                            <label class="form-label small text-muted mb-1">Eslatish sanasi (ixtiyoriy)</label>
+                            <input type="date" id="note-reminder-date" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-5">
+                            <button class="btn btn-sm text-white w-100" style="background:var(--modme-orange);" onclick="addNote()"><i class="ti ti-plus me-1"></i>Qo'shish</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="notes-list"><div class="text-muted text-center py-4">Eslatmalar yo'q</div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TEZKOR TO'LOV MODALI -->
+<div class="modal modal-blur fade" id="modal-quick-pay" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:14px;">
+            <div class="modal-header"><h5 class="modal-title fw-bold"><i class="ti ti-cash me-2 text-success"></i>To'lov qabul qilish</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="mb-3"><label class="form-label fw-bold">Miqdor (UZS)</label><input type="number" id="qp-amount" class="form-control" placeholder="500000" min="0"></div>
+                <div class="mb-3"><label class="form-label fw-bold">To'lov usuli</label>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-success flex-fill qp-method" onclick="selectQP('Naqd',this)">💵 Naqd</button>
+                        <button type="button" class="btn btn-sm btn-outline-info flex-fill qp-method" onclick="selectQP('Payme',this)">💳 Payme</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger flex-fill qp-method" onclick="selectQP('Click',this)">🔴 Click</button>
+                    </div>
+                    <input type="hidden" id="qp-method" value="Naqd">
+                </div>
+                <div class="mb-2"><label class="form-label fw-bold">Izoh</label><input type="text" id="qp-note" class="form-control" placeholder="Oktyabr oyi..."></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link text-secondary" data-bs-dismiss="modal">Bekor</button>
+                <button type="button" class="btn text-white" style="background:var(--modme-orange);" onclick="processQuickPay()"><i class="ti ti-check me-1"></i>Qabul qilish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TALABANI MUZLATISH MODALI -->
+<div class="modal modal-blur fade" id="modal-freeze" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:14px;">
+            <div class="modal-header"><h5 class="modal-title fw-bold"><i class="ti ti-snowflake me-2 text-warning"></i>Talabani muzlatish</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="alert alert-warning py-2 mb-3" style="font-size:12px;"><i class="ti ti-info-circle me-1"></i>Talaba "Muzlatilgan" holatga o'tkaziladi — vaqtincha dars qatnashmaydi.</div>
+                <div class="mb-2">
+                    <label class="form-label fw-bold">Qaysi sanadan boshlab muzlatiladi <span class="text-danger">*</span></label>
+                    <input type="date" id="freeze-date" class="form-control">
+                </div>
+                <div class="mb-1">
+                    <label class="form-label fw-bold">Sabab (ixtiyoriy)</label>
+                    <input type="text" id="freeze-reason" class="form-control" placeholder="Masalan: shifokorga ketdi, safarga chiqdi...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link text-secondary" data-bs-dismiss="modal">Bekor</button>
+                <button type="button" class="btn text-white" style="background:#e67e22;" onclick="confirmFreezeStudent()"><i class="ti ti-snowflake me-1"></i>Muzlatish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SINOV DARSIDAGI TALABANI FAOLLASHTIRISH MODALI -->
+<div class="modal modal-blur fade" id="modal-activate-profile" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:14px;">
+            <div class="modal-header"><h5 class="modal-title fw-bold"><i class="ti ti-circle-check me-2 text-success"></i>Talabani faollashtirish</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="alert alert-success py-2 mb-3" style="font-size:12px;"><i class="ti ti-info-circle me-1"></i>Talaba "Faol" holatga o'tkaziladi.</div>
+                <div class="mb-1">
+                    <label class="form-label fw-bold">Faollashtirish sanasi <span class="text-danger">*</span></label>
+                    <input type="date" id="activate-date-profile" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link text-secondary" data-bs-dismiss="modal">Bekor</button>
+                <button type="button" class="btn text-white" style="background:#2bab41;" onclick="confirmActivateFromProfile()"><i class="ti ti-check me-1"></i>Faollashtirish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+<script src="shared.js"></script>
+<script>
+let currentStudentId = null;
+let currentStudent = null;
+
+function switchTab(name) {
+    document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('tab-'+name).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
+function selectQP(method, btn) {
+    document.getElementById('qp-method').value = method;
+    document.querySelectorAll('.qp-method').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+function processQuickPay() {
+    const amount = Number(document.getElementById('qp-amount').value);
+    const method = document.getElementById('qp-method').value;
+    const note   = document.getElementById('qp-note').value;
+    if (!amount || amount <= 0) { alert('Miqdorni kiriting!'); return; }
+
+    const students = JSON.parse(localStorage.getItem('students') || '[]');
+    const idx = students.findIndex(s => String(s.id) === String(currentStudentId));
+    if (idx === -1) return;
+    students[idx].balance = (Number(students[idx].balance) || 0) + amount;
+    localStorage.setItem('students', JSON.stringify(students));
+
+    const history = JSON.parse(localStorage.getItem('payment_history') || '[]');
+    const payId = Date.now();
+    history.unshift({ id: payId, studentId: currentStudentId, studentName: students[idx].name, group: students[idx].group, amount, method, note, date: new Date().toISOString() });
+    localStorage.setItem('payment_history', JSON.stringify(history.slice(0, 500)));
+
+    if (typeof logActivity==='function') logActivity("To'landi", `${students[idx].name}: ${amount.toLocaleString()} UZS`);
+    if (typeof awardPointsForPayment==='function') awardPointsForPayment(currentStudentId, amount);
+
+    bootstrap.Modal.getInstance(document.getElementById('modal-quick-pay')).hide();
+    currentStudent = students[idx];
+    renderPayments();
+    document.getElementById('profile-balance').innerText = (Number(students[idx].balance)||0).toLocaleString() + ' UZS';
+    document.getElementById('profile-balance').style.color = students[idx].balance >= 0 ? '#2bab41' : '#d63939';
+}
+
+function renderPayments() {
+    const history = JSON.parse(localStorage.getItem('payment_history') || '[]');
+    const myPay = history.filter(p => String(p.studentId) === String(currentStudentId));
+    const el = document.getElementById('payments-list');
+    el.innerHTML = myPay.length ? myPay.map(p => {
+        const d = new Date(p.date);
+        const dt = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        return `<div class="payment-row">
+            <div>
+                <div class="fw-bold text-dark">${Number(p.amount).toLocaleString()} UZS</div>
+                <small class="text-muted">${dt} · ${p.method}${p.note?' · '+p.note:''}</small>
+            </div>
+            <a href="receipt.html?payment=${p.id}" class="btn btn-sm btn-outline-secondary"><i class="ti ti-receipt me-1"></i>Chek</a>
+        </div>`;
+    }).join('') : '<div class="text-muted text-center py-4">To\'lovlar yo\'q</div>';
+}
+
+function renderAttendance() {
+    const att = JSON.parse(localStorage.getItem('attendance') || '{}');
+    const groupAtt = (att[currentStudent.group] || {})[currentStudentId] || {};
+    let was = 0, not = 0, html = '';
+    const MONTH_UZ = ['Yan','Feb','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
+    Object.keys(groupAtt).sort().reverse().slice(0, 20).forEach(k => {
+        const d = new Date(k);
+        const lbl = groupAtt[k]==='was' ? '✓ Keldi' : '✕ Kelmadi';
+        const cls = groupAtt[k]==='was' ? 'text-success' : 'text-danger';
+        if(groupAtt[k]==='was') was++; else not++;
+        html += `<div class="d-flex justify-content-between align-items-center py-2 border-bottom" style="font-size:13px;"><span class="text-muted">${d.getDate()} ${MONTH_UZ[d.getMonth()]} ${d.getFullYear()}</span><span class="${cls} fw-bold">${lbl}</span></div>`;
+    });
+    const total = was + not;
+    const pct = total ? Math.round(was/total*100) : 0;
+    document.getElementById('att-pct').innerText  = pct + '%';
+    document.getElementById('att-was').innerText  = was;
+    document.getElementById('att-not').innerText  = not;
+    document.getElementById('profile-att-pct').innerText = pct + '%';
+    document.getElementById('att-calendar').innerHTML = html || '<div class="text-muted text-center py-3">Davomat belgilanmagan</div>';
+}
+
+function renderHomework() {
+    const hw = JSON.parse(localStorage.getItem('homework_' + currentStudentId) || '[]');
+    const el = document.getElementById('homework-list');
+    const gradeMap = {'A':'grade-a','B':'grade-b','C':'grade-c','D':'grade-d'};
+    el.innerHTML = hw.length ? hw.map((h,i) =>
+        `<div class="hw-item">
+            <div class="hw-grade ${gradeMap[h.grade]||'grade-b'}">${h.grade||'?'}</div>
+            <div style="flex:1;">
+                <div class="fw-bold" style="font-size:13px;">${h.title}</div>
+                <div class="text-muted" style="font-size:12px;">${h.date} · ${h.subject||''}</div>
+                ${h.note?`<div style="font-size:12px;color:#626976;margin-top:2px;">${h.note}</div>`:''}
+            </div>
+            <button class="btn btn-sm btn-icon btn-ghost-danger" onclick="deleteHomework(${i})"><i class="ti ti-trash"></i></button>
+        </div>`
+    ).join('') : '<div class="text-muted text-center py-4">Uy vazifalari yo\'q</div>';
+}
+
+function renderGrades() {
+    const grades = JSON.parse(localStorage.getItem('grades_' + currentStudentId) || '[]');
+    const el = document.getElementById('grades-list');
+    const gradeMap = {'5':'grade-a','4':'grade-b','3':'grade-c','2':'grade-d'};
+    const avg = grades.length ? (grades.reduce((a,g)=>a+Number(g.score),0)/grades.length).toFixed(1) : 0;
+    el.innerHTML = grades.length ? `
+        <div class="text-center mb-3"><div class="h1 fw-bold" style="color:var(--modme-orange);">${avg}</div><div class="text-muted small">O'rtacha ball</div></div>
+        ${grades.map((g,i) =>
+            `<div class="hw-item">
+                <div class="hw-grade ${gradeMap[g.score]||'grade-b'}">${g.score}</div>
+                <div style="flex:1;">
+                    <div class="fw-bold" style="font-size:13px;">${g.subject||'Umumiy'}</div>
+                    <div class="text-muted" style="font-size:12px;">${g.date}${g.note?' · '+g.note:''}</div>
+                </div>
+                <button class="btn btn-sm btn-icon btn-ghost-danger" onclick="deleteGrade(${i})"><i class="ti ti-trash"></i></button>
+            </div>`
+        ).join('')}` : '<div class="text-muted text-center py-4">Baholar yo\'q</div>';
+}
+
+function addHomework() {
+    const title   = prompt('Vazifa sarlavhasi:');
+    if (!title) return;
+    const subject = prompt('Fan (ixtiyoriy):') || '';
+    const grade   = prompt('Baho (A/B/C/D):')?.toUpperCase() || 'B';
+    const note    = prompt('Izoh (ixtiyoriy):') || '';
+    const today   = new Date();
+    const date    = `${today.getDate()}.${today.getMonth()+1}.${today.getFullYear()}`;
+    const hw = JSON.parse(localStorage.getItem('homework_' + currentStudentId) || '[]');
+    hw.unshift({ title, subject, grade: ['A','B','C','D'].includes(grade)?grade:'B', note, date });
+    localStorage.setItem('homework_' + currentStudentId, JSON.stringify(hw));
+    renderHomework();
+    if(typeof logActivity==='function') logActivity("Yangilandi", `${currentStudent.name}: vazifa — ${title}`);
+}
+
+function deleteHomework(idx) {
+    if (!confirm('Vazifani o\'chirishni xohlaysizmi?')) return;
+    const hw = JSON.parse(localStorage.getItem('homework_' + currentStudentId) || '[]');
+    hw.splice(idx, 1);
+    localStorage.setItem('homework_' + currentStudentId, JSON.stringify(hw));
+    renderHomework();
+}
+
+function addGrade() {
+    const subject = prompt('Fan:') || 'Umumiy';
+    const score   = prompt('Ball (2-5):');
+    if (!score || !['2','3','4','5'].includes(score)) { alert('Ball 2-5 oralig\'ida bo\'lishi kerak!'); return; }
+    const note    = prompt('Izoh (ixtiyoriy):') || '';
+    const today   = new Date();
+    const date    = `${today.getDate()}.${today.getMonth()+1}.${today.getFullYear()}`;
+    const grades  = JSON.parse(localStorage.getItem('grades_' + currentStudentId) || '[]');
+    grades.unshift({ subject, score, note, date });
+    localStorage.setItem('grades_' + currentStudentId, JSON.stringify(grades));
+    renderGrades();
+
+    // Avtomatik gamifikatsiya balli
+    if (typeof awardPointsForGrade === 'function') awardPointsForGrade(currentStudentId, score, subject);
+}
+
+function deleteGrade(idx) {
+    if (!confirm('Bahoni o\'chirishni xohlaysizmi?')) return;
+    const grades = JSON.parse(localStorage.getItem('grades_' + currentStudentId) || '[]');
+    grades.splice(idx, 1);
+    localStorage.setItem('grades_' + currentStudentId, JSON.stringify(grades));
+    renderGrades();
+}
+
+// ---- ESLATMALAR (Eslatmalar / Reminders) ----
+const MONTH_UZ_NOTES = ['Yan','Fev','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
+
+function getNotes() {
+    return JSON.parse(localStorage.getItem('notes_' + currentStudentId) || '[]');
+}
+function saveNotes(notes) {
+    localStorage.setItem('notes_' + currentStudentId, JSON.stringify(notes));
+}
+
+function addNote() {
+    const textEl = document.getElementById('note-text');
+    const dateEl = document.getElementById('note-reminder-date');
+    const text = textEl.value.trim();
+
+    if (!text) {
+        if (typeof showToast === 'function') showToast("Eslatma matnini kiriting!", 'danger');
+        else alert("Eslatma matnini kiriting!");
+        return;
+    }
+
+    const notes = getNotes();
+    notes.unshift({
+        id: Date.now(),
+        text,
+        reminderDate: dateEl.value || '',
+        createdAt: new Date().toISOString(),
+        done: false
+    });
+    saveNotes(notes);
+
+    textEl.value = '';
+    dateEl.value = '';
+
+    if (typeof logActivity === 'function') logActivity("Qo'shildi", `${currentStudent.name} uchun eslatma qo'shildi`);
+    if (typeof showToast === 'function') showToast("Eslatma qo'shildi", 'success');
+    renderNotes();
+}
+
+function toggleNoteDone(id) {
+    const notes = getNotes();
+    const note = notes.find(n => n.id === id);
+    if (!note) return;
+    note.done = !note.done;
+    saveNotes(notes);
+    renderNotes();
+}
+
+function deleteNote(id) {
+    const notes = getNotes().filter(n => n.id !== id);
+    saveNotes(notes);
+    renderNotes();
+}
+
+// ---- HOLATNI BOSHQARISH (Muzlatish / Faollashtirish) ----
+function renderStatusAction(student) {
+    const el = document.getElementById('profile-status-action');
+    if (!el) return;
+
+    if (student.status === 'Faol') {
+        el.innerHTML = `<button class="btn btn-sm btn-outline-warning" style="font-size:11px;padding:3px 10px;" onclick="openFreezeModal()"><i class="ti ti-snowflake me-1"></i>Muzlatish</button>`;
+    } else if (student.status === 'Muzlatilgan') {
+        const freezeInfo = student.freezeDate ? `<div class="text-muted" style="font-size:10px;margin-top:2px;">${formatUzDateShort(student.freezeDate)} dan</div>` : '';
+        el.innerHTML = `<button class="btn btn-sm btn-outline-success" style="font-size:11px;padding:3px 10px;" onclick="openActivateFromProfileModal()"><i class="ti ti-player-play me-1"></i>Qayta faollashtirish</button>${freezeInfo}`;
+    } else if (student.status === 'Sinov darsida') {
+        el.innerHTML = `<button class="btn btn-sm btn-outline-success" style="font-size:11px;padding:3px 10px;" onclick="openActivateFromProfileModal()"><i class="ti ti-circle-check me-1"></i>Faollashtirish</button>`;
+    } else {
+        el.innerHTML = '';
+    }
+}
+
+function formatUzDateShort(dateStr) {
+    const d = new Date(dateStr);
+    if (isNaN(d)) return '';
+    return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+}
+
+function openFreezeModal() {
+    document.getElementById('freeze-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('freeze-reason').value = '';
+    new bootstrap.Modal(document.getElementById('modal-freeze')).show();
+}
+
+function confirmFreezeStudent() {
+    const freezeDate = document.getElementById('freeze-date').value;
+    const reason = document.getElementById('freeze-reason').value.trim();
+
+    if (!freezeDate) {
+        if (typeof showToast === 'function') showToast("Muzlatish sanasini tanlang!", 'danger');
+        return;
+    }
+
+    const students = JSON.parse(localStorage.getItem('students') || '[]');
+    const idx = students.findIndex(s => String(s.id) === String(currentStudentId));
+    if (idx === -1) return;
+
+    students[idx].status = 'Muzlatilgan';
+    students[idx].freezeDate = freezeDate;
+    students[idx].freezeReason = reason || '';
+    localStorage.setItem('students', JSON.stringify(students));
+    currentStudent = students[idx];
+
+    const dateDisplay = formatUzDateShort(freezeDate);
+    if (typeof logActivity === 'function') logActivity("Yangilandi", `${students[idx].name} muzlatildi (${dateDisplay} sanasidan)${reason ? ' — ' + reason : ''}`);
+    if (typeof showToast === 'function') showToast(`${students[idx].name} muzlatildi (${dateDisplay} dan)`, 'success');
+
+    bootstrap.Modal.getInstance(document.getElementById('modal-freeze')).hide();
+
+    const statusClr = '#e67e22';
+    const statusEl = document.getElementById('profile-status');
+    statusEl.innerText = 'Muzlatilgan';
+    statusEl.style.color = statusClr;
+    renderStatusAction(students[idx]);
+}
+
+function openActivateFromProfileModal() {
+    document.getElementById('activate-date-profile').value = new Date().toISOString().split('T')[0];
+    new bootstrap.Modal(document.getElementById('modal-activate-profile')).show();
+}
+
+function confirmActivateFromProfile() {
+    const activationDate = document.getElementById('activate-date-profile').value;
+    if (!activationDate) {
+        if (typeof showToast === 'function') showToast("Faollashtirish sanasini tanlang!", 'danger');
+        return;
+    }
+
+    const students = JSON.parse(localStorage.getItem('students') || '[]');
+    const idx = students.findIndex(s => String(s.id) === String(currentStudentId));
+    if (idx === -1) return;
+
+    const wasFrozen = students[idx].status === 'Muzlatilgan';
+    students[idx].status = 'Faol';
+    students[idx].activationDate = activationDate;
+    localStorage.setItem('students', JSON.stringify(students));
+    currentStudent = students[idx];
+
+    const dateDisplay = formatUzDateShort(activationDate);
+    if (typeof logActivity === 'function') logActivity("Yangilandi", `${students[idx].name} ${wasFrozen ? 'qayta ' : ''}faollashtirildi (${dateDisplay} sanasidan)`);
+    if (typeof showToast === 'function') showToast(`${students[idx].name} faollashtirildi!`, 'success');
+
+    bootstrap.Modal.getInstance(document.getElementById('modal-activate-profile')).hide();
+
+    const statusEl = document.getElementById('profile-status');
+    statusEl.innerText = 'Faol';
+    statusEl.style.color = '#2bab41';
+    renderStatusAction(students[idx]);
+}
+
+function renderNotes() {
+    const notes = getNotes();
+    const el = document.getElementById('notes-list');
+    const badge = document.getElementById('notes-count-badge');
+
+    const pendingCount = notes.filter(n => !n.done).length;
+    if (badge) {
+        if (pendingCount > 0) { badge.style.display = 'inline-block'; badge.innerText = pendingCount; }
+        else { badge.style.display = 'none'; }
+    }
+
+    if (!notes.length) {
+        el.innerHTML = '<div class="text-muted text-center py-4">Eslatmalar yo\'q</div>';
+        return;
+    }
+
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    el.innerHTML = notes.map(n => {
+        const created = new Date(n.createdAt);
+        const createdStr = `${created.getDate()} ${MONTH_UZ_NOTES[created.getMonth()]} ${created.getFullYear()}`;
+
+        let reminderBadge = '';
+        if (n.reminderDate) {
+            const rDate = new Date(n.reminderDate);
+            const rStr = `${rDate.getDate()} ${MONTH_UZ_NOTES[rDate.getMonth()]} ${rDate.getFullYear()}`;
+            const isOverdue = rDate < today && !n.done;
+            const isToday = rDate.getTime() === today.getTime() && !n.done;
+            const badgeColor = n.done ? '#99a1ad' : isOverdue ? '#d63939' : isToday ? '#ff7a00' : '#206bc4';
+            const badgeBg = n.done ? '#f1f3f7' : isOverdue ? '#fbeaea' : isToday ? '#fff0e6' : '#e8f0fd';
+            const badgeLabel = isOverdue ? 'Muddati o\'tdi' : isToday ? 'Bugun' : 'Eslatish';
+            reminderBadge = `<span class="badge" style="background:${badgeBg};color:${badgeColor};font-size:11px;"><i class="ti ti-bell me-1"></i>${badgeLabel}: ${rStr}</span>`;
+        }
+
+        return `<div class="hw-item" style="align-items:flex-start;${n.done ? 'opacity:.55;' : ''}">
+            <button class="btn btn-sm btn-icon" style="background:${n.done?'#2bab41':'#fff'};border:1.5px solid ${n.done?'#2bab41':'#e5e8ef'};border-radius:50%;width:28px;height:28px;flex-shrink:0;" onclick="toggleNoteDone(${n.id})" title="${n.done?'Bajarilmagan deb belgilash':'Bajarildi deb belgilash'}">
+                ${n.done ? '<i class="ti ti-check" style="color:#fff;font-size:14px;"></i>' : ''}
+            </button>
+            <div style="flex:1;">
+                <div style="font-size:13px;${n.done?'text-decoration:line-through;':''}">${n.text}</div>
+                <div class="d-flex gap-2 align-items-center flex-wrap mt-1">
+                    <span class="text-muted" style="font-size:11px;">${createdStr} qo'shilgan</span>
+                    ${reminderBadge}
+                </div>
+            </div>
+            <button class="btn btn-sm btn-icon btn-ghost-danger" onclick="deleteNote(${n.id})"><i class="ti ti-trash"></i></button>
+        </div>`;
+    }).join('');
+}
+
+window.onload = function() {
+    const params = new URLSearchParams(window.location.search);
+    currentStudentId = params.get('id');
+    const students = JSON.parse(localStorage.getItem('students') || '[]');
+    const student  = students.find(s => String(s.id) === String(currentStudentId));
+
+    if (!student) {
+        document.getElementById('not-found').classList.remove('d-none');
+        document.getElementById('profile-content').style.display = 'none';
+        return;
+    }
+    currentStudent = student;
+
+    document.title = `${student.name} - Mathzone CRM`;
+    document.getElementById('crumb-name').innerText = student.name;
+    document.getElementById('profile-name').innerText = student.name;
+    document.getElementById('profile-phone').innerText = student.phone || '—';
+    document.getElementById('profile-avatar').innerText = student.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+    document.getElementById('profile-group').innerText = student.group || '—';
+    document.getElementById('profile-startdate').innerText = student.startDate || '—';
+
+    const bal = Number(student.balance) || 0;
+    const balEl = document.getElementById('profile-balance');
+    balEl.innerText = bal.toLocaleString() + ' UZS';
+    balEl.style.color = bal >= 0 ? '#2bab41' : '#d63939';
+
+    const statusClr = student.status==='Faol'?'#2bab41':student.status==='Muzlatilgan'?'#e67e22':'#99a1ad';
+    const statusEl = document.getElementById('profile-status');
+    statusEl.innerText = student.status || '—';
+    statusEl.style.color = statusClr;
+
+    renderStatusAction(student);
+
+    const groups  = JSON.parse(localStorage.getItem('groups')   || '[]');
+    const teachers= JSON.parse(localStorage.getItem('teachers') || '[]');
+    const group   = groups.find(g => g.name === student.group) || {};
+    document.getElementById('profile-price').innerHTML = typeof formatGroupPriceHTML === 'function' ? (group.price ? formatGroupPriceHTML(group) + '/oy' : '—') : (group.price ? Number(group.price).toLocaleString()+' UZS/oy' : '—');
+    document.getElementById('profile-teacher').innerText = group.teacher || '—';
+
+    renderPayments();
+    renderAttendance();
+    renderHomework();
+    renderGrades();
+    renderNotes();
+};
+</script>
+</body>
+</html>

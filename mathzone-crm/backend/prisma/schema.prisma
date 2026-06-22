@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  username    String   @unique
+  email       String   @unique
+  password    String
+  name        String
+  role        Role     @default(RECEPTION)
+  avatar      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  auditLogs   AuditLog[]
+
+  @@map("users")
+}
+
+model Student {
+  id          Int      @id @default(autoincrement())
+  name        String
+  phone       String   @unique
+  groupId     Int?
+  balance     Int      @default(0)
+  status      StudentStatus @default(ACTIVE)
+  startDate   DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  group       Group?   @relation(fields: [groupId], references: [id])
+  payments    Payment[]
+  attendances Attendance[]
+  grades      Grade[]
+  notes       Note[]
+
+  @@map("students")
+
+  @@index([phone])
+  @@index([groupId])
+  @@index([status])
+}
+
+model Group {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  teacherId   Int
+  price       Int
+  schedule    String?
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+
+  teacher     Teacher  @relation(fields: [teacherId], references: [id])
+  students    Student[]
+  
+  @@map("groups")
+}
+
+model Teacher {
+  id          Int      @id @default(autoincrement())
+  name        String
+  phone       String?
+  subject     String
+  salaryRate  Int      @default(1500000)
+  createdAt   DateTime @default(now())
+
+  groups      Group[]
+  
+  @@map("teachers")
+}
+
+model Payment {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  amount      Int
+  method      String
+  comment     String?
+  createdAt   DateTime @default(now())
+
+  student     Student  @relation(fields: [studentId], references: [id])
+  
+  @@map("payments")
+}
+
+model Attendance {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  groupId     Int?
+  date        DateTime
+  status      String   // present, absent, late
+  createdAt   DateTime @default(now())
+
+  student     Student  @relation(fields: [studentId], references: [id])
+  
+  @@map("attendances")
+}
+
+model Grade {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  subject     String
+  score       Int
+  createdAt   DateTime @default(now())
+
+  student     Student  @relation(fields: [studentId], references: [id])
+  
+  @@map("grades")
+}
+
+model Note {
+  id            Int      @id @default(autoincrement())
+  studentId     Int
+  text          String
+  reminderDate  DateTime?
+  done          Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  student       Student  @relation(fields: [studentId], references: [id])
+  
+  @@map("notes")
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  action      String
+  entityType  String
+  entityId    Int?
+  oldData     Json?
+  newData     Json?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+enum Role {
+  ADMINISTRATOR
+  RECEPTION
+  TEACHER
+  ACCOUNTANT
+}
+
+enum StudentStatus {
+  ACTIVE
+  TRIAL
+  FROZEN
+  GRADUATED
+  ARCHIVED
+}

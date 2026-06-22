@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM - O'qituvchilar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        :root { --modme-orange: #ff7a00; --sidebar-bg: #1e1e2d; }
+        body { background-color: #f6f8fb; font-family: system-ui, -apple-system, sans-serif; }
+        
+        
+        .sidebar-brand span { color: var(--modme-orange); }
+        
+        
+        
+        
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: #fff; padding: 12px 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .teacher-card { border-radius: 14px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.3s ease; }
+        .teacher-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
+        .teacher-avatar { width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; background-color: rgba(255, 122, 0, 0.1); color: var(--modme-orange); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-fixed">
+        <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+            <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+            <li class="sidebar-item active"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+            <li class="sidebar-item"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+            <li class="sidebar-item"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+            <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+            <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+            <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+            <li class="sidebar-item"><a href="timetable.html" class="sidebar-link"><i class="ti ti-calendar-week"></i><span>Jadval</span></a></li>
+            <li class="sidebar-item"><a href="salary.html" class="sidebar-link"><i class="ti ti-moneybag"></i><span>Ish haqi</span></a></li>
+            <li class="sidebar-item"><a href="exam.html" class="sidebar-link"><i class="ti ti-pencil-check"></i><span>Testlar</span></a></li>
+            <li class="sidebar-item"><a href="certificate.html" class="sidebar-link"><i class="ti ti-award"></i><span>Sertifikat</span></a></li>
+            <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+            <li class="sidebar-item" style="margin-top:auto;padding-bottom:12px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+        </ul>
+    </div>
+
+    <div class="mobile-bottom-nav">
+        <div class="nav-items">
+            <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+            <a href="leads.html"><i class="ti ti-users-group"></i>Lidlar</a>
+            <a href="student.html"><i class="ti ti-backpack"></i>Talabalar</a>
+            <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+            <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center"><i class="ti ti-map-pin me-2 text-muted"></i><span class="fw-bold">Yunusobod filiali / O'qituvchilar</span></div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="search-global-btn" class="btn btn-icon btn-ghost-secondary rounded-circle" title="Ctrl+K"><i class="ti ti-search"></i></button>
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+                <div class="d-none d-xl-block"><div id="navbar-name" class="fw-bold" style="font-size: 13px;">Behruz Berdiyev</div></div>
+            </div>
+        </div>
+
+        <div class="card p-3 mb-4 border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="row g-3 align-items-center justify-content-between">
+                <div class="col-md-8 d-flex flex-wrap gap-2 align-items-center">
+                    <div class="input-icon" style="min-width: 250px;">
+                        <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+                        <input type="text" id="teacher-search" class="form-control" placeholder="Ism orqali qidirish..." oninput="renderTeachers()">
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn text-white" style="background-color: var(--modme-orange);" data-bs-toggle="modal" data-bs-target="#modal-teacher">
+                        <i class="ti ti-plus me-2"></i>Yangi o'qituvchi qo'shish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row row-cards" id="teachers-container">
+            </div>
+    </div>
+
+    <div class="modal modal-blur fade" id="modal-teacher" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 14px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold fs-3">Yangi o'qituvchi qo'shish</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">F.I.Sh</label>
+                        <input type="text" id="teacher-name" class="form-control" placeholder="Masalan: Muzaffar Egamberdiyev">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Telefon raqami</label>
+                        <input type="text" id="teacher-phone" class="form-control" placeholder="+998 90 123 45 67" data-phone-mask>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Yo'nalish / Fan</label>
+                        <input type="text" id="teacher-subject" class="form-control" placeholder="Masalan: Matematika (SAT)">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Oylik stavka (UZS)</label>
+                        <input type="number" id="teacher-salary" class="form-control" placeholder="Masalan: 3000000" min="0">
+                        <small class="text-muted">Bo'sh qoldirsangiz, "Ish haqi" bo'limida standart stavka (1 500 000 × guruhlar soni) ishlatiladi</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="button" class="btn text-white" style="background-color: var(--modme-orange);" onclick="addTeacher()">Saqlash</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- O'QITUVCHINI TAHRIRLASH MODALI -->
+    <div class="modal modal-blur fade" id="modal-edit-teacher" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 14px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold fs-3"><i class="ti ti-edit me-2" style="color:var(--modme-orange);"></i>O'qituvchini tahrirlash</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning py-2 mb-3" style="font-size:12px;" id="edit-teacher-sync-note" hidden>
+                        <i class="ti ti-info-circle me-1"></i>Ismni o'zgartirsangiz, bog'liq guruhlar avtomatik yangilanadi.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">F.I.Sh</label>
+                        <input type="text" id="edit-teacher-name" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Telefon raqami</label>
+                        <input type="text" id="edit-teacher-phone" class="form-control" data-phone-mask>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Yo'nalish / Fan</label>
+                        <input type="text" id="edit-teacher-subject" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Oylik stavka (UZS)</label>
+                        <input type="number" id="edit-teacher-salary" class="form-control" min="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="button" class="btn text-white" style="background-color: var(--modme-orange);" onclick="saveEditTeacher()"><i class="ti ti-check me-1"></i>Saqlash</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+    <script src="shared.js"></script>
+
+    <script>
+        let defaultTeachers = [
+            { id: 1, name: "Muzaffar Egamberdiyev", phone: "+998 90 111 22 33", subject: "Matematika (SAT)" },
+            { id: 2, name: "Behruz Berdiyev", phone: "+998 90 444 55 66", subject: "Matematika (Intensiv)" }
+        ];
+
+        if (!localStorage.getItem('teachers')) {
+            localStorage.setItem('teachers', JSON.stringify(defaultTeachers));
+        }
+
+        function getTeachers() {
+            return localStorage.getItem('teachers') ? JSON.parse(localStorage.getItem('teachers')) : [];
+        }
+
+        function getGroups() {
+            return localStorage.getItem('groups') ? JSON.parse(localStorage.getItem('groups')) : [];
+        }
+
+        function renderTeachers() {
+            const teachers = getTeachers();
+            const groups = getGroups();
+            const container = document.getElementById('teachers-container');
+            const searchQuery = document.getElementById('teacher-search').value.toLowerCase();
+            container.innerHTML = '';
+
+            teachers.forEach((teacher, index) => {
+                if (!teacher.name.toLowerCase().includes(searchQuery)) return;
+
+                const groupCount = groups.filter(g => g.teacher === teacher.name).length;
+                const initials = teacher.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+                container.innerHTML += `
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card teacher-card" style="cursor:pointer;" onclick="openTeacherGroups('${teacher.name}')">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="teacher-avatar">${initials}</span>
+                                        <div>
+                                            <h3 class="fw-bold text-dark mb-1" style="font-size: 16px;">${teacher.name}</h3>
+                                            <div class="text-muted small"><i class="ti ti-book me-1"></i>${teacher.subject}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr class="my-2" style="opacity: 0.1;">
+                                <div class="row g-2 text-muted small">
+                                    <div class="col-6 d-flex align-items-center"><i class="ti ti-phone me-1 text-primary"></i>${teacher.phone}</div>
+                                    <div class="col-6 d-flex align-items-center"><i class="ti ti-books me-1 text-success"></i>${groupCount} ta guruh</div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <span class="text-primary small fw-bold"><i class="ti ti-books me-1"></i>Guruhlarini ko'rish</span>
+                                    <div class="d-flex gap-1">
+                                        <button class="btn btn-sm btn-white text-secondary" onclick="event.stopPropagation(); openEditTeacher(${index})" title="Tahrirlash"><i class="ti ti-edit"></i></button>
+                                        <button class="btn btn-sm btn-white text-danger" onclick="event.stopPropagation(); deleteTeacher(${index})" title="O'chirish"><i class="ti ti-trash"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function openTeacherGroups(teacherName) {
+            window.location.href = 'groups.html?teacher=' + encodeURIComponent(teacherName);
+        }
+
+        function addTeacher() {
+            const nameEl = document.getElementById('teacher-name');
+            const phoneEl = document.getElementById('teacher-phone');
+            const subjectEl = document.getElementById('teacher-subject');
+
+            const name = nameEl.value.trim();
+            const phone = phoneEl.value.trim();
+
+            if (!name || !phone) {
+                if (typeof showToast === 'function') showToast("Iltimos, o'qituvchining ismi va telefon raqamini kiriting!", 'danger');
+                else alert("Iltimos, o'qituvchining ismi va telefon raqamini kiriting!");
+                return;
+            }
+
+            if (typeof isValidUzPhone === 'function' && !isValidUzPhone(phone)) {
+                if (typeof showToast === 'function') showToast("Telefon raqam noto'g'ri formatda!", 'danger');
+                else alert("Telefon raqam noto'g'ri formatda!");
+                phoneEl.focus();
+                return;
+            }
+
+            const normalizedPhone = typeof normalizePhone === 'function' ? normalizePhone(phone) : phone;
+            const existing = getTeachers().find(t => (typeof normalizePhone === 'function' ? normalizePhone(t.phone) : t.phone) === normalizedPhone);
+            if (existing) {
+                if (typeof showToast === 'function') showToast(`"${existing.name}" shu telefon raqam bilan allaqachon ro'yxatda!`, 'danger');
+                else alert(`"${existing.name}" shu telefon raqam bilan allaqachon ro'yxatda!`);
+                return;
+            }
+
+            const teachers = getTeachers();
+            let salary = parseInt(document.getElementById('teacher-salary').value) || 0;
+            if (salary < 0) salary = 0;
+            teachers.push({ id: Date.now(), name: name, phone: phone, subject: subjectEl.value.trim() || "Belgilanmagan", salary: salary || undefined });
+            localStorage.setItem('teachers', JSON.stringify(teachers));
+            if (typeof logActivity === 'function') logActivity("Qo'shildi", "Yangi o'qituvchi: " + name);
+            if (typeof showToast === 'function') showToast(`${name} muvaffaqiyatli qo'shildi!`, 'success');
+
+            nameEl.value = '';
+            phoneEl.value = '';
+            subjectEl.value = '';
+            document.getElementById('teacher-salary').value = '';
+
+            let modal = bootstrap.Modal.getInstance(document.getElementById('modal-teacher'));
+            modal.hide();
+
+            renderTeachers();
+        }
+
+        function openEditTeacher(index) {
+            const teachers = getTeachers();
+            const t = teachers[index];
+            if (!t) return;
+            window.editingTeacherIndex = index;
+            document.getElementById('edit-teacher-name').value = t.name;
+            document.getElementById('edit-teacher-phone').value = t.phone;
+            document.getElementById('edit-teacher-subject').value = t.subject || '';
+            document.getElementById('edit-teacher-salary').value = t.salary || '';
+            new bootstrap.Modal(document.getElementById('modal-edit-teacher')).show();
+        }
+
+        function saveEditTeacher() {
+            const idx = window.editingTeacherIndex;
+            const teachers = getTeachers();
+            const oldTeacher = teachers[idx];
+            if (!oldTeacher) return;
+
+            const newName = document.getElementById('edit-teacher-name').value.trim();
+            const newPhone = document.getElementById('edit-teacher-phone').value.trim();
+
+            if (!newName || !newPhone) {
+                if (typeof showToast === 'function') showToast("Ism va telefon raqamini kiriting!", 'danger');
+                return;
+            }
+            if (typeof isValidUzPhone === 'function' && !isValidUzPhone(newPhone)) {
+                if (typeof showToast === 'function') showToast("Telefon raqam noto'g'ri formatda!", 'danger');
+                return;
+            }
+
+            let salary = parseInt(document.getElementById('edit-teacher-salary').value) || 0;
+            if (salary < 0) salary = 0;
+
+            const oldName = oldTeacher.name;
+            teachers[idx] = {
+                ...oldTeacher,
+                name: newName,
+                phone: newPhone,
+                subject: document.getElementById('edit-teacher-subject').value.trim() || "Belgilanmagan",
+                salary: salary || undefined
+            };
+            localStorage.setItem('teachers', JSON.stringify(teachers));
+
+            // SINXRONIZATSIYA: ism o'zgargan bo'lsa, bog'liq guruhlarni ham yangilash
+            if (oldName !== newName) {
+                const groups = getGroups().map(g => g.teacher === oldName ? { ...g, teacher: newName } : g);
+                localStorage.setItem('groups', JSON.stringify(groups));
+                // Ish haqi tarixidagi yozuvlarni ham yangilaymiz (hisobot uzilib qolmasligi uchun)
+                const salaryHistory = JSON.parse(localStorage.getItem('salary_history') || '[]');
+                salaryHistory.forEach(s => { if (s.teacher === oldName) s.teacher = newName; });
+                localStorage.setItem('salary_history', JSON.stringify(salaryHistory));
+                if (typeof logActivity === 'function') logActivity("Yangilandi", `O'qituvchi: ${oldName} → ${newName} (guruhlar sinxronlandi)`);
+            } else {
+                if (typeof logActivity === 'function') logActivity("Yangilandi", `O'qituvchi: ${newName}`);
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('modal-edit-teacher')).hide();
+            if (typeof showToast === 'function') showToast(`${newName} ma'lumotlari yangilandi`, 'success');
+            renderTeachers();
+        }
+
+        function deleteTeacher(index) {
+            const teachers = getTeachers();
+            const teacher = teachers[index];
+            if (!teacher) return;
+
+            const groups = getGroups();
+            const affectedGroups = groups.filter(g => g.teacher === teacher.name);
+
+            const msg = affectedGroups.length > 0
+                ? `<strong>${teacher.name}</strong>ni o'chirsangiz, u dars beradigan <strong>${affectedGroups.length} ta guruh</strong> ("${affectedGroups.map(g=>g.name).join('", "')}") "Tayinlanmagan" holatga o'tadi. Bu guruhlarga keyin yangi o'qituvchi belgilashni unutmang.`
+                : `<strong>${teacher.name}</strong>ni o'chirishni xohlaysizmi?`;
+
+            const doDelete = () => {
+                teachers.splice(index, 1);
+                localStorage.setItem('teachers', JSON.stringify(teachers));
+
+                // SINXRONIZATSIYA: bog'liq guruhlarni "Tayinlanmagan" qilib belgilash
+                if (affectedGroups.length > 0) {
+                    const allGroups = getGroups().map(g => g.teacher === teacher.name ? { ...g, teacher: "Tayinlanmagan" } : g);
+                    localStorage.setItem('groups', JSON.stringify(allGroups));
+                }
+
+                if (typeof logActivity === 'function') logActivity("O'chirildi", `O'qituvchi: ${teacher.name}${affectedGroups.length ? ` (${affectedGroups.length} guruh "Tayinlanmagan" qilindi)` : ''}`);
+                if (typeof showToast === 'function') showToast(`${teacher.name} o'chirildi`, 'success');
+                renderTeachers();
+            };
+
+            if (typeof showConfirmModal === 'function') {
+                showConfirmModal({ title: "O'qituvchini o'chirish", message: msg, confirmLabel: "Ha, o'chirish", danger: true, onConfirm: doDelete });
+            } else if (confirm("Ushbu o'qituvchini o'chirishni xohlaysizmi?")) {
+                doDelete();
+            }
+        }
+
+        window.onload = renderTeachers;
+    </script>
+
+    
+
+
+<!-- GLOBAL QIDIRUV -->
+<div id="search-overlay" class="search-overlay">
+    <div class="search-box">
+        <div class="search-input-wrap"><i class="ti ti-search"></i><input type="text" id="search-global-input" placeholder="Talaba, guruh, o'qituvchi..."><kbd style="font-size:11px;background:#f1f3f7;padding:2px 6px;border-radius:4px;">ESC</kbd></div>
+        <div class="search-results" id="search-global-results"></div>
+        <div class="search-hint"><span><kbd>Ctrl+K</kbd> Qidiruv</span><span><kbd>ESC</kbd> Yopish</span></div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM — Ish haqi</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        .teacher-card{background:#fff;border-radius:14px;box-shadow:0 4px 14px rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.04);padding:20px;margin-bottom:14px;transition:box-shadow .2s;}
+        .teacher-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.08);}
+        .avatar-circle{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;background:rgba(255,122,0,.1);color:#ff7a00;}
+        .salary-bar{height:8px;border-radius:4px;background:#f1f3f7;overflow:hidden;margin-top:8px;}
+        .salary-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#ff7a00,#ffb347);}
+        .stat-pill{background:#f8fafc;border-radius:10px;padding:10px 14px;text-align:center;}
+        .history-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f3f7;font-size:13px;}
+        .history-row:last-child{border-bottom:none;}
+        .detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;align-items:flex-end;}
+        .detail-overlay.open{display:flex;}
+        .detail-panel{background:#fff;border-radius:20px 20px 0 0;padding:28px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 -8px 30px rgba(0,0,0,.1);}
+        @media(min-width:768px){.detail-overlay{align-items:center;justify-content:flex-end;padding:0;}.detail-panel{max-width:440px;height:100vh;border-radius:0;}}
+    </style>
+</head>
+<body>
+<div class="sidebar-fixed">
+    <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+    <ul class="sidebar-menu">
+        <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+        <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+        <li class="sidebar-item active"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+        <li class="sidebar-item"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+        <li class="sidebar-item"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+        <li class="sidebar-item"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+        <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+        <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+        <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+        <li class="sidebar-item" style="margin-top:auto;padding-bottom:12px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+    </ul>
+</div>
+<div class="mobile-bottom-nav">
+    <div class="nav-items">
+        <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+        <a href="teachers.html" class="active"><i class="ti ti-school"></i>O'qituvchi</a>
+        <a href="student.html"><i class="ti ti-backpack"></i>Talabalar</a>
+        <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+        <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="top-navbar">
+        <div class="d-flex align-items-center gap-2">
+            <i class="ti ti-map-pin text-muted"></i>
+            <select id="branch-selector" class="form-select border-0 bg-transparent fw-bold p-0 pe-3" style="box-shadow:none;min-width:160px;"></select>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <select id="month-filter" class="form-select" style="width:auto;" onchange="renderAll()"></select>
+            <button class="btn btn-outline-secondary" onclick="exportSalaryCSV()"><i class="ti ti-file-spreadsheet me-1"></i>Excel</button>
+            <button class="btn text-white" style="background:#ff7a00;" onclick="openAddSalary()"><i class="ti ti-plus me-1"></i>Maosh to'lash</button>
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+            <div id="navbar-name" class="d-none d-xl-block fw-bold" style="font-size:13px;"></div>
+        </div>
+    </div>
+
+    <!-- Umumiy statistika -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-xl-3"><div class="card border-0 shadow-sm p-3" style="border-radius:12px;"><div class="text-muted small fw-bold">Jami o'qituvchilar</div><div id="stat-total" class="h1 fw-bold text-dark my-1">0</div></div></div>
+        <div class="col-6 col-xl-3"><div class="card border-0 shadow-sm p-3" style="border-radius:12px;"><div class="text-muted small fw-bold">Bu oy maosh fondi</div><div id="stat-fund" class="h2 fw-bold text-danger my-1">0 UZS</div></div></div>
+        <div class="col-6 col-xl-3"><div class="card border-0 shadow-sm p-3" style="border-radius:12px;"><div class="text-muted small fw-bold">To'langan</div><div id="stat-paid" class="h2 fw-bold text-success my-1">0 UZS</div></div></div>
+        <div class="col-6 col-xl-3"><div class="card border-0 shadow-sm p-3" style="border-radius:12px;"><div class="text-muted small fw-bold">Qoldiq</div><div id="stat-remaining" class="h2 fw-bold text-warning my-1">0 UZS</div></div></div>
+    </div>
+
+    <!-- O'qituvchilar ro'yxati -->
+    <div id="teachers-list"></div>
+</div>
+
+<!-- O'qituvchi detail panel -->
+<div id="detail-overlay" class="detail-overlay">
+    <div class="detail-panel">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div id="detail-name" class="fw-bold" style="font-size:18px;"></div>
+            <div class="d-flex gap-1">
+                <button id="detail-export-btn" class="btn btn-sm btn-outline-success" title="Excel'ga yuklash"><i class="ti ti-file-spreadsheet"></i></button>
+                <button onclick="document.getElementById('detail-overlay').classList.remove('open')" class="btn btn-icon btn-ghost-secondary"><i class="ti ti-x"></i></button>
+            </div>
+        </div>
+        <div class="row g-2 mb-4" id="detail-stats"></div>
+        <h5 class="fw-bold mb-3"><i class="ti ti-history me-2 text-primary"></i>To'lov tarixi</h5>
+        <div id="detail-history"></div>
+        <div class="mt-4">
+            <button class="btn w-100 text-white" style="background:#ff7a00;" onclick="openPayForTeacher()"><i class="ti ti-cash me-1"></i>Maosh to'lash</button>
+        </div>
+    </div>
+</div>
+
+<!-- Maosh to'lash modali -->
+<div class="modal modal-blur fade" id="modal-salary" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:14px;">
+            <div class="modal-header"><h5 class="modal-title fw-bold"><i class="ti ti-cash me-2 text-success"></i>Maosh to'lash</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="mb-3"><label class="form-label fw-bold">O'qituvchi</label><select id="sal-teacher" class="form-select" onchange="updateSalaryInfo()"></select></div>
+                <div id="sal-info" class="alert alert-info py-2 mb-3" style="display:none;font-size:13px;"></div>
+                <div class="mb-3"><label class="form-label fw-bold">Miqdor (UZS)</label><input type="number" id="sal-amount" class="form-control" placeholder="2000000" min="0"></div>
+                <div class="mb-3"><label class="form-label fw-bold">To'lov turi</label>
+                    <select id="sal-type" class="form-select">
+                        <option>Oylik maosh</option><option>Avans</option><option>Bonus</option><option>Ushlab qolish</option>
+                    </select>
+                </div>
+                <div class="mb-2"><label class="form-label fw-bold">Izoh</label><input type="text" id="sal-note" class="form-control" placeholder="Oktabr oyi maoshi..."></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-link text-secondary" data-bs-dismiss="modal">Bekor</button>
+                <button class="btn text-white" style="background:#ff7a00;" onclick="processSalary()"><i class="ti ti-check me-1"></i>To'lash</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+<script src="shared.js"></script>
+<script>
+const MONTHS_UZ=['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentyabr','Oktyabr','Noyabr','Dekabr'];
+let currentTeacher = null;
+
+function getTeachers(){ return JSON.parse(localStorage.getItem('teachers')||'[]'); }
+function getGroups(){   return JSON.parse(localStorage.getItem('groups')||'[]'); }
+function getSalaryHistory(){ return JSON.parse(localStorage.getItem('salary_history')||'[]'); }
+function saveSalaryHistory(d){ localStorage.setItem('salary_history',JSON.stringify(d)); }
+
+function getStavka(t){
+    // Stavka: teachers da salary bo'lsa o'sha, bo'lmasa guruh soni × standart
+    if(t.salary) return Number(t.salary);
+    const groups = getGroups().filter(g=>g.teacher===t.name);
+    return groups.length * 1500000; // 1.5M per group default
+}
+
+function getMonthKey(year,month){ return `${year}-${String(month+1).padStart(2,'0')}`; }
+
+function populateMonthFilter(){
+    const sel = document.getElementById('month-filter');
+    const now = new Date();
+    let html='';
+    for(let i=0;i<12;i++){
+        const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+        const key=getMonthKey(d.getFullYear(),d.getMonth());
+        html+=`<option value="${key}" ${i===0?'selected':''}>${MONTHS_UZ[d.getMonth()]} ${d.getFullYear()}</option>`;
+    }
+    sel.innerHTML=html;
+}
+
+function populateSalaryModal(){
+    const teachers=getTeachers();
+    const sel=document.getElementById('sal-teacher');
+    sel.innerHTML=teachers.length?teachers.map(t=>`<option value="${t.name}">${t.name}</option>`).join(''):'<option>O\'qituvchi yo\'q</option>';
+    updateSalaryInfo();
+}
+
+function updateSalaryInfo(){
+    const name=document.getElementById('sal-teacher').value;
+    const teachers=getTeachers();
+    const t=teachers.find(x=>x.name===name);
+    if(!t){document.getElementById('sal-info').style.display='none';return;}
+    const stavka=getStavka(t);
+    const monthKey=document.getElementById('month-filter').value;
+    const paid=getSalaryHistory().filter(s=>s.teacher===name&&s.monthKey===monthKey&&s.type!=='Ushlab qolish').reduce((a,s)=>a+s.amount,0);
+    const deductions=getSalaryHistory().filter(s=>s.teacher===name&&s.monthKey===monthKey&&s.type==='Ushlab qolish').reduce((a,s)=>a+s.amount,0);
+    const remaining=Math.max(stavka-paid+deductions,0);
+    const infoEl=document.getElementById('sal-info');
+    infoEl.style.display='block';
+    infoEl.innerHTML=`Stavka: <strong>${stavka.toLocaleString()} UZS</strong> · To'langan: <strong>${paid.toLocaleString()}</strong> · Qoldiq: <strong>${remaining.toLocaleString()}</strong>`;
+    document.getElementById('sal-amount').value=remaining>0?remaining:'';
+}
+
+function openAddSalary(){
+    populateSalaryModal();
+    new bootstrap.Modal(document.getElementById('modal-salary')).show();
+}
+
+function openPayForTeacher(){
+    if(!currentTeacher)return;
+    populateSalaryModal();
+    document.getElementById('sal-teacher').value=currentTeacher.name;
+    updateSalaryInfo();
+    new bootstrap.Modal(document.getElementById('modal-salary')).show();
+}
+
+function processSalary(){
+    const name=document.getElementById('sal-teacher').value;
+    const amount=Number(document.getElementById('sal-amount').value);
+    const type=document.getElementById('sal-type').value;
+    const note=document.getElementById('sal-note').value;
+    const monthKey=document.getElementById('month-filter').value;
+    if(!name){alert('O\'qituvchini tanlang!');return;}
+    if(!amount||amount<=0){alert('Miqdorni kiriting!');return;}
+    const history=getSalaryHistory();
+    history.unshift({id:Date.now(),teacher:name,amount,type,note,monthKey,date:new Date().toISOString()});
+    saveSalaryHistory(history.slice(0,1000));
+    if(typeof logActivity==='function') logActivity("To'landi",`${name} maoshi: ${amount.toLocaleString()} UZS (${type})`);
+    bootstrap.Modal.getInstance(document.getElementById('modal-salary')).hide();
+    renderAll();
+}
+
+function showDetail(teacherName){
+    const teachers=getTeachers();
+    const t=teachers.find(x=>x.name===teacherName)||{name:teacherName};
+    currentTeacher=t;
+    const monthKey=document.getElementById('month-filter').value;
+    const stavka=getStavka(t);
+    const history=getSalaryHistory().filter(s=>s.teacher===teacherName);
+    const monthHistory=history.filter(s=>s.monthKey===monthKey);
+    const paid=monthHistory.filter(s=>s.type!=='Ushlab qolish').reduce((a,s)=>a+s.amount,0);
+    const deductions=monthHistory.filter(s=>s.type==='Ushlab qolish').reduce((a,s)=>a+s.amount,0);
+    const remaining=Math.max(stavka-paid+deductions,0);
+    document.getElementById('detail-name').innerText=teacherName;
+    document.getElementById('detail-stats').innerHTML=`
+        <div class="col-6"><div class="stat-pill"><div class="text-muted small">Stavka</div><div class="fw-bold">${stavka.toLocaleString()} UZS</div></div></div>
+        <div class="col-6"><div class="stat-pill"><div class="text-muted small">To'langan</div><div class="fw-bold text-success">${paid.toLocaleString()} UZS</div></div></div>
+        <div class="col-6"><div class="stat-pill"><div class="text-muted small">Ushlab qolish</div><div class="fw-bold text-danger">${deductions.toLocaleString()} UZS</div></div></div>
+        <div class="col-6"><div class="stat-pill"><div class="text-muted small">Qoldiq</div><div class="fw-bold text-warning">${remaining.toLocaleString()} UZS</div></div></div>`;
+    const MONTH_UZ_SHORT=['Yan','Feb','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
+    const TYPE_COLORS={Bonus:'text-success','Oylik maosh':'text-primary','Avans':'text-warning','Ushlab qolish':'text-danger'};
+    document.getElementById('detail-history').innerHTML=history.length?history.slice(0,15).map(s=>{
+        const d=new Date(s.date);
+        const sign=s.type==='Ushlab qolish'?'-':'+';
+        const cls=TYPE_COLORS[s.type]||'text-dark';
+        return `<div class="history-row"><div><div class="fw-bold" style="font-size:13px;">${s.type}${s.note?' — '+s.note:''}</div><div class="text-muted" style="font-size:11px;">${d.getDate()} ${MONTH_UZ_SHORT[d.getMonth()]} ${d.getFullYear()} · ${s.monthKey}</div></div><span class="${cls} fw-bold">${sign}${s.amount.toLocaleString()} UZS</span></div>`;
+    }).join(''):'<div class="text-muted text-center py-4">To\'lovlar tarixi yo\'q</div>';
+    document.getElementById('detail-export-btn').onclick = () => exportTeacherSalaryCSV(teacherName);
+    document.getElementById('detail-overlay').classList.add('open');
+}
+
+function renderAll(){
+    const teachers=getTeachers();
+    const groups=getGroups();
+    const monthKey=document.getElementById('month-filter').value;
+    const history=getSalaryHistory();
+
+    document.getElementById('stat-total').innerText=teachers.length;
+
+    let totalFund=0,totalPaid=0;
+    teachers.forEach(t=>{totalFund+=getStavka(t);});
+    const monthHistory=history.filter(s=>s.monthKey===monthKey&&s.type!=='Ushlab qolish');
+    monthHistory.forEach(s=>{totalPaid+=s.amount;});
+    const remaining=Math.max(totalFund-totalPaid,0);
+    document.getElementById('stat-fund').innerText=totalFund.toLocaleString()+' UZS';
+    document.getElementById('stat-paid').innerText=totalPaid.toLocaleString()+' UZS';
+    document.getElementById('stat-remaining').innerText=remaining.toLocaleString()+' UZS';
+
+    if(!teachers.length){
+        document.getElementById('teachers-list').innerHTML='<div class="text-center text-muted py-5"><i class="ti ti-school" style="font-size:48px;display:block;margin-bottom:12px;color:#d0d3db;"></i>O\'qituvchilar yo\'q</div>';
+        return;
+    }
+
+    document.getElementById('teachers-list').innerHTML=teachers.map(t=>{
+        const stavka=getStavka(t);
+        const paid=history.filter(s=>s.teacher===t.name&&s.monthKey===monthKey&&s.type!=='Ushlab qolish').reduce((a,s)=>a+s.amount,0);
+        const deductions=history.filter(s=>s.teacher===t.name&&s.monthKey===monthKey&&s.type==='Ushlab qolish').reduce((a,s)=>a+s.amount,0);
+        const net=stavka-paid+deductions;
+        const pct=stavka>0?Math.min(Math.round(paid/stavka*100),100):0;
+        const myGroups=groups.filter(g=>g.teacher===t.name);
+        const initials=t.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+        const statusColor=net<=0?'#2bab41':net<stavka*0.5?'#ff7a00':'#d63939';
+        const statusLabel=net<=0?'To\'liq to\'landi':net<stavka*0.5?'Qisman to\'landi':'To\'lanmagan';
+        return `<div class="teacher-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-circle">${initials}</div>
+                    <div>
+                        <div class="fw-bold" style="font-size:15px;">${t.name}</div>
+                        <div class="text-muted small">${t.subject||'Fan ko\'rsatilmagan'} · ${myGroups.length} guruh</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="badge" style="background:${statusColor}20;color:${statusColor};font-size:11px;">${statusLabel}</span>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="showDetail('${t.name}')"><i class="ti ti-eye me-1"></i>Ko'rish</button>
+                    <button class="btn btn-sm btn-outline-success" onclick="exportTeacherSalaryCSV('${t.name.replace(/'/g, "\\'")}')" title="Bu o'qituvchining maosh tarixini Excel'ga yuklash"><i class="ti ti-file-spreadsheet"></i></button>
+                    <button class="btn btn-sm text-white" style="background:#ff7a00;" onclick="currentTeacher={name:'${t.name}'};openPayForTeacher()"><i class="ti ti-cash me-1"></i>To'lash</button>
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-4"><div class="text-muted small">Stavka</div><div class="fw-bold">${stavka.toLocaleString()} UZS</div></div>
+                <div class="col-4"><div class="text-muted small">To'langan</div><div class="fw-bold text-success">${paid.toLocaleString()} UZS</div></div>
+                <div class="col-4"><div class="text-muted small">Qoldiq</div><div class="fw-bold" style="color:${statusColor};">${Math.max(net,0).toLocaleString()} UZS</div></div>
+            </div>
+            <div class="salary-bar"><div class="salary-fill" style="width:${pct}%;"></div></div>
+            <div class="text-muted" style="font-size:11px;margin-top:4px;">${pct}% to'langan</div>
+        </div>`;
+    }).join('');
+}
+
+function exportSalaryCSV(){
+    const teachers=getTeachers();
+    const monthKey=document.getElementById('month-filter').value;
+    const rows=[['O\'qituvchi','Fan','Guruhlar','Stavka','To\'langan','Qoldiq','Holati']];
+    teachers.forEach(t=>{
+        const stavka=getStavka(t);
+        const paid=getSalaryHistory().filter(s=>s.teacher===t.name&&s.monthKey===monthKey&&s.type!=='Ushlab qolish').reduce((a,s)=>a+s.amount,0);
+        const remaining=Math.max(stavka-paid,0);
+        const myGroups=getGroups().filter(g=>g.teacher===t.name).map(g=>g.name).join('; ');
+        rows.push([t.name,t.subject||'—',myGroups,stavka,paid,remaining,remaining<=0?"To'liq":"Qoldiq bor"]);
+    });
+    if(typeof downloadCSV==='function') downloadCSV(rows,`ish_haqi_${monthKey}`);
+}
+
+// Har bir o'qituvchi uchun ALOHIDA Excel eksport — to'liq to'lov tarixi bilan
+function exportTeacherSalaryCSV(teacherName){
+    const teachers = getTeachers();
+    const t = teachers.find(x => x.name === teacherName);
+    if (!t) { if(typeof showToast==='function') showToast("O'qituvchi topilmadi", 'danger'); return; }
+
+    const monthKey = document.getElementById('month-filter').value;
+    const stavka = getStavka(t);
+    const myGroups = getGroups().filter(g => g.teacher === teacherName).map(g => g.name).join('; ');
+    const history = getSalaryHistory().filter(s => s.teacher === teacherName).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    const paidThisMonth = history.filter(s => s.monthKey === monthKey && s.type !== 'Ushlab qolish').reduce((a,s) => a+s.amount, 0);
+    const deductThisMonth = history.filter(s => s.monthKey === monthKey && s.type === 'Ushlab qolish').reduce((a,s) => a+s.amount, 0);
+    const remaining = Math.max(stavka - paidThisMonth + deductThisMonth, 0);
+
+    const rows = [
+        ["O'qituvchi maosh hisoboti"],
+        ['Ism', t.name],
+        ['Fan', t.subject || '—'],
+        ['Guruhlar', myGroups || '—'],
+        ['Oylik stavka (UZS)', stavka],
+        ['Tanlangan oy', monthKey],
+        ['Shu oy to\'langan (UZS)', paidThisMonth],
+        ['Shu oy qoldiq (UZS)', remaining],
+        [],
+        ['To\'lovlar tarixi (barcha vaqt)'],
+        ['Sana', 'Turi', 'Miqdor (UZS)', 'Oy', 'Izoh']
+    ];
+    history.forEach(s => {
+        const d = new Date(s.date);
+        const dateStr = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+        rows.push([dateStr, s.type, s.amount, s.monthKey, s.note || '']);
+    });
+
+    if (typeof downloadCSV === 'function') {
+        const safeName = teacherName.replace(/[^a-zA-Z0-9\u0400-\u04ffа-яА-Я\s]/g, '').replace(/\s+/g, '_');
+        downloadCSV(rows, `maosh_${safeName}`);
+        if (typeof logActivity === 'function') logActivity('Hisobot', `${teacherName} maosh hisoboti Excel'ga yuklandi`);
+        if (typeof showToast === 'function') showToast(`${teacherName} hisoboti yuklab olindi`, 'success');
+    }
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+    populateMonthFilter();
+    renderAll();
+    document.getElementById('detail-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('detail-overlay'))document.getElementById('detail-overlay').classList.remove('open');});
+});
+</script>
+</body>
+</html>

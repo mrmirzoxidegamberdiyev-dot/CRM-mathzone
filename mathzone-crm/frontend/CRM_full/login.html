@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM — Kirish</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <style>
+        :root { --modme-orange: #ff7a00; }
+        body { background: #f6f8fb; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .login-card {
+            width: 420px; max-width: 95vw;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            padding: 40px 36px;
+        }
+        .brand { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 6px; }
+        .brand span { color: var(--modme-orange); }
+        .subtitle { text-align: center; color: #99a1ad; font-size: 14px; margin-bottom: 32px; }
+        .form-label { font-weight: 600; font-size: 13px; margin-bottom: 5px; }
+        .form-control { border-radius: 10px; height: 44px; border: 1.5px solid #e5e8ef; font-size: 14px; }
+        .form-control:focus { border-color: var(--modme-orange); box-shadow: 0 0 0 3px rgba(255,122,0,0.12); }
+        .btn-login {
+            width: 100%; height: 46px; background: var(--modme-orange);
+            color: #fff; border: none; border-radius: 12px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 4px;
+        }
+        .btn-login:hover { background: #e56d00; }
+        .btn-login:active { transform: scale(0.98); }
+        .btn-login:disabled { background: #ffb366; cursor: not-allowed; transform: none; }
+        .error-msg { color: #d63939; font-size: 13px; text-align: center; margin-top: 8px; display: none; }
+        .pass-wrap { position: relative; }
+        .pass-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #99a1ad; background: none; border: none; font-size: 18px; }
+    </style>
+</head>
+<body>
+<div class="login-card">
+    <div class="brand">math<span>zone</span> CRM</div>
+    <div class="subtitle">O'quv markazi boshqaruv tizimi</div>
+
+    <div class="mb-3">
+        <label class="form-label">Login</label>
+        <input type="text" id="login-user" class="form-control" placeholder="Login nomingiz" autocomplete="username">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Parol</label>
+        <div class="pass-wrap">
+            <input type="password" id="login-pass" class="form-control" placeholder="••••••••" autocomplete="current-password">
+            <button class="pass-toggle" onclick="togglePass()" tabindex="-1"><i class="ti ti-eye" id="eye-icon"></i></button>
+        </div>
+    </div>
+
+    <div class="error-msg" id="error-msg"><i class="ti ti-alert-circle me-1"></i><span id="error-text">Login yoki parol noto'g'ri</span></div>
+
+    <button class="btn-login" id="login-btn" onclick="doLogin()">Kirish</button>
+</div>
+
+<script src="auth.js"></script>
+<script>
+    async function doLogin() {
+        const u = document.getElementById('login-user').value.trim();
+        const p = document.getElementById('login-pass').value;
+        const errorEl = document.getElementById('error-msg');
+        const errorText = document.getElementById('error-text');
+        const passInput = document.getElementById('login-pass');
+        const btn = document.getElementById('login-btn');
+
+        errorEl.style.display = 'none';
+        passInput.style.borderColor = '';
+
+        if (!u || !p) {
+            errorText.textContent = 'Login va parolni kiriting';
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Kutilmoqda...';
+
+        try {
+            await Auth.login(u, p);
+            window.location.href = 'dashboard.html';
+        } catch (err) {
+            errorText.textContent = err.message || 'Login yoki parol noto\'g\'ri';
+            errorEl.style.display = 'block';
+            passInput.style.borderColor = '#d63939';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Kirish';
+        }
+    }
+
+    function togglePass() {
+        const input = document.getElementById('login-pass');
+        const icon = document.getElementById('eye-icon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'ti ti-eye-off';
+        } else {
+            input.type = 'password';
+            icon.className = 'ti ti-eye';
+        }
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+    Auth.isLoggedIn().then(loggedIn => {
+        if (loggedIn) window.location.href = 'dashboard.html';
+    });
+</script>
+</body>
+</html>

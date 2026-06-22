@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathzone CRM - Moliya</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        :root { --modme-orange: #ff7a00; --sidebar-bg: #1e1e2d; }
+        body { background-color: #f6f8fb; font-family: system-ui, -apple-system, sans-serif; }
+        
+        
+        .sidebar-brand span { color: var(--modme-orange); }
+        
+        
+        
+        
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: #fff; padding: 12px 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .stat-card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); background: #fff; }
+        .stat-icon-wrapper { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 15px; background-color: rgba(255, 122, 0, 0.1); color: var(--modme-orange); }
+
+        .floating-window { background: #fff; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .floating-header { padding: 15px 20px; border-bottom: 1px solid #f1f1f4; display: flex; justify-content: space-between; align-items: center; }
+        .floating-body { padding: 20px; }
+        .finance-box { background: #f8fafc; border-left: 4px solid #0052cc; border-radius: 8px; padding: 15px; margin-bottom: 12px; }
+        .finance-box.success { border-left-color: #2bab41; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-fixed">
+        <a href="dashboard.html" class="sidebar-brand">math<span>zone</span></a>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="dashboard.html" class="sidebar-link"><i class="ti ti-dashboard"></i><span>Dashboard</span></a></li>
+            <li class="sidebar-item"><a href="leads.html" class="sidebar-link"><i class="ti ti-users-group"></i><span>Lidlar</span></a></li>
+            <li class="sidebar-item"><a href="teachers.html" class="sidebar-link"><i class="ti ti-school"></i><span>O'qituvchilar</span></a></li>
+            <li class="sidebar-item"><a href="groups.html" class="sidebar-link"><i class="ti ti-books"></i><span>Guruhlar</span></a></li>
+            <li class="sidebar-item"><a href="student.html" class="sidebar-link"><i class="ti ti-backpack"></i><span>Talabalar</span></a></li>
+            <li class="sidebar-item active"><a href="finance.html" class="sidebar-link"><i class="ti ti-wallet"></i><span>Moliya</span></a></li>
+            <li class="sidebar-item"><a href="reports.html" class="sidebar-link"><i class="ti ti-report-analytics"></i><span>Hisobotlar</span></a></li>
+            <li class="sidebar-item"><a href="gamification.html" class="sidebar-link"><i class="ti ti-device-gamepad-2"></i><span>Gamifikatsiya</span></a></li>
+            <li class="sidebar-item"><a href="timetable.html" class="sidebar-link"><i class="ti ti-calendar-week"></i><span>Jadval</span></a></li>
+            <li class="sidebar-item"><a href="salary.html" class="sidebar-link"><i class="ti ti-moneybag"></i><span>Ish haqi</span></a></li>
+            <li class="sidebar-item"><a href="exam.html" class="sidebar-link"><i class="ti ti-pencil-check"></i><span>Testlar</span></a></li>
+            <li class="sidebar-item"><a href="certificate.html" class="sidebar-link"><i class="ti ti-award"></i><span>Sertifikat</span></a></li>
+            <li class="sidebar-item"><a href="settings.html" class="sidebar-link"><i class="ti ti-settings"></i><span>Sozlamalar</span></a></li>
+            <li class="sidebar-item" style="margin-top:auto;padding-bottom:12px;"><a href="#" class="sidebar-link" onclick="logout()"><i class="ti ti-logout"></i><span>Chiqish</span></a></li>
+        </ul>
+    </div>
+
+    <div class="mobile-bottom-nav">
+        <div class="nav-items">
+            <a href="dashboard.html"><i class="ti ti-dashboard"></i>Bosh</a>
+            <a href="leads.html"><i class="ti ti-users-group"></i>Lidlar</a>
+            <a href="student.html"><i class="ti ti-backpack"></i>Talabalar</a>
+            <a href="finance.html"><i class="ti ti-wallet"></i>Moliya</a>
+            <a href="settings.html"><i class="ti ti-settings"></i>Sozlama</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center"><i class="ti ti-map-pin me-2 text-muted"></i><span class="fw-bold">Yunusobod filiali / Moliya</span></div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="search-global-btn" class="btn btn-icon btn-ghost-secondary rounded-circle" title="Ctrl+K"><i class="ti ti-search"></i></button>
+            <button id="dark-toggle" class="btn btn-icon btn-ghost-secondary rounded-circle"></button>
+            <span id="navbar-avatar" class="avatar avatar-sm rounded-circle bg-orange-lt fw-bold">BB</span>
+                <div class="d-none d-xl-block"><div id="navbar-name" class="fw-bold" style="font-size: 13px;">Behruz Berdiyev</div></div>
+            </div>
+        </div>
+
+        <div class="row row-cards mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="card stat-card p-3">
+                    <div class="stat-icon-wrapper"><i class="ti ti-cash"></i></div>
+                    <div class="text-muted small uppercase fw-bold">Umumiy balans</div>
+                    <div id="total-balance" class="h1 fw-bold text-dark my-1">0</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card stat-card p-3">
+                    <div class="stat-icon-wrapper" style="background-color: rgba(43, 171, 65, 0.1); color: #2bab41;"><i class="ti ti-trending-up"></i></div>
+                    <div class="text-muted small uppercase fw-bold">Musbat balansli talabalar</div>
+                    <div id="positive-count" class="h1 fw-bold text-success my-1">0</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card stat-card p-3">
+                    <div class="stat-icon-wrapper" style="background-color: rgba(214, 57, 57, 0.1); color: #d63939;"><i class="ti ti-alert-triangle"></i></div>
+                    <div class="text-muted small uppercase fw-bold">Qarzdorlar soni</div>
+                    <div id="debtor-count" class="h1 fw-bold text-danger my-1">0</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card stat-card p-3">
+                    <div class="stat-icon-wrapper" style="background-color: rgba(32, 107, 196, 0.1); color: #206bc4;"><i class="ti ti-receipt"></i></div>
+                    <div class="text-muted small uppercase fw-bold">Umumiy qarz miqdori</div>
+                    <div id="total-debt" class="h1 fw-bold my-1" style="color:#d63939;">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 border-0 shadow-sm mb-4" style="border-radius: 14px;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="card-title fw-bold m-0">To'lovlar dinamikasi</h3>
+                <div class="badge bg-orange-lt">Yillik tahlil</div>
+            </div>
+            <div id="payments-chart"></div>
+        </div>
+
+        <div class="floating-window">
+            <div class="floating-header">
+                <span class="fw-bold fs-3 text-dark"><i class="ti ti-cash me-2 text-primary"></i>Barcha to'lovlar</span>
+                <button class="btn btn-sm btn-icon btn-ghost-secondary rounded-circle"><i class="ti ti-dots-vertical"></i></button>
+            </div>
+            <div class="floating-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="finance-box">
+                            <div class="text-muted small">Joriy oy to'lovlari (qabul qilingan):</div>
+                            <div id="total-payments" class="h2 fw-bold text-primary my-1">0 UZS</div>
+                            <small class="text-muted"><i class="ti ti-calendar me-1"></i><span id="payments-period"></span></small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="finance-box success">
+                            <div class="text-muted small">Sof foyda (daromad − maosh xarajati):</div>
+                            <div id="net-profit" class="h2 fw-bold text-success my-1">0 UZS</div>
+                            <small class="text-muted"><i class="ti ti-calendar me-1"></i><span id="profit-period"></span></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-3 mb-4 border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="input-icon" style="max-width: 320px;">
+                <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+                <input type="text" id="finance-search" class="form-control" placeholder="Ism orqali qidirish..." oninput="renderFinance()">
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table table-striped">
+                    <thead>
+                        <tr>
+                            <th>F.I.Sh.</th>
+                            <th>Guruh</th>
+                            <th>Balans</th>
+                            <th>Holati</th>
+                        </tr>
+                    </thead>
+                    <tbody id="finance-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+    <script src="shared.js"></script>
+
+    <script>
+        function getStudents() {
+            return localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : [];
+        }
+
+        function renderFinance() {
+            const students = getStudents();
+            const searchQuery = document.getElementById('finance-search').value.toLowerCase();
+            const tableBody = document.getElementById('finance-table-body');
+            tableBody.innerHTML = '';
+
+            let totalBalance = 0;
+            let positiveCount = 0;
+            let debtorCount = 0;
+            let totalDebt = 0;
+
+            students.forEach(student => {
+                const balance = Number(student.balance) || 0;
+                totalBalance += balance;
+                if (balance >= 0) {
+                    positiveCount++;
+                } else {
+                    debtorCount++;
+                    totalDebt += Math.abs(balance);
+                }
+            });
+
+            document.getElementById('total-balance').innerText = totalBalance.toLocaleString() + ' UZS';
+            document.getElementById('positive-count').innerText = positiveCount;
+            document.getElementById('debtor-count').innerText = debtorCount;
+            document.getElementById('total-debt').innerText = totalDebt.toLocaleString() + ' UZS';
+
+            // Joriy oy davri
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            const formatUzDate = d => `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
+            const periodLabel = `${formatUzDate(firstDay)} - ${formatUzDate(lastDay)}`;
+            const monthKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+
+            // TUZATISH: "Sof foyda" avval shunchaki umumiy balansni takrorlardi (noto'g'ri ko'rsatkich edi).
+            // Endi HAQIQIY hisob: joriy oyda haqiqatda qabul qilingan to'lovlar (payment_history)
+            // minus shu oyda to'langan o'qituvchi maoshlari (salary_history) = sof foyda.
+            const paymentHistory = JSON.parse(localStorage.getItem('payment_history') || '[]');
+            const monthlyIncome = paymentHistory
+                .filter(p => {
+                    const d = new Date(p.date);
+                    return d >= firstDay && d <= lastDay;
+                })
+                .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+
+            const salaryHistory = JSON.parse(localStorage.getItem('salary_history') || '[]');
+            const monthlyExpense = salaryHistory
+                .filter(s => s.monthKey === monthKey && s.type !== 'Ushlab qolish')
+                .reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+
+            const netProfit = monthlyIncome - monthlyExpense;
+
+            document.getElementById('total-payments').innerText = monthlyIncome.toLocaleString() + ' UZS';
+            document.getElementById('net-profit').innerText = netProfit.toLocaleString() + ' UZS';
+            document.getElementById('net-profit').style.color = netProfit >= 0 ? '#2bab41' : '#d63939';
+            document.getElementById('payments-period').innerText = periodLabel;
+            document.getElementById('profit-period').innerText = `${periodLabel} (daromad − o'qituvchi maoshi)`;
+
+            students
+                .filter(s => s.name.toLowerCase().includes(searchQuery))
+                .forEach(student => {
+                    const balance = Number(student.balance) || 0;
+                    const balanceClass = balance >= 0 ? 'text-success' : 'text-danger';
+                    const statusBadge = balance >= 0
+                        ? '<span class="badge bg-success">To\'langan</span>'
+                        : '<span class="badge bg-danger">Qarzdor</span>';
+
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td class="fw-bold text-dark">${student.name}</td>
+                            <td><span class="badge bg-purple-lt">${student.group}</span></td>
+                            <td class="${balanceClass} fw-bold">${balance.toLocaleString()} UZS</td>
+                            <td>${statusBadge}</td>
+                        </tr>
+                    `;
+                });
+        }
+
+        function renderPaymentsChart() {
+            // TUZATISH: avval grafik har doim soxta, qattiq yozilgan raqamlarni ko'rsatardi
+            // ([500000, 1200000, ...] — haqiqiy to'lovlarga hech qanday aloqasi yo'q edi).
+            // Endi so'nggi 6 oylik HAQIQIY to'lovlar tarixidan (payment_history) hisoblanadi.
+            const MONTH_SHORT_UZ = ['Yan','Fev','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
+            const paymentHistory = JSON.parse(localStorage.getItem('payment_history') || '[]');
+
+            const months = [];
+            const today = new Date();
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                months.push({ year: d.getFullYear(), month: d.getMonth(), label: `${MONTH_SHORT_UZ[d.getMonth()]} ${String(d.getFullYear()).slice(2)}` });
+            }
+
+            const seriesData = months.map(m => {
+                return paymentHistory
+                    .filter(p => {
+                        const pd = new Date(p.date);
+                        return pd.getFullYear() === m.year && pd.getMonth() === m.month;
+                    })
+                    .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+            });
+
+            var options = {
+                chart: { type: 'line', height: 280, toolbar: { show: false }, fontFamily: 'inherit' },
+                stroke: { curve: 'smooth', width: 3, colors: ['#ff7a00'] },
+                series: [{ name: 'To\'lovlar', data: seriesData }],
+                xaxis: { categories: months.map(m => m.label) },
+                colors: ['#ff7a00'],
+                markers: { size: 5, colors: ['#ff7a00'], strokeColors: '#fff', strokeWidth: 2 },
+                grid: { strokeDashArray: 4 },
+                yaxis: { labels: { formatter: v => v >= 1000000 ? (v/1000000).toFixed(1)+'M' : v.toLocaleString() } },
+                noData: { text: 'Hali to\'lov tarixi yo\'q' }
+            };
+            var chart = new ApexCharts(document.querySelector("#payments-chart"), options);
+            chart.render();
+        }
+
+        window.onload = function () {
+            renderFinance();
+            renderPaymentsChart();
+        };
+    </script>
+
+    
+
+
+<!-- GLOBAL QIDIRUV -->
+<div id="search-overlay" class="search-overlay">
+    <div class="search-box">
+        <div class="search-input-wrap"><i class="ti ti-search"></i><input type="text" id="search-global-input" placeholder="Talaba, guruh, o'qituvchi..."><kbd style="font-size:11px;background:#f1f3f7;padding:2px 6px;border-radius:4px;">ESC</kbd></div>
+        <div class="search-results" id="search-global-results"></div>
+        <div class="search-hint"><span><kbd>Ctrl+K</kbd> Qidiruv</span><span><kbd>ESC</kbd> Yopish</span></div>
+    </div>
+</div>
+</body>
+</html>
+
+<!-- TO'LOV QO'SHISH MODALI (Payme/Click uslubida) -->
+<div class="modal modal-blur fade" id="modal-payment" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius:14px;">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold fs-3"><i class="ti ti-cash me-2 text-success"></i>To'lov qabul qilish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Talaba</label>
+                    <select id="pay-student" class="form-select" onchange="fillPayStudent()"></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Miqdor (UZS)</label>
+                    <input type="number" id="pay-amount" class="form-control" placeholder="500000" min="0">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">To'lov usuli</label>
+                    <div class="row g-2">
+                        <div class="col-4"><label class="d-block text-center border rounded-2 p-2 pay-method-btn" onclick="selectPayMethod('Naqd')"><i class="ti ti-cash" style="font-size:24px;color:#2bab41;"></i><div style="font-size:12px;margin-top:4px;">Naqd</div></label></div>
+                        <div class="col-4"><label class="d-block text-center border rounded-2 p-2 pay-method-btn" onclick="selectPayMethod('Payme')"><i class="ti ti-credit-card" style="font-size:24px;color:#00aaff;"></i><div style="font-size:12px;margin-top:4px;">Payme</div></label></div>
+                        <div class="col-4"><label class="d-block text-center border rounded-2 p-2 pay-method-btn" onclick="selectPayMethod('Click')"><i class="ti ti-brand-mastercard" style="font-size:24px;color:#e53935;"></i><div style="font-size:12px;margin-top:4px;">Click</div></label></div>
+                    </div>
+                    <input type="hidden" id="pay-method" value="Naqd">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Izoh (ixtiyoriy)</label>
+                    <input type="text" id="pay-note" class="form-control" placeholder="Oktyabr oyi to'lovi...">
+                </div>
+                <div id="pay-student-balance" class="alert alert-info py-2" style="display:none;font-size:13px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                <button type="button" class="btn text-white" style="background:var(--modme-orange);" onclick="processPayment()"><i class="ti ti-check me-1"></i>To'lovni qabul qilish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.pay-method-btn { cursor:pointer; transition:all .15s; }
+.pay-method-btn:hover, .pay-method-btn.selected { background:#fff8f3; border-color:var(--modme-orange) !important; }
+</style>
+
+<script>
+// Finance sahifasiga "To'lov qo'shish" va "Excel eksport" tugmalarini qo'shish
+document.addEventListener('DOMContentLoaded', function() {
+    // Existing finance render - add payment button
+    const topBar = document.querySelector('.top-navbar');
+    if (topBar) {
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'd-flex gap-2';
+        btnGroup.innerHTML = `
+            <button class="btn-excel" onclick="exportFinanceToExcel()"><i class="ti ti-file-spreadsheet"></i>Excel</button>
+            <button class="btn text-white" style="background:var(--modme-orange);" data-bs-toggle="modal" data-bs-target="#modal-payment"><i class="ti ti-plus me-1"></i>To'lov qo'shish</button>
+        `;
+        topBar.appendChild(btnGroup);
+    }
+
+    // Modal talabalar ro'yxati
+    const payStudentSel = document.getElementById('pay-student');
+    if (payStudentSel) {
+        const students = JSON.parse(localStorage.getItem('students') || '[]');
+        payStudentSel.innerHTML = '<option value="">-- Talabani tanlang --</option>' +
+            students.map(s => `<option value="${s.id}">${s.name} (${s.group})</option>`).join('');
+    }
+});
+
+function fillPayStudent() {
+    const id = document.getElementById('pay-student').value;
+    const students = JSON.parse(localStorage.getItem('students') || '[]');
+    const s = students.find(x => String(x.id) === String(id));
+    const balDiv = document.getElementById('pay-student-balance');
+    if (s) {
+        const bal = Number(s.balance) || 0;
+        balDiv.style.display = 'block';
+        balDiv.className = bal >= 0 ? 'alert alert-success py-2' : 'alert alert-danger py-2';
+        balDiv.innerHTML = `Joriy balans: <strong>${bal.toLocaleString()} UZS</strong>`;
+    } else {
+        balDiv.style.display = 'none';
+    }
+}
+
+function selectPayMethod(method) {
+    document.getElementById('pay-method').value = method;
+    document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+}
+
+function processPayment() {
+    const studentId = document.getElementById('pay-student').value;
+    const amount = Number(document.getElementById('pay-amount').value);
+    const method = document.getElementById('pay-method').value;
+    const note = document.getElementById('pay-note').value;
+
+    if (!studentId) { alert("Iltimos, talabani tanlang!"); return; }
+    if (!amount || amount <= 0) { alert("To'lov miqdorini kiriting!"); return; }
+
+    const students = JSON.parse(localStorage.getItem('students') || '[]');
+    const idx = students.findIndex(s => String(s.id) === String(studentId));
+    if (idx === -1) return;
+
+    students[idx].balance = (Number(students[idx].balance) || 0) + amount;
+    localStorage.setItem('students', JSON.stringify(students));
+
+    // To'lovlar tarixini saqlash
+    const history = JSON.parse(localStorage.getItem('payment_history') || '[]');
+    history.unshift({
+        studentId, studentName: students[idx].name,
+        amount, method, note,
+        date: new Date().toISOString(),
+        id: Date.now()
+    });
+    localStorage.setItem('payment_history', JSON.stringify(history.slice(0, 500)));
+
+    // Faoliyat logi
+    if (typeof logActivity === 'function') logActivity("To'landi", `${students[idx].name}: ${amount.toLocaleString()} UZS (${method})`);
+    if (typeof awardPointsForPayment === 'function') awardPointsForPayment(studentId, amount);
+
+    bootstrap.Modal.getInstance(document.getElementById('modal-payment')).hide();
+    if (typeof renderFinance === 'function') renderFinance();
+
+    // Mini chek
+    alert(`✅ To'lov qabul qilindi!\n\nTalaba: ${students[idx].name}\nMiqdor: ${amount.toLocaleString()} UZS\nUsul: ${method}\n${note ? 'Izoh: ' + note : ''}`);
+}
+</script>
