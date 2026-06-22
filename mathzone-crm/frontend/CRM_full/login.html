@@ -61,6 +61,12 @@
 
 <script src="auth.js"></script>
 <script>
+    // Check if Auth is loaded
+    if (typeof Auth === 'undefined') {
+        console.error('Auth module not loaded! Check if auth.js is in the same directory.');
+        alert('Xatolik: auth.js fayli yuklanmadi. Brauzer konsolini tekshiring.');
+    }
+
     async function doLogin() {
         const u = document.getElementById('login-user').value.trim();
         const p = document.getElementById('login-pass').value;
@@ -82,9 +88,17 @@
         btn.textContent = 'Kutilmoqda...';
 
         try {
+            // Check if Auth exists
+            if (!window.Auth) {
+                throw new Error('Auth module yuklanmagan. Sahifani yangilang.');
+            }
+
+            console.log('Login attempt:', u);
             await Auth.login(u, p);
+            console.log('Login successful, redirecting...');
             window.location.href = 'dashboard.html';
         } catch (err) {
+            console.error('Login error:', err);
             errorText.textContent = err.message || 'Login yoki parol noto\'g\'ri';
             errorEl.style.display = 'block';
             passInput.style.borderColor = '#d63939';

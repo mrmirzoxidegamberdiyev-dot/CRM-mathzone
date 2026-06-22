@@ -222,3 +222,104 @@ Pull requests are welcome!
 
 Issues: GitHub Issues
 Email: support@mathzone.uz
+
+---
+
+## 🔧 Troubleshooting
+
+### "Auth is not defined" xatosi
+
+**Muammo**: Login sahifasida "Auth is not defined" xatosi ko'rinmoqda.
+
+**Sabab**: `auth.js` fayli yuklanmagan yoki backend server ishlamayotgan.
+
+**Yechim**:
+
+1. **Backend serverini tekshiring**:
+   ```bash
+   # Backend ishga tushganmi?
+   curl http://localhost:3000/api/health
+   
+   # Javob bo'lishi kerak:
+   # {"status":"healthy",...}
+   ```
+
+2. **Backend'ni ishga tushiring**:
+   ```bash
+   cd mathzone-crm
+   docker-compose up -d
+   
+   # Yoki
+   cd backend
+   npm install
+   npm run dev
+   ```
+
+3. **Brauzer konsolini tekshiring** (F12):
+   - CORS xatolari bormi?
+   - Network xatolari bormi?
+   - `auth.js` yuklanganmi?
+
+4. **Frontend'ni to'g'ri ochganmisiz?**
+   - ✅ To'g'ri: Live Server (http://localhost:5500)
+   - ❌ Noto'g'ri: `file:///path/to/login.html`
+
+5. **CORS muammosi bo'lsa**:
+   ```bash
+   # Backend .env faylida
+   CORS_ORIGINS=http://localhost:5500,http://127.0.0.1:5500
+   ```
+
+### Backend ishga tushmayapti
+
+1. **PostgreSQL ishlaganmi?**
+   ```bash
+   docker-compose ps
+   # postgres container "Up" bo'lishi kerak
+   ```
+
+2. **Loglarni ko'ring**:
+   ```bash
+   docker-compose logs backend
+   docker-compose logs postgres
+   ```
+
+3. **Environment variables to'g'rimi?**
+   ```bash
+   # .env faylida:
+   DATABASE_URL=postgresql://postgres:password@postgres:5432/mathzone_crm
+   JWT_SECRET=your-secret-here
+   ```
+
+### Frontend Backend'ga ulanmayapti
+
+1. **Backend URL to'g'rimi?**
+   - `auth.js` va `apiService.js` da: `http://localhost:3000`
+
+2. **CORS xatosi bo'lsa**:
+   - Backend'da `CORS_ORIGINS` environment variable to'g'ri sozlangan bo'lishi kerak
+   - Frontend URL backend'da ruxsat etilgan bo'lishi kerak
+
+3. **Network xatosi bo'lsa**:
+   - Backend port 3000'da ishlaganmi?
+   - Firewall to'siq qilmayaptimi?
+
+### Database Migration xatolari
+
+```bash
+# Migrations'ni qayta ishga tushiring
+docker-compose exec backend npx prisma migrate reset
+docker-compose exec backend npm run seed
+
+# Yoki
+cd backend
+npx prisma migrate reset
+npm run seed
+```
+
+### Qo'shimcha yordam
+
+Agar muammo hal bo'lmasa:
+1. GitHub'da issue oching
+2. Xato xabarini va loglarni yuboring
+3. Brauzer konsol chiqishini screenshot qiling
